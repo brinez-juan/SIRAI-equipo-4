@@ -1,17 +1,32 @@
-import { Admin, Resource } from "react-admin";
+import { Admin, Resource, type ResourceProps } from "react-admin";
 import { Layout } from "./Layout";
 import { dataProvider } from "./dataProvider";
 import authProvider from "./authProvider";
 import { i18nProvider } from "./i18n";
 import { Inicio } from "./paginas/Inicio";
-import { listarRegiones } from "./recursos/Regiones";
-import { listarEstancias } from "./recursos/Estancias";
+import { ListarRegiones, CrearRegion, EditarRegion } from "./recursos/Regiones";
+import {
+  ListarEstancias,
+  CrearEstancia,
+  EditarEstancia,
+} from "./recursos/Estancias";
 import { RECURSOS, puedeVer } from "./permisos";
 
 // Cada issue agrega aquí su línea (y su entrada en permisos.ts con los roles).
-const COMPONENTES_RECURSO: Record<string, { list: () => JSX.Element }> = {
-  Regiones: { list: listarRegiones },
-  Estancias: { list: listarEstancias },
+// recordRepresentation: lo que se muestra cuando otro recurso apunta a este (ej. la región de una estancia).
+const COMPONENTES_RECURSO: Record<string, Omit<ResourceProps, "name">> = {
+  Regiones: {
+    list: ListarRegiones,
+    create: CrearRegion,
+    edit: EditarRegion,
+    recordRepresentation: "nombre",
+  },
+  Estancias: {
+    list: ListarEstancias,
+    create: CrearEstancia,
+    edit: EditarEstancia,
+    recordRepresentation: "nombre",
+  },
 };
 
 // [IA+Humano] Base generada con Claude (prompt #3 en docs/ia/prompts.md), modificada por: pendiente
