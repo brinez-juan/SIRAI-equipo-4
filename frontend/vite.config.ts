@@ -8,8 +8,9 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: true,
     https:{
-      key: fs.readFileSync("./frontend.key"),
-      cert: fs.readFileSync("./frontend.crt")
+      // Mismos certificados que el backend (los genera el equipo, no se suben a git)
+      key: fs.readFileSync("../backend/backend.key"),
+      cert: fs.readFileSync("../backend/backend.crt")
     }
 
   },
