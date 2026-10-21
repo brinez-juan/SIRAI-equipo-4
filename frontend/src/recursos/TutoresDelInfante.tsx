@@ -26,7 +26,7 @@ const PARENTESCOS = [
   { id: "MADRE", name: "Madre" },
   { id: "PADRE", name: "Padre" },
   { id: "ABUELO_A", name: "Abuelo(a)" },
-  { id: "TIO_A", name: "TÃ­o(a)" },
+  { id: "TIO_A", name: "Tío(a)" },
   { id: "HERMANO_A", name: "Hermano(a)" },
   { id: "TUTOR_LEGAL", name: "Tutor legal" },
   { id: "OTRO", name: "Otro" },
