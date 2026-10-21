@@ -38,4 +38,24 @@ export const dataProvider = {
     fetchJsonUtil(`${tutoresUrl(infanteId)}/${encodeURIComponent(tutorId)}`, {
       method: "DELETE",
     }),
+  // [IA] Generado con Claude (prompt #17 en docs/ia/prompts.md). Revisado por: pendiente
+  // Cierre del pase de lista (issue 17): faltas para quien no tiene registro y seguimientos para quien los genera.
+  cerrarPaseLista: (datos: { fecha: string; turno: string }) =>
+    fetchJsonUtil(`${import.meta.env.VITE_BACKEND}/cierres`, {
+      method: "POST",
+      body: JSON.stringify(datos),
+    }).then(
+      ({ json }) =>
+        json as { cierre: RaRecord; faltas: number; seguimientos: number },
+    ),
+  // [IA] Generado con Claude (prompt #16 en docs/ia/prompts.md). Revisado por: pendiente
+  // Salida con tutor autorizado (issue 16). El día es hoy: lo calcula el backend.
+  registrarSalida: (
+    infanteId: Identifier,
+    datos: { tutor_id: Identifier; turno: string },
+  ) =>
+    fetchJsonUtil(
+      `${import.meta.env.VITE_BACKEND}/pase-lista/${encodeURIComponent(infanteId)}/salida`,
+      { method: "PUT", body: JSON.stringify(datos) },
+    ).then(({ json }) => json as RaRecord),
 };
