@@ -119,7 +119,7 @@ async function createData(recurso, req, res){
 	res.status(201).json(data);
 }
 
-// [IA] Generado con Claude (prompt #3 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
 // Registra en el router las 5 rutas de react-admin para un recurso, protegidas por sus roles.
 // Ejemplo: registrarRecurso(router, "Estancias", {tabla: "estancias", columnas: [...], roles: ["ADMIN_CENTRAL"]})
 function registrarRecurso(router, nombre, recurso){

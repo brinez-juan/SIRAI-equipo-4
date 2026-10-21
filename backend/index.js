@@ -28,6 +28,7 @@ app.use(autenticar);
 app.use(registrarPeticion);
 app.use(rutasCatalogos);
 
+// [Humano] Escrito por: pendiente. Arranque HTTPS del servidor con los certificados backend.key y backend.crt
 const options={
 	key: fs.readFileSync("backend.key"),
 	cert: fs.readFileSync("backend.crt")

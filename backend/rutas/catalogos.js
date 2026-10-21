@@ -3,7 +3,7 @@ const {registrarRecurso}=require("../crud");
 
 const router=express.Router();
 
-// [IA] Generado con Claude (prompt #3 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
 // Regiones y estancias: solo el administrador central las consulta y modifica.
 registrarRecurso(router, "Regiones", {
 	tabla: "regiones",

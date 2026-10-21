@@ -49,7 +49,7 @@ async function log(sujeto, accion, entidad, entidadId, antes, despues, req){
 	}
 }
 
-// [IA] Generado con Claude (prompt #3 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
 // Verifica el JWT del header "Authentication". Si es válido deja sus datos en req.usuario
 // ({usuario, rol, estancia_id, region_id}); si falta, expiró o fue alterado responde 401.
 function autenticar(req, res, next){
@@ -61,7 +61,7 @@ function autenticar(req, res, next){
 	}
 }
 
-// [IA] Generado con Claude (prompt #3 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
 // Deja pasar solo a los roles indicados; uso: permitir("DIRECTORA", "DOCENTE"). Responde 403 si no.
 function permitir(...roles){
 	return (req, res, next)=>{
@@ -73,7 +73,7 @@ function permitir(...roles){
 	};
 }
 
-// [IA] Generado con Claude (prompt #3 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
 // Guarda en audit_log cada petición autenticada cuando termina, con su código de respuesta.
 // Así ningún endpoint se queda sin logging aunque su autor no llame a log().
 function registrarPeticion(req, res, next){
