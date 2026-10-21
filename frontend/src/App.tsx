@@ -15,6 +15,7 @@ import {
   CrearInfante,
   EditarInfante,
 } from "./recursos/Infantes";
+import { ListarTutores, CrearTutor, EditarTutor } from "./recursos/Tutores";
 import { ESCRITURA, RECURSOS, puedeVer } from "./permisos";
 
 // Cada issue agrega aquí su línea (y su entrada en permisos.ts con los roles).
@@ -38,6 +39,12 @@ const COMPONENTES_RECURSO: Record<string, Omit<ResourceProps, "name">> = {
     edit: EditarInfante,
     recordRepresentation: (infante) =>
       `${infante.nombre} ${infante.primer_apellido}`,
+  },
+  Tutores: {
+    list: ListarTutores,
+    create: CrearTutor,
+    edit: EditarTutor,
+    recordRepresentation: (tutor) => `${tutor.nombre} ${tutor.primer_apellido}`,
   },
 };
 
