@@ -21,6 +21,7 @@ const rutasContactos=require("./rutas/contactos");
 const rutasAsistencia=require("./rutas/asistencia");
 const rutasSalida=require("./rutas/salida");
 const rutasCierres=require("./rutas/cierres");
+const {iniciarCierreAutomatico}=require("./cierreTurno");
 
 const PORT=3000;
 const app=express();
@@ -54,6 +55,8 @@ https.createServer(options,app).listen(PORT, async ()=>{
 	await db.query("SELECT 1");
 	console.log("conectado a la base de datos");
 	console.log("Backend corriendo en puerto 3000");
+	// Issue 18: cada minuto cierra los turnos cuya hora_cierre ya pasó
+	iniciarCierreAutomatico();
 });
 
 
