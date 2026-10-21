@@ -39,6 +39,8 @@ type Renglon = {
   nombre: string;
   primer_apellido: string;
   segundo_apellido: string | null;
+  // Candado del issue 24: no se le puede marcar Presente hasta que tenga alta médica
+  requiere_alta: boolean;
   asistencia: Asistencia | null;
 };
 
@@ -62,6 +64,8 @@ const TURNOS: Record<string, string> = {
   VESPERTINO: "Vespertino",
 };
 const TURNO_INICIAL = "MATUTINO";
+// Mismo texto que el 409 de PUT /pase-lista (issue 24)
+const REQUIERE_ALTA = "Requiere alta para ingresar.";
 // asistencias.fecha es el día local de la estancia
 const ZONA = "America/Mexico_City";
 
@@ -92,10 +96,11 @@ const textoEstado = (asistencia: Asistencia | null) => {
     : nombre;
 };
 
-// [IA] Generado con Claude (prompt #14 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA+Humano] Base generada con Claude (prompt #14), modificada con el prompt #24 (candado de reingreso)
 // Pase de lista del día (issue 14): fecha de hoy y turno matutino ya seleccionados. El flujo rápido es
 // "Marcar todos presentes" (1 clic) y luego 1 clic por cada excepción. DOCENTE y DIRECTORA capturan;
 // TRABAJO_SOCIAL y MEDICO solo consultan. Habla con GET/PUT /pase-lista y POST /pase-lista/todos-presentes.
+// Issue 24: el renglón de un infante con candado dice "Requiere alta para ingresar" y no deja marcarlo Presente.
 export const PaseLista = () => {
   const notify = useNotify();
   const logoutIfAccessDenied = useLogoutIfAccessDenied();
@@ -189,11 +194,15 @@ export const PaseLista = () => {
         method: "POST",
         body: JSON.stringify({ fecha: pase.fecha, turno: pase.turno }),
       });
-      notify(
+      const marcados =
         json.marcados == 1
           ? "Se marcó 1 infante como presente."
-          : `Se marcaron ${json.marcados} infantes como presentes.`,
-        { type: "success" },
+          : `Se marcaron ${json.marcados} infantes como presentes.`;
+      notify(
+        json.requieren_alta > 0
+          ? `${marcados} ${json.requieren_alta} no se marcaron porque requieren alta médica para ingresar.`
+          : marcados,
+        { type: json.requieren_alta > 0 ? "warning" : "success" },
       );
     } catch (error) {
       manejarError(error);
@@ -203,7 +212,8 @@ export const PaseLista = () => {
     }
   };
 
-  const pendientes = pase?.infantes.filter((i) => !i.asistencia).length ?? 0;
+  const pendientes =
+    pase?.infantes.filter((i) => !i.asistencia && !i.requiere_alta).length ?? 0;
   const bloqueado = !puedeCapturar || !pase || pase.cerrado;
 
   return (
@@ -306,6 +316,16 @@ export const PaseLista = () => {
                       >
                         {textoEstado(infante.asistencia)}
                       </Typography>
+                      {infante.requiere_alta && (
+                        <Typography
+                          id={`alta-${infante.id}`}
+                          variant="body2"
+                          color="warning.main"
+                          fontWeight="bold"
+                        >
+                          ⚠ {REQUIERE_ALTA}
+                        </Typography>
+                      )}
                     </TableCell>
                     <TableCell>
                       <ToggleButtonGroup
@@ -324,6 +344,14 @@ export const PaseLista = () => {
                           <ToggleButton
                             key={codigo}
                             value={codigo}
+                            disabled={
+                              codigo == "PRESENTE" && infante.requiere_alta
+                            }
+                            aria-describedby={
+                              codigo == "PRESENTE" && infante.requiere_alta
+                                ? `alta-${infante.id}`
+                                : undefined
+                            }
                             sx={{ textTransform: "none" }}
                           >
                             {codigo == actual ? `✓ ${texto}` : texto}
