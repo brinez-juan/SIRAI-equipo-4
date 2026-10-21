@@ -16,6 +16,7 @@ const rutasCatalogos=require("./rutas/catalogos");
 const rutasUsuarios=require("./rutas/usuarios");
 const rutasInfantes=require("./rutas/infantes");
 const rutasTutores=require("./rutas/tutores");
+const rutasInfanteTutor=require("./rutas/infanteTutor");
 const rutasContactos=require("./rutas/contactos");
 const rutasAsistencia=require("./rutas/asistencia");
 
@@ -35,6 +36,7 @@ app.use(rutasCatalogos);
 app.use(rutasUsuarios);
 app.use(rutasInfantes);
 app.use(rutasTutores);
+app.use(rutasInfanteTutor);
 app.use(rutasContactos);
 app.use(rutasAsistencia);
 

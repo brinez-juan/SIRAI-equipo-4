@@ -16,6 +16,7 @@ import {
   useResourceDefinition,
 } from "react-admin";
 import { useErrorAlGuardar } from "./errores";
+import { TutoresDelInfante } from "./TutoresDelInfante";
 import { ContactosEmergencia } from "./ContactosEmergencia";
 
 const DUPLICADO =
@@ -118,6 +119,7 @@ export const CrearInfante = () => {
 
 // [IA] Generado con Claude (prompt #9 en docs/ia/prompts.md). Revisado por: pendiente
 // pessimistic: espera la respuesta del backend antes de mostrar el cambio, así un 409 no deja datos falsos en pantalla.
+// Modificado con el prompt #11: debajo del formulario va la sección de tutores del infante.
 export const EditarInfante = () => {
   const onError = useErrorAlGuardar(DUPLICADO);
   return (
@@ -128,6 +130,7 @@ export const EditarInfante = () => {
       mutationOptions={{ onError }}
     >
       <FormularioInfante />
+      <TutoresDelInfante />
       <ContactosEmergencia />
     </Edit>
   );

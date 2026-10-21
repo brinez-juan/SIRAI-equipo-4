@@ -1,4 +1,4 @@
-import { fetchUtils } from "react-admin";
+import { fetchUtils, type Identifier, type RaRecord } from "react-admin";
 import jsonServerProvider from "ra-data-json-server";
 
 const fetchJsonUtil = (url: string, options: fetchUtils.Options = {}) => {
@@ -12,7 +12,30 @@ const fetchJsonUtil = (url: string, options: fetchUtils.Options = {}) => {
   return fetchUtils.fetchJson(url, options);
 };
 
-export const dataProvider = jsonServerProvider(
-  import.meta.env.VITE_BACKEND,
-  fetchJsonUtil,
-);
+const tutoresUrl = (infanteId: Identifier) =>
+  `${import.meta.env.VITE_BACKEND}/Infantes/${encodeURIComponent(infanteId)}/tutores`;
+
+// [IA] Generado con Claude (prompt #11 en docs/ia/prompts.md). Revisado por: pendiente
+// Además del CRUD de react-admin, las rutas anidadas /Infantes/:id/tutores (issue 11).
+// Se usan con useDataProvider<typeof dataProvider>().
+export const dataProvider = {
+  ...jsonServerProvider(import.meta.env.VITE_BACKEND, fetchJsonUtil),
+  tutoresDeInfante: (infanteId: Identifier) =>
+    fetchJsonUtil(tutoresUrl(infanteId)).then(({ json }) => json as RaRecord[]),
+  vincularTutor: (
+    infanteId: Identifier,
+    datos: {
+      tutor_id: Identifier;
+      parentesco: string;
+      autorizado_recoger: boolean;
+    },
+  ) =>
+    fetchJsonUtil(tutoresUrl(infanteId), {
+      method: "POST",
+      body: JSON.stringify(datos),
+    }).then(({ json }) => json as RaRecord),
+  desvincularTutor: (infanteId: Identifier, tutorId: Identifier) =>
+    fetchJsonUtil(`${tutoresUrl(infanteId)}/${encodeURIComponent(tutorId)}`, {
+      method: "DELETE",
+    }),
+};
