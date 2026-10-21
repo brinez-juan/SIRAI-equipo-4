@@ -16,6 +16,7 @@ import {
   useResourceDefinition,
 } from "react-admin";
 import { useErrorAlGuardar } from "./errores";
+import { ContactosEmergencia } from "./ContactosEmergencia";
 
 const DUPLICADO =
   "Ya existe un infante con esa matrícula o ese código de credencial.";
@@ -127,6 +128,7 @@ export const EditarInfante = () => {
       mutationOptions={{ onError }}
     >
       <FormularioInfante />
+      <ContactosEmergencia />
     </Edit>
   );
 };
