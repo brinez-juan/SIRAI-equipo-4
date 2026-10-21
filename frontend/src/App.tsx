@@ -14,7 +14,7 @@ const COMPONENTES_RECURSO: Record<string, { list: () => JSX.Element }> = {
   Estancias: { list: listarEstancias },
 };
 
-// [IA+Humano] Base generada con Claude (prompt #F3-1 en docs/ia/prompts.md), modificada por: pendiente
+// [IA+Humano] Base generada con Claude (prompt #3 en docs/ia/prompts.md), modificada por: pendiente
 // react-admin llama a getPermissions (el rol) y este render solo monta lo que ese rol puede ver.
 export const App = () => (
   <Admin

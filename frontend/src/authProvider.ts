@@ -2,11 +2,11 @@ import { AuthProvider } from "react-admin";
 
 const LLAVES = ["auth", "rol", "nombre", "id"];
 
-// [IA] Generado con Claude (prompt #F3-1 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Generado con Claude (prompt #3 en docs/ia/prompts.md). Revisado por: pendiente
 const limpiarSesion = () =>
   LLAVES.forEach((llave) => sessionStorage.removeItem(llave));
 
-// [IA] Generado con Claude (prompt #F3-1 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Generado con Claude (prompt #3 en docs/ia/prompts.md). Revisado por: pendiente
 // Sesión contra POST /login del backend. Guarda token, rol y nombre en sessionStorage.
 const authProvider: AuthProvider = {
   login: async ({ username, password }) => {
