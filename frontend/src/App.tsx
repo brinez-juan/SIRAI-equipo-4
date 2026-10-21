@@ -29,12 +29,14 @@ import type { ComponentType } from "react";
 import { Route } from "react-router-dom";
 import { PaseLista } from "./paginas/PaseLista";
 import { Expediente } from "./paginas/Expediente";
+import { Reportes } from "./paginas/Reportes";
 import { ESCRITURA, PAGINAS, RECURSOS, puedeVer } from "./permisos";
 
 // Páginas propias por ruta (deben estar también en PAGINAS de permisos.ts, con sus roles).
 const COMPONENTES_PAGINA: Record<string, ComponentType> = {
   "pase-lista": PaseLista,
   "expediente/:infanteId": Expediente,
+  reportes: Reportes,
 };
 
 // Cada issue agrega aquí su línea (y su entrada en permisos.ts con los roles).
