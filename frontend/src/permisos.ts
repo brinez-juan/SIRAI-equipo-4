@@ -23,6 +23,7 @@ export const TODOS_LOS_ROLES: Rol[] = [
 export const RECURSOS: Record<string, Rol[]> = {
   Regiones: ["ADMIN_CENTRAL"],
   Estancias: ["ADMIN_CENTRAL"],
+  Usuarios: ["ADMIN_CENTRAL"],
 };
 
 export const puedeVer = (
