@@ -5,6 +5,7 @@ const {log, permitir}=require("../seguridad");
 const router=express.Router();
 const TURNOS=["MATUTINO", "VESPERTINO"];
 const CERRADO="El pase de lista ya se cerró.";
+const REQUIERE_ALTA="Requiere alta para ingresar.";
 const COLUMNAS="id, estancia_id, infante_id, fecha, turno, estado_codigo, hora_entrada, hora_salida, capturado_en, created_by, created_at, updated_at";
 
 // [IA] Generado con Claude (prompt #13 en docs/ia/prompts.md). Revisado por: pendiente
@@ -53,6 +54,24 @@ async function buscarAsistencia(conexion, estanciaId, infanteId, fecha, turno){
 	return filas[0];
 }
 
+// [IA] Generado con Claude (prompt #24 en docs/ia/prompts.md). Revisado por: pendiente
+// Candado de reingreso (issue 24): de los infantes dados, los que tienen un seguimiento sin cerrar cuya causa
+// tiene requiere_alta = 1 y que todavía no tiene alta médica. Solo cuentan las inasistencias hasta la fecha que se
+// captura: una falta posterior no bloquea un día anterior. Devuelve un Set con sus ids.
+async function requierenAlta(conexion, infanteIds, fecha){
+	if(infanteIds.length==0){
+		return new Set();
+	}
+	let [filas]=await conexion.query(
+		"SELECT DISTINCT a.infante_id FROM seguimientos s JOIN asistencias a ON a.id=s.asistencia_id"+
+		" JOIN causas_inasistencia c ON c.codigo=s.causa_codigo"+
+		" WHERE a.infante_id IN (?) AND a.fecha<=? AND s.estado<>'CERRADO' AND c.requiere_alta=1 AND s.deleted_at IS NULL AND a.deleted_at IS NULL"+
+		" AND NOT EXISTS (SELECT 1 FROM altas_medicas m WHERE m.seguimiento_id=s.id AND m.deleted_at IS NULL)",
+		[infanteIds, fecha]
+	);
+	return new Set(filas.map(fila=>fila.infante_id));
+}
+
 // [IA] Generado con Claude (prompt #13 en docs/ia/prompts.md). Revisado por: pendiente
 // Corre fn(conexion) en una transacción; si algo falla no se guarda nada.
 async function enTransaccion(fn){
@@ -70,8 +89,9 @@ async function enTransaccion(fn){
 	}
 }
 
-// [IA] Generado con Claude (prompt #13 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA+Humano] Base generada con Claude (prompt #13), modificada con el prompt #24 (requiere_alta)
 // Infantes de mi estancia, cada uno con su asistencia de ese día y turno (o null), y si el turno ya se cerró.
+// requiere_alta: el candado del issue 24 está activo y no se le puede marcar PRESENTE.
 // GET /pase-lista?fecha=2026-10-20&turno=MATUTINO
 router.get("/pase-lista", lectura, async (req, res)=>{
 	try{
@@ -91,6 +111,7 @@ router.get("/pase-lista", lectura, async (req, res)=>{
 			" WHERE i.estancia_id=? AND i.deleted_at IS NULL ORDER BY i.primer_apellido, i.segundo_apellido, i.nombre",
 			[fecha, turno, estanciaId]
 		);
+		let bloqueados=await requierenAlta(db, filas.map(fila=>fila.id), fecha);
 		res.json({
 			fecha: fecha,
 			turno: turno,
@@ -101,6 +122,7 @@ router.get("/pase-lista", lectura, async (req, res)=>{
 				nombre: fila.nombre,
 				primer_apellido: fila.primer_apellido,
 				segundo_apellido: fila.segundo_apellido,
+				requiere_alta: bloqueados.has(fila.id),
 				asistencia: fila.asistencia_id==null?null:{
 					id: fila.asistencia_id,
 					estado_codigo: fila.estado_codigo,
@@ -115,9 +137,10 @@ router.get("/pase-lista", lectura, async (req, res)=>{
 	}
 });
 
-// [IA] Generado con Claude (prompt #13 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA+Humano] Base generada con Claude (prompt #13), modificada con el prompt #24 (candado de reingreso)
 // Registra o corrige la asistencia de un infante: upsert sobre uq_asistencia_dia (estancia, infante, fecha, turno).
 // PRESENTE pone hora_entrada (si ya la tenía, se conserva la primera); cualquier otro estado la deja en NULL.
+// Si el infante tiene el candado del issue 24, PRESENTE responde 409 "Requiere alta para ingresar."
 // Las horas se toman de Node (new Date()) y no de NOW(): mysql2 las guarda en UTC sin importar la zona del servidor MySQL.
 // created_by es quien capturó primero; quien corrige queda en audit_log.
 router.put("/pase-lista/:infanteId", escritura, async (req, res)=>{
@@ -145,7 +168,10 @@ router.put("/pase-lista/:infanteId", escritura, async (req, res)=>{
 		let ahora=new Date();
 		let resultado=await enTransaccion(async conexion=>{
 			if(await estaCerrado(conexion, estanciaId, cuerpo.fecha, cuerpo.turno, true)){
-				return null;
+				return {mensaje: CERRADO};
+			}
+			if(cuerpo.estado_codigo=="PRESENTE" && (await requierenAlta(conexion, [req.params.infanteId], cuerpo.fecha)).size>0){
+				return {mensaje: REQUIERE_ALTA};
 			}
 			let antes=await buscarAsistencia(conexion, estanciaId, req.params.infanteId, cuerpo.fecha, cuerpo.turno);
 			await conexion.query(
@@ -160,8 +186,8 @@ router.put("/pase-lista/:infanteId", escritura, async (req, res)=>{
 			let despues=await buscarAsistencia(conexion, estanciaId, req.params.infanteId, cuerpo.fecha, cuerpo.turno);
 			return {antes, despues};
 		});
-		if(resultado==null){
-			return res.status(409).json({message: CERRADO});
+		if(resultado.mensaje){
+			return res.status(409).json({message: resultado.mensaje});
 		}
 		await log(req.usuario, resultado.antes==null?"CREATE":"UPDATE", "asistencias", resultado.despues.id, resultado.antes??null, resultado.despues, req);
 		res.json(resultado.despues);
@@ -170,9 +196,10 @@ router.put("/pase-lista/:infanteId", escritura, async (req, res)=>{
 	}
 });
 
-// [IA] Generado con Claude (prompt #13 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA+Humano] Base generada con Claude (prompt #13), modificada con el prompt #24 (candado de reingreso)
 // Marca PRESENTE a todos los infantes de mi estancia que aún no tienen registro ese día y turno;
-// los que ya tienen uno (cualquier estado) no se tocan. Body: {fecha, turno}. Responde {marcados}.
+// los que ya tienen uno (cualquier estado) no se tocan, y los que tienen el candado del issue 24 se saltan.
+// Body: {fecha, turno}. Responde {marcados, requieren_alta} (cuántos se saltaron por el candado).
 router.post("/pase-lista/todos-presentes", escritura, async (req, res)=>{
 	try{
 		let cuerpo=req.body??{};
@@ -185,15 +212,19 @@ router.post("/pase-lista/todos-presentes", escritura, async (req, res)=>{
 			return res.status(400).json({message: "La estancia no opera el turno "+cuerpo.turno+"."});
 		}
 		let ahora=new Date();
+		let saltados=0;
 		let creadas=await enTransaccion(async conexion=>{
 			if(await estaCerrado(conexion, estanciaId, cuerpo.fecha, cuerpo.turno, true)){
 				return null;
 			}
-			let [pendientes]=await conexion.query(
+			let [sinRegistro]=await conexion.query(
 				"SELECT i.id FROM infantes i WHERE i.estancia_id=? AND i.deleted_at IS NULL AND NOT EXISTS"+
 				" (SELECT 1 FROM asistencias a WHERE a.infante_id=i.id AND a.estancia_id=i.estancia_id AND a.fecha=? AND a.turno=? AND a.deleted_at IS NULL)",
 				[estanciaId, cuerpo.fecha, cuerpo.turno]
 			);
+			let bloqueados=await requierenAlta(conexion, sinRegistro.map(infante=>infante.id), cuerpo.fecha);
+			let pendientes=sinRegistro.filter(infante=>!bloqueados.has(infante.id));
+			saltados=bloqueados.size;
 			if(pendientes.length==0){
 				return [];
 			}
@@ -213,7 +244,7 @@ router.post("/pase-lista/todos-presentes", escritura, async (req, res)=>{
 		for(let fila of creadas){
 			await log(req.usuario, "CREATE", "asistencias", fila.id, null, fila, req);
 		}
-		res.json({marcados: creadas.length});
+		res.json({marcados: creadas.length, requieren_alta: saltados});
 	}catch(error){
 		responderError(res, error);
 	}

@@ -37,6 +37,8 @@ export const RECURSOS: Record<string, Rol[]> = {
 export const ESCRITURA: Record<string, Rol[]> = {
   Infantes: ["DIRECTORA"],
   PaseLista: ["DOCENTE", "DIRECTORA"],
+  // Issue 24: emiten la alta médica (cerrar el caso lo pueden todos los que ven el seguimiento)
+  AltaMedica: ["MEDICO", "DIRECTORA"],
 };
 
 // [IA] Generado con Claude (prompt #14 en docs/ia/prompts.md). Revisado por: pendiente
