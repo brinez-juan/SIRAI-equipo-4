@@ -1,11 +1,34 @@
 const mysql=require("mysql2/promise");
 const {db, responderError}=require("./db");
 const {log, permitir}=require("./seguridad");
+const {cifrar, descifrar}=require("./cifrado");
 
 // CRUD genérico para react-admin (ra-data-json-server).
 // Un recurso se describe con un objeto:
 //   {tabla: "estancias", columnas: [columnas que se pueden escribir], roles: [roles con acceso]}
+// Opcional: cifrados: ["telefono_cifrado"], columnas (ya incluidas en "columnas") que se cifran al
+// escribir y se descifran solo en la respuesta. En la base y en audit_log quedan siempre cifradas.
 // Los nombres de columna solo salen de esa configuración, nunca del request, para no inyectar SQL.
+
+// [IA] Generado con Claude (prompt #7 en docs/ia/prompts.md). Revisado por: pendiente
+// Copia de la fila con las columnas cifradas ya descifradas, para responder al cliente.
+// La fila original no se toca: es la que va a la bitácora, que nunca debe guardar texto en claro.
+function paraRespuesta(recurso, fila){
+	if(fila==null || !recurso.cifrados){
+		return fila;
+	}
+	let copia={...fila};
+	for(let campo of recurso.cifrados){
+		copia[campo]=descifrar(copia[campo]);
+	}
+	return copia;
+}
+
+// [IA] Generado con Claude (prompt #7 en docs/ia/prompts.md). Revisado por: pendiente
+// Valores a escribir en la base: las columnas cifradas se cifran aquí, antes de armar el SQL.
+function valoresParaEscribir(recurso, campos, body){
+	return campos.map(campo=>(recurso.cifrados??[]).includes(campo)?cifrar(body[campo]):body[campo]);
+}
 
 // [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
 // Filtros de react-admin (?campo=valor), solo sobre columnas conocidas; excluye borrados lógicos
@@ -43,7 +66,7 @@ async function getList(recurso, req, res){
 	);
 	res.set("Access-Control-Expose-Headers", "X-Total-Count");
 	res.set("X-Total-Count", total);
-	res.json(data);
+	res.json(data.map(fila=>paraRespuesta(recurso, fila)));
 }
 
 // [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
@@ -51,7 +74,7 @@ async function getList(recurso, req, res){
 async function getMany(recurso, req, res){
 	let ids=[].concat(req.query.id);
 	let [data]=await db.query("SELECT * FROM "+mysql.escapeId(recurso.tabla)+" WHERE id IN (?) AND deleted_at IS NULL", [ids]);
-	res.json(data);
+	res.json(data.map(fila=>paraRespuesta(recurso, fila)));
 }
 
 // [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
@@ -61,7 +84,7 @@ async function getManyReference(recurso, req, res){
 	let [data]=await db.query("SELECT * FROM "+mysql.escapeId(recurso.tabla)+where, valores);
 	res.set("Access-Control-Expose-Headers", "X-Total-Count");
 	res.set("X-Total-Count", data.length);
-	res.json(data);
+	res.json(data.map(fila=>paraRespuesta(recurso, fila)));
 }
 
 // [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
@@ -70,7 +93,7 @@ async function getOne(recurso, id, req, res){
 	if(data==null){
 		res.sendStatus(404);
 	}else{
-		res.json(data);
+		res.json(paraRespuesta(recurso, data));
 	}
 }
 
@@ -85,11 +108,11 @@ async function updateData(recurso, id, req, res){
 	let asignaciones=campos.map(campo=>mysql.escapeId(campo)+"=?").concat("updated_at=CURRENT_TIMESTAMP(3)");
 	await db.query(
 		"UPDATE "+mysql.escapeId(recurso.tabla)+" SET "+asignaciones.join(", ")+" WHERE id=? AND deleted_at IS NULL",
-		[...campos.map(campo=>req.body[campo]), id]
+		[...valoresParaEscribir(recurso, campos, req.body), id]
 	);
 	let data=await buscarPorId(recurso, id);
 	await log(req.usuario, "UPDATE", recurso.tabla, id, antes, data, req);
-	res.json(data);
+	res.json(paraRespuesta(recurso, data));
 }
 
 // [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
@@ -101,13 +124,13 @@ async function deleteData(recurso, id, req, res){
 	}
 	await db.query("UPDATE "+mysql.escapeId(recurso.tabla)+" SET deleted_at=CURRENT_TIMESTAMP(3) WHERE id=?", [id]);
 	await log(req.usuario, "SOFT_DELETE", recurso.tabla, id, antes, null, req);
-	res.json(antes);
+	res.json(paraRespuesta(recurso, antes));
 }
 
 // [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
 async function createData(recurso, req, res){
 	let campos=recurso.columnas.filter(campo=>campo in req.body);
-	let valores=campos.map(campo=>req.body[campo]);
+	let valores=valoresParaEscribir(recurso, campos, req.body);
 	campos.push("created_by");
 	valores.push(req.usuario.usuario);
 	let [resultado]=await db.query(
@@ -116,14 +139,15 @@ async function createData(recurso, req, res){
 	);
 	let data=await buscarPorId(recurso, resultado.insertId);
 	await log(req.usuario, "CREATE", recurso.tabla, data.id, null, data, req);
-	res.status(201).json(data);
+	res.status(201).json(paraRespuesta(recurso, data));
 }
 
 // [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
 // Registra en el router las 5 rutas de react-admin para un recurso, protegidas por sus roles.
 // Ejemplo: registrarRecurso(router, "Estancias", {tabla: "estancias", columnas: [...], roles: ["ADMIN_CENTRAL"]})
 function registrarRecurso(router, nombre, recurso){
-	recurso.lectura=["id", ...recurso.columnas, "created_at", "updated_at"];
+	// Las columnas cifradas no sirven para filtrar ni ordenar: en la base solo hay texto cifrado.
+	recurso.lectura=["id", ...recurso.columnas.filter(campo=>!(recurso.cifrados??[]).includes(campo)), "created_at", "updated_at"];
 	let soloRoles=permitir(...recurso.roles);
 
 	router.get("/"+nombre, soloRoles, async (req,res)=>{
