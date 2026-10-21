@@ -1,5 +1,5 @@
 const mysql=require("mysql2/promise");
-const {db, responderError}=require("./db");
+const {db, uuidv7, responderError}=require("./db");
 const {log, permitir}=require("./seguridad");
 const {cifrar, descifrar}=require("./cifrado");
 
@@ -8,6 +8,11 @@ const {cifrar, descifrar}=require("./cifrado");
 //   {tabla: "estancias", columnas: [columnas que se pueden escribir], roles: [roles con acceso]}
 // Opcional: cifrados: ["telefono_cifrado"], columnas (ya incluidas en "columnas") que se cifran al
 // escribir y se descifran solo en la respuesta. En la base y en audit_log quedan siempre cifradas.
+// Opcional: escritura: [roles], los que pueden crear, editar y borrar (por defecto, los mismos de "roles").
+// Opcional: uuid: true, el id es CHAR(36) y se genera con uuidv7() (tablas sin AUTO_INCREMENT).
+// Opcional: porEstancia: true, todo se filtra y se asigna con req.usuario.estancia_id (el del token),
+// nunca con la estancia que mande el request; un usuario sin estancia recibe 403.
+// Opcional: busqueda: [columnas], el ?q= de react-admin busca con LIKE en esas columnas unidas.
 // Los nombres de columna solo salen de esa configuración, nunca del request, para no inyectar SQL.
 
 // [IA] Generado con Claude (prompt #7 en docs/ia/prompts.md). Revisado por: pendiente
@@ -30,9 +35,16 @@ function valoresParaEscribir(recurso, campos, body){
 	return campos.map(campo=>(recurso.cifrados??[]).includes(campo)?cifrar(body[campo]):body[campo]);
 }
 
-// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
-// Filtros de react-admin (?campo=valor), solo sobre columnas conocidas; excluye borrados lógicos
-function filtros(recurso, query){
+// [IA] Generado con Claude (prompt #9 en docs/ia/prompts.md). Revisado por: pendiente
+// Condición extra para recursos porEstancia: solo filas de la estancia del token.
+function deMiEstancia(recurso, req){
+	return recurso.porEstancia?{sql: " AND estancia_id=?", valores: [req.usuario.estancia_id]}:{sql: "", valores: []};
+}
+
+// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md), modificado con el prompt #9. Revisado por: pendiente
+// Filtros de react-admin (?campo=valor), solo sobre columnas conocidas; excluye borrados lógicos.
+// ?q= busca texto en las columnas de "busqueda"; %, _ y \ se escapan para que el usuario no arme comodines.
+function filtros(recurso, query, req){
 	let condiciones=["deleted_at IS NULL"];
 	let valores=[];
 	for(let campo in query){
@@ -41,12 +53,19 @@ function filtros(recurso, query){
 			valores.push(query[campo]);
 		}
 	}
-	return {where: " WHERE "+condiciones.join(" AND "), valores};
+	if(recurso.busqueda && typeof query.q=="string" && query.q.trim()!=""){
+		condiciones.push("CONCAT_WS(' ', "+recurso.busqueda.map(campo=>mysql.escapeId(campo)).join(", ")+") LIKE ?");
+		valores.push("%"+query.q.trim().replace(/[\\%_]/g, "\\$&")+"%");
+	}
+	let estancia=deMiEstancia(recurso, req);
+	return {where: " WHERE "+condiciones.join(" AND ")+estancia.sql, valores: [...valores, ...estancia.valores]};
 }
 
-// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
-async function buscarPorId(recurso, id){
-	let [data]=await db.query("SELECT * FROM "+mysql.escapeId(recurso.tabla)+" WHERE id=? AND deleted_at IS NULL", [id]);
+// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md), modificado con el prompt #9. Revisado por: pendiente
+// En recursos porEstancia, un id de otra estancia se comporta como si no existiera (404).
+async function buscarPorId(recurso, id, req){
+	let estancia=deMiEstancia(recurso, req);
+	let [data]=await db.query("SELECT * FROM "+mysql.escapeId(recurso.tabla)+" WHERE id=? AND deleted_at IS NULL"+estancia.sql, [id, ...estancia.valores]);
 	return data[0];
 }
 
@@ -57,7 +76,7 @@ async function getList(recurso, req, res){
 	let sortOrder=req.query._order=="ASC"?"ASC":"DESC";
 	let inicio=Number(req.query._start)||0;
 	let fin=Number(req.query._end)||inicio+25;
-	let {where, valores}=filtros(recurso, req.query);
+	let {where, valores}=filtros(recurso, req.query, req);
 	let tabla=mysql.escapeId(recurso.tabla);
 	let [[{total}]]=await db.query("SELECT COUNT(*) AS total FROM "+tabla+where, valores);
 	let [data]=await db.query(
@@ -73,14 +92,15 @@ async function getList(recurso, req, res){
 // Varios registros por id (?id=1&id=2)
 async function getMany(recurso, req, res){
 	let ids=[].concat(req.query.id);
-	let [data]=await db.query("SELECT * FROM "+mysql.escapeId(recurso.tabla)+" WHERE id IN (?) AND deleted_at IS NULL", [ids]);
+	let estancia=deMiEstancia(recurso, req);
+	let [data]=await db.query("SELECT * FROM "+mysql.escapeId(recurso.tabla)+" WHERE id IN (?) AND deleted_at IS NULL"+estancia.sql, [ids, ...estancia.valores]);
 	res.json(data.map(fila=>paraRespuesta(recurso, fila)));
 }
 
 // [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
 // Registros que apuntan a otro (?estancia_id=3), sin paginar
 async function getManyReference(recurso, req, res){
-	let {where, valores}=filtros(recurso, req.query);
+	let {where, valores}=filtros(recurso, req.query, req);
 	let [data]=await db.query("SELECT * FROM "+mysql.escapeId(recurso.tabla)+where, valores);
 	res.set("Access-Control-Expose-Headers", "X-Total-Count");
 	res.set("X-Total-Count", data.length);
@@ -89,7 +109,7 @@ async function getManyReference(recurso, req, res){
 
 // [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
 async function getOne(recurso, id, req, res){
-	let data=await buscarPorId(recurso, id);
+	let data=await buscarPorId(recurso, id, req);
 	if(data==null){
 		res.sendStatus(404);
 	}else{
@@ -100,7 +120,7 @@ async function getOne(recurso, id, req, res){
 // [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
 // Solo actualiza las columnas permitidas y guarda en la bitácora el antes y el después
 async function updateData(recurso, id, req, res){
-	let antes=await buscarPorId(recurso, id);
+	let antes=await buscarPorId(recurso, id, req);
 	if(antes==null){
 		return res.sendStatus(404);
 	}
@@ -110,7 +130,7 @@ async function updateData(recurso, id, req, res){
 		"UPDATE "+mysql.escapeId(recurso.tabla)+" SET "+asignaciones.join(", ")+" WHERE id=? AND deleted_at IS NULL",
 		[...valoresParaEscribir(recurso, campos, req.body), id]
 	);
-	let data=await buscarPorId(recurso, id);
+	let data=await buscarPorId(recurso, id, req);
 	await log(req.usuario, "UPDATE", recurso.tabla, id, antes, data, req);
 	res.json(paraRespuesta(recurso, data));
 }
@@ -118,7 +138,7 @@ async function updateData(recurso, id, req, res){
 // [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
 // Borrado lógico: solo llena deleted_at, el registro sigue en la tabla
 async function deleteData(recurso, id, req, res){
-	let antes=await buscarPorId(recurso, id);
+	let antes=await buscarPorId(recurso, id, req);
 	if(antes==null){
 		return res.sendStatus(404);
 	}
@@ -127,28 +147,41 @@ async function deleteData(recurso, id, req, res){
 	res.json(paraRespuesta(recurso, antes));
 }
 
-// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md), modificado con el prompt #9. Revisado por: pendiente
+// id (uuid) y estancia_id (porEstancia) los pone el servidor; lo que mande el request en esos campos se ignora.
 async function createData(recurso, req, res){
 	let campos=recurso.columnas.filter(campo=>campo in req.body);
 	let valores=valoresParaEscribir(recurso, campos, req.body);
 	campos.push("created_by");
 	valores.push(req.usuario.usuario);
+	let id=recurso.uuid?uuidv7():null;
+	if(recurso.uuid){
+		campos.push("id");
+		valores.push(id);
+	}
+	if(recurso.porEstancia){
+		campos.push("estancia_id");
+		valores.push(req.usuario.estancia_id);
+	}
 	let [resultado]=await db.query(
 		"INSERT INTO "+mysql.escapeId(recurso.tabla)+" ("+campos.map(campo=>mysql.escapeId(campo)).join(", ")+") VALUES (?)",
 		[valores]
 	);
-	let data=await buscarPorId(recurso, resultado.insertId);
+	let data=await buscarPorId(recurso, recurso.uuid?id:resultado.insertId, req);
 	await log(req.usuario, "CREATE", recurso.tabla, data.id, null, data, req);
 	res.status(201).json(paraRespuesta(recurso, data));
 }
 
-// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md), modificado con el prompt #9. Revisado por: pendiente
 // Registra en el router las 5 rutas de react-admin para un recurso, protegidas por sus roles.
+// GET para "roles"; POST, PUT y DELETE solo para "escritura" (si se indica).
 // Ejemplo: registrarRecurso(router, "Estancias", {tabla: "estancias", columnas: [...], roles: ["ADMIN_CENTRAL"]})
 function registrarRecurso(router, nombre, recurso){
 	// Las columnas cifradas no sirven para filtrar ni ordenar: en la base solo hay texto cifrado.
 	recurso.lectura=["id", ...recurso.columnas.filter(campo=>!(recurso.cifrados??[]).includes(campo)), "created_at", "updated_at"];
-	let soloRoles=permitir(...recurso.roles);
+	let conEstancia=(req, res, next)=>recurso.porEstancia && req.usuario.estancia_id==null?res.sendStatus(403):next();
+	let soloRoles=[permitir(...recurso.roles), conEstancia];
+	let soloEscritura=[permitir(...(recurso.escritura??recurso.roles)), conEstancia];
 
 	router.get("/"+nombre, soloRoles, async (req,res)=>{
 		try{
@@ -172,7 +205,7 @@ function registrarRecurso(router, nombre, recurso){
 		}
 	});
 
-	router.put("/"+nombre+"/:id", soloRoles, async(req, res)=>{
+	router.put("/"+nombre+"/:id", soloEscritura, async(req, res)=>{
 		try{
 			await updateData(recurso, req.params.id, req, res);
 		}catch(error){
@@ -180,7 +213,7 @@ function registrarRecurso(router, nombre, recurso){
 		}
 	});
 
-	router.delete("/"+nombre+"/:id", soloRoles, async(req, res)=>{
+	router.delete("/"+nombre+"/:id", soloEscritura, async(req, res)=>{
 		try{
 			await deleteData(recurso, req.params.id, req, res);
 		}catch(error){
@@ -188,7 +221,7 @@ function registrarRecurso(router, nombre, recurso){
 		}
 	});
 
-	router.post("/"+nombre, soloRoles, async(req, res)=>{
+	router.post("/"+nombre, soloEscritura, async(req, res)=>{
 		try{
 			await createData(recurso, req, res);
 		}catch(error){
