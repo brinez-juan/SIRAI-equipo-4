@@ -13,6 +13,7 @@ const {db}=require("./db");
 const {autenticar, registrarPeticion}=require("./seguridad");
 const rutasSesion=require("./rutas/sesion");
 const rutasCatalogos=require("./rutas/catalogos");
+const rutasUsuarios=require("./rutas/usuarios");
 
 const PORT=3000;
 const app=express();
@@ -27,6 +28,7 @@ app.use(rutasSesion);
 app.use(autenticar);
 app.use(registrarPeticion);
 app.use(rutasCatalogos);
+app.use(rutasUsuarios);
 
 // [Humano] Escrito por: pendiente. Arranque HTTPS del servidor con los certificados backend.key y backend.crt
 const options={
