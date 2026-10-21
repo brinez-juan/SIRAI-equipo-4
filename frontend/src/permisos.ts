@@ -26,6 +26,7 @@ export const RECURSOS: Record<string, Rol[]> = {
   Infantes: ["DIRECTORA", "DOCENTE", "TRABAJO_SOCIAL", "MEDICO"],
   Tutores: ["DIRECTORA", "TRABAJO_SOCIAL"],
   Usuarios: ["ADMIN_CENTRAL"],
+  Asistencias: ["DIRECTORA", "DOCENTE", "TRABAJO_SOCIAL", "MEDICO"],
 };
 
 // [IA] Generado con Claude (prompt #9 en docs/ia/prompts.md). Revisado por: pendiente

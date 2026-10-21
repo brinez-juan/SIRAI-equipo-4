@@ -21,6 +21,7 @@ import {
   editarUsuario,
   listarUsuarios,
 } from "./recursos/Usuarios";
+import { ListarAsistencias } from "./recursos/Asistencias";
 import type { ComponentType } from "react";
 import { Route } from "react-router-dom";
 import { PaseLista } from "./paginas/PaseLista";
@@ -65,6 +66,10 @@ const COMPONENTES_RECURSO: Record<string, Omit<ResourceProps, "name">> = {
     edit: editarUsuario,
     recordRepresentation: (usuario) =>
       `${usuario.nombre} ${usuario.primer_apellido}`,
+  },
+  Asistencias: {
+    list: ListarAsistencias,
+    options: { label: "Historial de asistencia" },
   },
 };
 
