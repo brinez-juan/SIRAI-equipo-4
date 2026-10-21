@@ -1,5 +1,5 @@
 const express=require("express");
-const {db, responderError}=require("../db");
+const {db, uuidv7, responderError}=require("../db");
 const {log, permitir}=require("../seguridad");
 const {cifrar, descifrar}=require("../cifrado");
 
@@ -8,10 +8,10 @@ const router=express.Router();
 // [IA] Generado con Claude (prompt #20 en docs/ia/prompts.md). Revisado por: pendiente
 // Tabla 2.5 del plan: TRABAJO_SOCIAL, MEDICO y DIRECTORA llevan los seguimientos; DOCENTE no ve notas ni
 // seguimientos. El token debe traer estancia: la estancia nunca sale del request.
-const acceso=[
-	permitir("TRABAJO_SOCIAL", "MEDICO", "DIRECTORA"),
-	(req, res, next)=>req.usuario.estancia_id==null?res.sendStatus(403):next()
-];
+const conEstancia=(req, res, next)=>req.usuario.estancia_id==null?res.sendStatus(403):next();
+const acceso=[permitir("TRABAJO_SOCIAL", "MEDICO", "DIRECTORA"), conEstancia];
+// Issue 24: la alta médica solo la emiten MEDICO y DIRECTORA.
+const accesoAlta=[permitir("MEDICO", "DIRECTORA"), conEstancia];
 
 // El seguimiento no guarda infante ni estancia: los dos salen de su asistencia.
 const DESDE=" FROM seguimientos s JOIN asistencias a ON a.id=s.asistencia_id JOIN infantes i ON i.id=a.infante_id"
@@ -215,6 +215,146 @@ router.put("/seguimientos/:id/clasificar", acceso, async (req, res)=>{
 			fecha_probable_retorno: despuesFilas[0].fecha_probable_retorno,
 			causa: {...causas[0], detalle: descifrar(despuesFilas[0].detalle_causa_cifrado)}
 		});
+	}catch(error){
+		responderError(res, error);
+	}
+});
+
+const MAX_FOLIO=50;
+const MAX_OBSERVACIONES=2000;
+// FOR UPDATE OF s: alta y cierre del mismo caso se forman en fila, así no se cierra un caso mientras se le da de alta.
+const BLOQUEAR_SEGUIMIENTO=" WHERE s.id=? AND a.estancia_id=? AND s.deleted_at IS NULL AND a.deleted_at IS NULL FOR UPDATE OF s";
+
+// [IA] Generado con Claude (prompt #24 en docs/ia/prompts.md). Revisado por: pendiente
+// Corre fn(conexion) en una transacción; si algo falla no se guarda nada.
+async function enTransaccion(fn){
+	let conexion=await db.getConnection();
+	try{
+		await conexion.beginTransaction();
+		let resultado=await fn(conexion);
+		await conexion.commit();
+		return resultado;
+	}catch(error){
+		await conexion.rollback();
+		throw error;
+	}finally{
+		conexion.release();
+	}
+}
+
+// [IA] Generado con Claude (prompt #24 en docs/ia/prompts.md). Revisado por: pendiente
+// Alta médica vigente de un seguimiento (la que no tiene borrado lógico), o undefined.
+async function buscarAlta(conexion, seguimientoId){
+	let [altas]=await conexion.query(
+		"SELECT m.id, m.seguimiento_id, m.folio_justificante, m.emitida_en, m.emitida_por, CONCAT_WS(' ', u.nombre, u.primer_apellido) AS emitida_por_nombre,"+
+		" m.observaciones_cifrado, m.created_by, m.created_at FROM altas_medicas m JOIN usuarios u ON u.id=m.emitida_por"+
+		" WHERE m.seguimiento_id=? AND m.deleted_at IS NULL",
+		[seguimientoId]
+	);
+	return altas[0];
+}
+
+// [IA] Generado con Claude (prompt #24 en docs/ia/prompts.md). Revisado por: pendiente
+// Revisa el body de la alta: folio obligatorio, observaciones opcionales. Exigir texto evita que un objeto o
+// arreglo llegue a la consulta SQL.
+function validarAlta(cuerpo){
+	if(typeof cuerpo.folio!="string" || cuerpo.folio.trim()=="" || cuerpo.folio.trim().length>MAX_FOLIO){
+		return "El folio del justificante es obligatorio (hasta "+MAX_FOLIO+" caracteres).";
+	}
+	if(cuerpo.observaciones!=null && (typeof cuerpo.observaciones!="string" || cuerpo.observaciones.length>MAX_OBSERVACIONES)){
+		return "Las observaciones deben ser un texto de hasta "+MAX_OBSERVACIONES+" caracteres.";
+	}
+	return null;
+}
+
+// [IA] Generado con Claude (prompt #24 en docs/ia/prompts.md). Revisado por: pendiente
+// Registra la alta médica de un seguimiento de mi estancia (si es de otra, 404). Quita el candado de reingreso
+// del pase de lista y permite cerrar los casos cuya causa requiere alta. Una alta por caso (409 si ya tiene) y
+// no se emite sobre un caso cerrado (409). Las observaciones son confidenciales: se guardan cifradas y así entran
+// a la bitácora. emitida_por es quien la registra, tomado del token. Body: {folio, observaciones}.
+router.post("/seguimientos/:id/alta", accesoAlta, async (req, res)=>{
+	try{
+		let cuerpo=req.body??{};
+		let invalido=validarAlta(cuerpo);
+		if(invalido){
+			return res.status(400).json({message: invalido});
+		}
+		let observaciones=typeof cuerpo.observaciones=="string" && cuerpo.observaciones.trim()!=""?cuerpo.observaciones.trim():null;
+		let resultado=await enTransaccion(async conexion=>{
+			let [filas]=await conexion.query("SELECT s.id, s.estado"+DESDE+BLOQUEAR_SEGUIMIENTO, [req.params.id, req.usuario.estancia_id]);
+			let seguimiento=filas[0];
+			if(seguimiento==null){
+				return {status: 404};
+			}
+			if(seguimiento.estado=="CERRADO"){
+				return {status: 409, message: "El caso ya está cerrado."};
+			}
+			if(await buscarAlta(conexion, seguimiento.id)){
+				return {status: 409, message: "El caso ya tiene alta médica."};
+			}
+			let id=uuidv7();
+			await conexion.query(
+				"INSERT INTO altas_medicas (id, seguimiento_id, emitida_por, emitida_en, folio_justificante, observaciones_cifrado, created_by) VALUES (?,?,?,?,?,?,?)",
+				[id, seguimiento.id, req.usuario.usuario, new Date(), cuerpo.folio.trim(), cifrar(observaciones), req.usuario.usuario]
+			);
+			return {alta: await buscarAlta(conexion, seguimiento.id)};
+		});
+		if(resultado.status==404){
+			return res.sendStatus(404);
+		}
+		if(resultado.status){
+			return res.status(resultado.status).json({message: resultado.message});
+		}
+		let {observaciones_cifrado, ...alta}=resultado.alta;
+		await log(req.usuario, "CREATE", "altas_medicas", alta.id, null, resultado.alta, req);
+		res.status(201).json({...alta, observaciones: descifrar(observaciones_cifrado)});
+	}catch(error){
+		responderError(res, error);
+	}
+});
+
+// [IA] Generado con Claude (prompt #24 en docs/ia/prompts.md). Revisado por: pendiente
+// Cierra un seguimiento de mi estancia (si es de otra, 404). Solo se cierra un caso clasificado
+// (chk_clasificado_con_causa) y, si su causa tiene requiere_alta = 1, solo con alta médica: si no, 409.
+// cerrado_por es quien lo cierra, tomado del token. Un caso cerrado ya no se clasifica ni recibe alta.
+router.put("/seguimientos/:id/cerrar", acceso, async (req, res)=>{
+	try{
+		let resultado=await enTransaccion(async conexion=>{
+			let [filas]=await conexion.query(
+				"SELECT s.id, s.estado, s.causa_codigo, s.cerrado_en, s.cerrado_por, c.requiere_alta"+DESDE+
+				" LEFT JOIN causas_inasistencia c ON c.codigo=s.causa_codigo"+BLOQUEAR_SEGUIMIENTO,
+				[req.params.id, req.usuario.estancia_id]
+			);
+			let seguimiento=filas[0];
+			if(seguimiento==null){
+				return {status: 404};
+			}
+			if(seguimiento.estado=="CERRADO"){
+				return {status: 409, message: "El caso ya está cerrado."};
+			}
+			if(seguimiento.causa_codigo==null){
+				return {status: 409, message: "Clasifique la causa antes de cerrar el caso."};
+			}
+			if(Number(seguimiento.requiere_alta)==1 && !await buscarAlta(conexion, seguimiento.id)){
+				return {status: 409, message: "La causa requiere alta médica: no se puede cerrar el caso sin ella."};
+			}
+			let ahora=new Date();
+			await conexion.query(
+				"UPDATE seguimientos SET estado='CERRADO', cerrado_en=?, cerrado_por=?, updated_at=CURRENT_TIMESTAMP(3) WHERE id=?",
+				[ahora, req.usuario.usuario, seguimiento.id]
+			);
+			let [despues]=await conexion.query("SELECT id, estado, causa_codigo, cerrado_en, cerrado_por FROM seguimientos WHERE id=?", [seguimiento.id]);
+			let antes={id: seguimiento.id, estado: seguimiento.estado, causa_codigo: seguimiento.causa_codigo, cerrado_en: seguimiento.cerrado_en, cerrado_por: seguimiento.cerrado_por};
+			return {antes, despues: despues[0]};
+		});
+		if(resultado.status==404){
+			return res.sendStatus(404);
+		}
+		if(resultado.status){
+			return res.status(resultado.status).json({message: resultado.message});
+		}
+		await log(req.usuario, "UPDATE", "seguimientos", resultado.despues.id, resultado.antes, resultado.despues, req);
+		res.json(resultado.despues);
 	}catch(error){
 		responderError(res, error);
 	}

@@ -56,6 +56,21 @@ export const dataProvider = {
       `${import.meta.env.VITE_BACKEND}/seguimientos/${encodeURIComponent(seguimientoId)}/clasificar`,
       { method: "PUT", body: JSON.stringify(datos) },
     ).then(({ json }) => json as RaRecord),
+  // [IA] Generado con Claude (prompt #24 en docs/ia/prompts.md). Revisado por: pendiente
+  // Alta médica y cierre de un seguimiento (issue 24).
+  registrarAlta: (
+    seguimientoId: Identifier,
+    datos: { folio: string; observaciones: string | null },
+  ) =>
+    fetchJsonUtil(
+      `${import.meta.env.VITE_BACKEND}/seguimientos/${encodeURIComponent(seguimientoId)}/alta`,
+      { method: "POST", body: JSON.stringify(datos) },
+    ).then(({ json }) => json as RaRecord),
+  cerrarSeguimiento: (seguimientoId: Identifier) =>
+    fetchJsonUtil(
+      `${import.meta.env.VITE_BACKEND}/seguimientos/${encodeURIComponent(seguimientoId)}/cerrar`,
+      { method: "PUT" },
+    ).then(({ json }) => json as RaRecord),
   // [IA] Generado con Claude (prompt #17 en docs/ia/prompts.md). Revisado por: pendiente
   // Cierre del pase de lista (issue 17): faltas para quien no tiene registro y seguimientos para quien los genera.
   cerrarPaseLista: (datos: { fecha: string; turno: string }) =>
