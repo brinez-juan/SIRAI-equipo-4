@@ -27,6 +27,14 @@ const DUPLICADO =
 const soloFecha = (valor: unknown) =>
   typeof valor == "string" ? valor.slice(0, 10) : valor;
 
+// [IA] Generado con Claude (prompt #14 en docs/ia/prompts.md). Revisado por: pendiente
+// "format" solo cambia lo que se ve: si la fecha no se toca, el formulario la reenvía con
+// "T00:00:00.000Z" y MySQL la rechaza en la columna DATE (400). Se recorta aquí, antes de enviar.
+const fechaParaGuardar = (datos: Record<string, unknown>) => ({
+  ...datos,
+  fecha_nacimiento: soloFecha(datos.fecha_nacimiento),
+});
+
 const filtros = [
   <SearchInput
     key="q"
@@ -111,7 +119,12 @@ export const ListarInfantes = () => {
 export const CrearInfante = () => {
   const onError = useErrorAlGuardar(DUPLICADO);
   return (
-    <Create title="Nuevo infante" redirect="list" mutationOptions={{ onError }}>
+    <Create
+      title="Nuevo infante"
+      redirect="list"
+      mutationOptions={{ onError }}
+      transform={fechaParaGuardar}
+    >
       <FormularioInfante />
     </Create>
   );
@@ -120,6 +133,7 @@ export const CrearInfante = () => {
 // [IA] Generado con Claude (prompt #9 en docs/ia/prompts.md). Revisado por: pendiente
 // pessimistic: espera la respuesta del backend antes de mostrar el cambio, así un 409 no deja datos falsos en pantalla.
 // Modificado con el prompt #11: debajo del formulario va la sección de tutores del infante.
+// Modificado con el prompt #14: transform recorta la fecha antes de enviar (ver fechaParaGuardar).
 export const EditarInfante = () => {
   const onError = useErrorAlGuardar(DUPLICADO);
   return (
@@ -128,6 +142,7 @@ export const EditarInfante = () => {
       redirect="list"
       mutationMode="pessimistic"
       mutationOptions={{ onError }}
+      transform={fechaParaGuardar}
     >
       <FormularioInfante />
       <TutoresDelInfante />
