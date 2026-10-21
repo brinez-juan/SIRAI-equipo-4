@@ -38,6 +38,24 @@ export const dataProvider = {
     fetchJsonUtil(`${tutoresUrl(infanteId)}/${encodeURIComponent(tutorId)}`, {
       method: "DELETE",
     }),
+  // [IA] Generado con Claude (prompt #23 en docs/ia/prompts.md). Revisado por: pendiente
+  // Catálogo de causas con su asesoría y clasificación de un seguimiento (issue 23).
+  causasInasistencia: () =>
+    fetchJsonUtil(`${import.meta.env.VITE_BACKEND}/causas`).then(
+      ({ json }) => json as RaRecord[],
+    ),
+  clasificarSeguimiento: (
+    seguimientoId: Identifier,
+    datos: {
+      causa_codigo: string;
+      detalle: string | null;
+      fecha_probable_retorno: string | null;
+    },
+  ) =>
+    fetchJsonUtil(
+      `${import.meta.env.VITE_BACKEND}/seguimientos/${encodeURIComponent(seguimientoId)}/clasificar`,
+      { method: "PUT", body: JSON.stringify(datos) },
+    ).then(({ json }) => json as RaRecord),
   // [IA] Generado con Claude (prompt #17 en docs/ia/prompts.md). Revisado por: pendiente
   // Cierre del pase de lista (issue 17): faltas para quien no tiene registro y seguimientos para quien los genera.
   cerrarPaseLista: (datos: { fecha: string; turno: string }) =>
