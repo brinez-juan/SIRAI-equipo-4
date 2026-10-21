@@ -18,7 +18,7 @@ import {
 } from "react-admin";
 import { useErrorAlGuardar } from "./errores";
 
-const DUPLICADO = "Ya existe un tutor con ese código de credencial.";
+const DUPLICADO = "Ya existe un tutor con esos datos.";
 
 const filtros = [
   <SearchInput
@@ -57,8 +57,8 @@ const BarraGuardar = () => (
 );
 
 // [IA] Generado con Claude (prompt #10 en docs/ia/prompts.md). Revisado por: pendiente
-// Límites iguales a las columnas de tutores en schema.sql. El código de credencial no se captura:
-// lo genera el servidor. El teléfono viaja como "telefono_cifrado" y se guarda cifrado.
+// Límites iguales a las columnas de tutores en schema.sql. El teléfono viaja como "telefono_cifrado"
+// y se guarda cifrado.
 const CamposTutor = () => (
   <>
     <TextInput
@@ -103,7 +103,6 @@ export const ListarTutores = () => {
         <TextField source="segundo_apellido" label="Segundo apellido" />
         <TextField source="telefono_cifrado" label="Teléfono" />
         <TextField source="correo" label="Correo electrónico" />
-        <TextField source="codigo_credencial" label="Código de credencial" />
       </Datagrid>
     </List>
   );
@@ -143,12 +142,6 @@ export const EditarTutor = () => {
     >
       <SimpleForm toolbar={<BarraGuardar />}>
         <CamposTutor />
-        <TextInput
-          source="codigo_credencial"
-          label="Código de credencial"
-          helperText="Lo genera el sistema; no se puede cambiar"
-          disabled
-        />
       </SimpleForm>
     </Edit>
   );
