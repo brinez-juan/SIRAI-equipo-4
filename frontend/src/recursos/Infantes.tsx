@@ -17,6 +17,7 @@ import {
 } from "react-admin";
 import { useErrorAlGuardar } from "./errores";
 import { TutoresDelInfante } from "./TutoresDelInfante";
+import { ContactosEmergencia } from "./ContactosEmergencia";
 
 const DUPLICADO =
   "Ya existe un infante con esa matrícula o ese código de credencial.";
@@ -130,6 +131,7 @@ export const EditarInfante = () => {
     >
       <FormularioInfante />
       <TutoresDelInfante />
+      <ContactosEmergencia />
     </Edit>
   );
 };
