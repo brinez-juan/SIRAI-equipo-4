@@ -1,7 +1,7 @@
 // Las variables del .env se cargan antes de todo: db.js las lee al importarse.
 process.loadEnvFile(".env");
-if(!process.env.DATABASE_URL || !process.env.LLAVESECRETA){
-	console.error("Faltan DATABASE_URL o LLAVESECRETA en backend/.env (ver .env.example)");
+if(!process.env.DATABASE_URL || !process.env.LLAVESECRETA || !process.env.LLAVE_CIFRADO){
+	console.error("Faltan DATABASE_URL, LLAVESECRETA o LLAVE_CIFRADO en backend/.env (ver .env.example)");
 	process.exit(1);
 }
 
