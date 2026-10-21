@@ -47,6 +47,8 @@ export const PAGINAS: Record<string, Rol[]> = {
   "pase-lista": ["DOCENTE", "DIRECTORA", "TRABAJO_SOCIAL", "MEDICO"],
   // Expediente imprimible (issue 25); se abre desde el detalle del seguimiento, no desde el menú
   "expediente/:infanteId": ["TRABAJO_SOCIAL", "MEDICO", "DIRECTORA"],
+  // Cortes de asistencia en CSV y PDF (issue 28): sin nombres; el backend filtra por estancia o región
+  reportes: ["DIRECTORA", "SUPERVISOR", "ADMIN_CENTRAL"],
 };
 
 // Tablero semáforo (issue 27): es su pantalla de Inicio, no una ruta propia. Debe coincidir con backend/rutas/tablero.js
