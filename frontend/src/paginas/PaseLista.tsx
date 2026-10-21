@@ -24,11 +24,24 @@ import {
   type HttpError,
 } from "react-admin";
 import { llamarApi } from "../api";
-import { ESCRITURA, puedeVer } from "../permisos";
+import { ESCRITURA, LEEN_NOTA_JUSTIFICACION, puedeVer } from "../permisos";
+import {
+  JustificarInasistencia,
+  type JustificacionCapturada,
+  type Motivo,
+} from "./JustificarInasistencia";
+
+// Feature 42: por qué se justificó. "nota" solo llega a los roles de LEEN_NOTA_JUSTIFICACION.
+type Justificacion = {
+  causa_codigo: string;
+  causa_nombre: string;
+  nota?: string | null;
+};
 
 type Asistencia = {
   id: string;
   estado_codigo: string;
+  justificacion: Justificacion | null;
   hora_entrada: string | null;
   hora_salida: string | null;
 };
@@ -48,6 +61,8 @@ type PaseDeLista = {
   fecha: string;
   turno: string;
   cerrado: boolean;
+  // Catálogo del diálogo de justificación (DOCENTE no puede leer GET /causas)
+  motivos_justificacion: Motivo[];
   infantes: Renglon[];
 };
 
@@ -64,6 +79,8 @@ const TURNOS: Record<string, string> = {
   VESPERTINO: "Vespertino",
 };
 const TURNO_INICIAL = "MATUTINO";
+// El estado que pide motivo (feature 42)
+const JUSTIFICADO = "AUSENTE_JUSTIFICADO";
 // Mismo texto que el 409 de PUT /pase-lista (issue 24)
 const REQUIERE_ALTA = "Requiere alta para ingresar.";
 // asistencias.fecha es el día local de la estancia
@@ -84,13 +101,17 @@ const hora = (valor: string | null) =>
       })
     : "";
 
-// [IA] Generado con Claude (prompt #14 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Generado con Claude (prompt #14 en docs/ia/prompts.md), modificado con el prompt #42. Revisado por: pendiente
 // Texto del estado actual del renglón: el estado no se comunica solo con color.
+// Un ausente justificado dice también el motivo: "Ausente justificado — Enfermedad en casa".
 const textoEstado = (asistencia: Asistencia | null) => {
   if (!asistencia) {
     return "Sin registro";
   }
   const nombre = ESTADOS[asistencia.estado_codigo] ?? asistencia.estado_codigo;
+  if (asistencia.justificacion) {
+    return `${nombre} — ${asistencia.justificacion.causa_nombre}`;
+  }
   return asistencia.hora_entrada
     ? `${nombre} (entrada ${hora(asistencia.hora_entrada)})`
     : nombre;
@@ -101,11 +122,16 @@ const textoEstado = (asistencia: Asistencia | null) => {
 // "Marcar todos presentes" (1 clic) y luego 1 clic por cada excepción. DOCENTE y DIRECTORA capturan;
 // TRABAJO_SOCIAL y MEDICO solo consultan. Habla con GET/PUT /pase-lista y POST /pase-lista/todos-presentes.
 // Issue 24: el renglón de un infante con candado dice "Requiere alta para ingresar" y no deja marcarlo Presente.
+// Feature 42 (prompt #42): Ausente justificado pide el motivo en un diálogo; el renglón muestra el motivo, la nota
+// (solo a quien la puede leer) y "Cambiar motivo".
 export const PaseLista = () => {
   const notify = useNotify();
   const logoutIfAccessDenied = useLogoutIfAccessDenied();
   const { permissions: rol } = usePermissions();
   const puedeCapturar = puedeVer(ESCRITURA.PaseLista, rol);
+  const leeNota = puedeVer(LEEN_NOTA_JUSTIFICACION, rol);
+  // Renglón cuyo diálogo "Justificar inasistencia" está abierto (feature 42)
+  const [justificando, setJustificando] = useState<Renglon | null>(null);
   const [fecha, setFecha] = useState(hoy);
   // El seed solo opera MATUTINO; si la estancia no opera el turno elegido, el backend responde 400 con su mensaje
   const [turno, setTurno] = useState(TURNO_INICIAL);
@@ -148,8 +174,25 @@ export const PaseLista = () => {
     cargar();
   }, [cargar]);
 
-  const marcar = async (infante: Renglon, estado: string) => {
+  // [IA+Humano] Base generada con Claude (prompt #14), modificada con el prompt #42
+  // Ausente justificado no se guarda directo: primero abre el diálogo para el motivo.
+  const marcar = (infante: Renglon, estado: string) => {
     if (!pase || estado == infante.asistencia?.estado_codigo) {
+      return;
+    }
+    if (estado == JUSTIFICADO) {
+      setJustificando(infante);
+      return;
+    }
+    guardarEstado(infante, estado);
+  };
+
+  const guardarEstado = async (
+    infante: Renglon,
+    estado: string,
+    justificacion?: JustificacionCapturada,
+  ) => {
+    if (!pase) {
       return;
     }
     setGuardando(infante.id);
@@ -162,9 +205,11 @@ export const PaseLista = () => {
             fecha: pase.fecha,
             turno: pase.turno,
             estado_codigo: estado,
+            justificacion,
           }),
         },
       );
+      setJustificando(null);
       setPase(
         (actual) =>
           actual && {
@@ -316,6 +361,21 @@ export const PaseLista = () => {
                       >
                         {textoEstado(infante.asistencia)}
                       </Typography>
+                      {infante.asistencia?.justificacion?.nota && (
+                        <Typography variant="body2" color="text.secondary">
+                          Nota: {infante.asistencia.justificacion.nota}
+                        </Typography>
+                      )}
+                      {actual == JUSTIFICADO && !bloqueado && (
+                        <Button
+                          size="small"
+                          onClick={() => setJustificando(infante)}
+                          disabled={guardando != null}
+                          aria-label={`Cambiar motivo de ${nombre}`}
+                        >
+                          Cambiar motivo
+                        </Button>
+                      )}
                       {infante.requiere_alta && (
                         <Typography
                           id={`alta-${infante.id}`}
@@ -364,6 +424,27 @@ export const PaseLista = () => {
               })}
             </TableBody>
           </Table>
+        )}
+        {justificando && pase && (
+          <JustificarInasistencia
+            key={justificando.id}
+            infante={[
+              justificando.nombre,
+              justificando.primer_apellido,
+              justificando.segundo_apellido,
+            ]
+              .filter(Boolean)
+              .join(" ")}
+            motivos={pase.motivos_justificacion}
+            motivoActual={justificando.asistencia?.justificacion?.causa_codigo}
+            notaActual={justificando.asistencia?.justificacion?.nota}
+            leeNota={leeNota}
+            enviando={guardando != null}
+            alCancelar={() => setJustificando(null)}
+            alGuardar={(justificacion) =>
+              guardarEstado(justificando, JUSTIFICADO, justificacion)
+            }
+          />
         )}
       </CardContent>
     </Card>

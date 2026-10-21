@@ -53,14 +53,17 @@ router.get("/seguimientos", acceso, async (req, res)=>{
 // con su teléfono descifrado, llamadas con sus notas descifradas, causa con su asesoría y alta médica si existe.
 // Los campos descifrados salen sin el sufijo _cifrado. Como expone datos confidenciales, cada consulta exitosa
 // queda en audit_log con accion = READ_CONFIDENCIAL (además del registro general de la petición).
+// Modificado con el prompt #42: asistencia.justificacion trae el motivo y la nota del pase de lista.
 router.get("/seguimientos/:id", acceso, async (req, res)=>{
 	try{
 		let [seguimientos]=await db.query(
 			"SELECT s.id, s.estado, s.causa_codigo, s.detalle_causa_cifrado, DATE_FORMAT(s.fecha_probable_retorno, '%Y-%m-%d') AS fecha_probable_retorno,"+
 			" s.cerrado_en, s.cerrado_por, s.created_at, s.updated_at, a.id AS asistencia_id, DATE_FORMAT(a.fecha, '%Y-%m-%d') AS fecha, a.turno,"+
-			" a.estado_codigo, e.nombre AS estado_nombre, i.id AS infante_id, i.matricula, i.nombre, i.primer_apellido, i.segundo_apellido,"+
+			" a.estado_codigo, e.nombre AS estado_nombre, a.justificacion_causa_codigo, cj.nombre AS justificacion_causa_nombre, a.justificacion_cifrado,"+
+			" i.id AS infante_id, i.matricula, i.nombre, i.primer_apellido, i.segundo_apellido,"+
 			" DATE_FORMAT(i.fecha_nacimiento, '%Y-%m-%d') AS fecha_nacimiento"+
-			DESDE+" WHERE s.id=? AND a.estancia_id=? AND s.deleted_at IS NULL AND a.deleted_at IS NULL",
+			DESDE+" LEFT JOIN causas_inasistencia cj ON cj.codigo=a.justificacion_causa_codigo"+
+			" WHERE s.id=? AND a.estancia_id=? AND s.deleted_at IS NULL AND a.deleted_at IS NULL",
 			[req.params.id, req.usuario.estancia_id]
 		);
 		let fila=seguimientos[0];
@@ -105,7 +108,13 @@ router.get("/seguimientos/:id", acceso, async (req, res)=>{
 			cerrado_por: fila.cerrado_por,
 			created_at: fila.created_at,
 			updated_at: fila.updated_at,
-			asistencia: {id: fila.asistencia_id, fecha: fila.fecha, turno: fila.turno, estado_codigo: fila.estado_codigo, estado_nombre: fila.estado_nombre},
+			asistencia: {
+				id: fila.asistencia_id, fecha: fila.fecha, turno: fila.turno, estado_codigo: fila.estado_codigo, estado_nombre: fila.estado_nombre,
+				// Feature 42: el motivo y la nota que se capturaron en el pase de lista al marcar AUSENTE_JUSTIFICADO
+				justificacion: fila.justificacion_causa_codigo==null?null:{
+					causa_codigo: fila.justificacion_causa_codigo, causa_nombre: fila.justificacion_causa_nombre, nota: descifrar(fila.justificacion_cifrado)
+				}
+			},
 			infante: {
 				id: fila.infante_id, matricula: fila.matricula, nombre: fila.nombre, primer_apellido: fila.primer_apellido,
 				segundo_apellido: fila.segundo_apellido, fecha_nacimiento: fila.fecha_nacimiento

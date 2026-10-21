@@ -151,6 +151,14 @@ const DetalleSeguimiento = () => {
           {TURNOS[caso.asistencia.turno] ?? caso.asistencia.turno} ·{" "}
           {caso.asistencia.estado_nombre}
         </Dato>
+        {/* Feature 42 (prompt #42): por qué se justificó, según lo capturado en el pase de lista */}
+        {caso.asistencia.justificacion && (
+          <Dato etiqueta="Justificación del pase de lista">
+            {caso.asistencia.justificacion.causa_nombre}
+            {caso.asistencia.justificacion.nota &&
+              ` · ${caso.asistencia.justificacion.nota}`}
+          </Dato>
+        )}
         <Dato etiqueta="Estado del caso">
           {ESTADOS_CASO[caso.estado] ?? caso.estado}
         </Dato>

@@ -1,3 +1,4 @@
+import { Typography } from "@mui/material";
 import {
   Datagrid,
   DateField,
@@ -43,9 +44,27 @@ const filtros = [
   />,
 ];
 
-// [IA] Generado con Claude (prompt #19 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Generado con Claude (prompt #42 en docs/ia/prompts.md). Revisado por: pendiente
+// Motivo de un ausente justificado y, debajo, la nota (el backend solo la manda a DIRECTORA, TRABAJO_SOCIAL y MEDICO).
+const Motivo = ({ asistencia }: { asistencia: RaRecord }) =>
+  asistencia.justificacion_causa_nombre ? (
+    <>
+      <Typography variant="body2">
+        {asistencia.justificacion_causa_nombre}
+      </Typography>
+      {asistencia.justificacion_nota && (
+        <Typography variant="body2" color="text.secondary">
+          {asistencia.justificacion_nota}
+        </Typography>
+      )}
+    </>
+  ) : (
+    <>—</>
+  );
+
+// [IA+Humano] Base generada con Claude (prompt #19 en docs/ia/prompts.md), modificada con el prompt #42. Revisado por: pendiente
 // Historial de solo lectura para todos los roles de estancia; el backend siempre filtra por la estancia del token.
-// El estado se muestra con su nombre (texto), no solo con color.
+// El estado se muestra con su nombre (texto), no solo con color. "Motivo": por qué se justificó la falta.
 export const ListarAsistencias = () => (
   <List
     title="Historial de asistencia"
@@ -71,6 +90,11 @@ export const ListarAsistencias = () => (
         }
       />
       <TextField source="estado_nombre" label="Estado" sortBy="estado_codigo" />
+      <FunctionField
+        label="Motivo"
+        sortable={false}
+        render={(asistencia: RaRecord) => <Motivo asistencia={asistencia} />}
+      />
       <DateField
         source="hora_entrada"
         label="Entrada"

@@ -171,3 +171,16 @@ Herramienta: Claude (Claude Code).
 
   cuando se desactiva debe de salir la opcion de activar para no tener que crear nuevamente la estancia
   ```
+
+## #42 · Feature 42: Justificación de la inasistencia (sin issue en el plan)
+- **Quién:** Jesús
+- **Para qué:** al marcar "Ausente justificado" en el pase de lista se pide el motivo (catálogo `causas_inasistencia`, sin "Sin respuesta") y una nota opcional cifrada. El motivo se ve en el pase de lista, el historial y el detalle del seguimiento (donde además llena de antemano la clasificación); la nota solo la leen DIRECTORA, TRABAJO_SOCIAL y MEDICO, y cada lectura queda como `READ_CONFIDENCIAL`. Migración `backend/migraciones/42_justificacion_inasistencia.sql`. Claude generó el código; Jesús lo revisa y hace los commits.
+- **Citado en:** `backend/migraciones/42_justificacion_inasistencia.sql`, `backend/rutas/asistencia.js`, `backend/rutas/historial.js`, `backend/rutas/seguimientos.js`, `frontend/src/paginas/JustificarInasistencia.tsx`, `PaseLista.tsx`, `Seguimiento.tsx`, `ClasificarSeguimiento.tsx`, `frontend/src/recursos/Asistencias.tsx`, `frontend/src/permisos.ts`.
+- **Prompt:**
+  ```
+  Dudas generales: Donde se pone la informacion de la justificación del infante de su inasistencia si es que existe
+
+  Esta issue no quiero eso, sino que a los alumnos se les puede poner faltas justificada pero no sale el porque o como se logra obetener esto
+
+  (Decisiones elegidas: pedir motivo y nota al marcar; motivo visible para todos y nota restringida; script de migración.)
+  ```
