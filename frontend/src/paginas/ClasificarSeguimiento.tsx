@@ -36,7 +36,11 @@ type Seguimiento = {
   id: string;
   estado: string;
   fecha_probable_retorno: string | null;
-  asistencia: { fecha: string };
+  // justificacion: lo capturado en el pase de lista al marcar Ausente justificado (feature 42)
+  asistencia: {
+    fecha: string;
+    justificacion: { causa_codigo: string; nota: string | null } | null;
+  };
   causa: { codigo: string; detalle: string | null } | null;
   contactos: Contacto[];
 };
@@ -67,8 +71,16 @@ export const ClasificarSeguimiento = ({ seguimiento, alClasificar }: Props) => {
   const notify = useNotify();
   const logoutIfAccessDenied = useLogoutIfAccessDenied();
   const [causas, setCausas] = useState<RaRecord[]>([]);
-  const [causa, setCausa] = useState(seguimiento.causa?.codigo ?? "");
-  const [detalle, setDetalle] = useState(seguimiento.causa?.detalle ?? "");
+  // Modificado con el prompt #42: si el caso aún no se clasifica, arranca con el motivo y la nota del pase de lista
+  const justificacion = seguimiento.causa
+    ? null
+    : seguimiento.asistencia.justificacion;
+  const [causa, setCausa] = useState(
+    seguimiento.causa?.codigo ?? justificacion?.causa_codigo ?? "",
+  );
+  const [detalle, setDetalle] = useState(
+    seguimiento.causa?.detalle ?? justificacion?.nota ?? "",
+  );
   const [retorno, setRetorno] = useState(
     seguimiento.fecha_probable_retorno ?? "",
   );

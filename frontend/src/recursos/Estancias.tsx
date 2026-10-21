@@ -2,6 +2,7 @@ import {
   AutocompleteInput,
   Create,
   Datagrid,
+  DeleteButton,
   Edit,
   List,
   ReferenceField,
@@ -11,26 +12,47 @@ import {
   TextField,
   TextInput,
   Toolbar,
+  WrapperField,
   maxLength,
   required,
 } from "react-admin";
 import { useErrorAlGuardar } from "./errores";
+import {
+  BotonActivar,
+  filtroDesactivadas,
+  useMostrandoDesactivadas,
+} from "./Desactivadas";
 
 const DUPLICADO = "Ya existe una estancia con esa clave.";
 
 // [IA] Generado con Claude (prompt #8 en docs/ia/prompts.md). Revisado por: pendiente
-// Solo guardar: el plan pide lista, crear y editar (sin borrar).
+// Al crear solo hay guardar.
 const BarraGuardar = () => (
   <Toolbar>
     <SaveButton />
   </Toolbar>
 );
 
-// [IA] Generado con Claude (prompt #8 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Generado con Claude (prompt #41 en docs/ia/prompts.md). Revisado por: pendiente
+// Al editar, además, "Desactivar" (borrado lógico) con confirmación. pessimistic: si el backend responde 409
+// (tiene infantes o usuarios activos), la estancia sigue en pantalla y el aviso muestra el mensaje del backend.
+const BarraEditar = () => (
+  <Toolbar sx={{ justifyContent: "space-between" }}>
+    <SaveButton />
+    <DeleteButton
+      label="Desactivar"
+      mutationMode="pessimistic"
+      confirmTitle="¿Desactivar la estancia?"
+      confirmContent="Dejará de aparecer en las listas, el tablero y los reportes, y ya no cerrará turnos. Se puede volver a activar con «Mostrar desactivadas». Solo se puede si no tiene infantes ni usuarios activos."
+    />
+  </Toolbar>
+);
+
+// [IA] Generado con Claude (prompt #8 en docs/ia/prompts.md), modificado con el prompt #41. Revisado por: pendiente
 // Límites iguales a las columnas de estancias en schema.sql. Los turnos vienen del seed
 // y no se editan aquí; max_sesiones queda fuera de alcance (plan, sección 7).
-const FormularioEstancia = () => (
-  <SimpleForm toolbar={<BarraGuardar />}>
+const FormularioEstancia = ({ editando = false }: { editando?: boolean }) => (
+  <SimpleForm toolbar={editando ? <BarraEditar /> : <BarraGuardar />}>
     <ReferenceInput
       source="region_id"
       reference="Regiones"
@@ -57,15 +79,37 @@ const FormularioEstancia = () => (
   </SimpleForm>
 );
 
-// [IA+Humano] Base generada con Claude (prompt #3 en docs/ia/prompts.md), modificada con el prompt #8. Revisado por: pendiente
-export const ListarEstancias = () => (
-  <List sort={{ field: "clave", order: "ASC" }}>
-    <Datagrid rowClick="edit" bulkActionButtons={false}>
+// [IA] Generado con Claude (prompt #41 en docs/ia/prompts.md). Revisado por: pendiente
+// Con "Mostrar desactivadas" los renglones no abren Editar y llevan el botón Activar.
+const TablaEstancias = () => {
+  const desactivadas = useMostrandoDesactivadas();
+  return (
+    <Datagrid
+      rowClick={desactivadas ? false : "edit"}
+      bulkActionButtons={false}
+    >
       <TextField source="clave" label="Clave" />
       <TextField source="nombre" label="Nombre" />
-      <ReferenceField source="region_id" reference="Regiones" label="Región" />
+      <ReferenceField
+        source="region_id"
+        reference="Regiones"
+        label="Región"
+        link={desactivadas ? false : "edit"}
+      />
       <TextField source="direccion" label="Dirección" />
+      {desactivadas && (
+        <WrapperField label="Acción">
+          <BotonActivar />
+        </WrapperField>
+      )}
     </Datagrid>
+  );
+};
+
+// [IA+Humano] Base generada con Claude (prompt #3 en docs/ia/prompts.md), modificada con los prompts #8 y #41. Revisado por: pendiente
+export const ListarEstancias = () => (
+  <List sort={{ field: "clave", order: "ASC" }} filters={[filtroDesactivadas]}>
+    <TablaEstancias />
   </List>
 );
 
@@ -94,7 +138,7 @@ export const EditarEstancia = () => {
       mutationMode="pessimistic"
       mutationOptions={{ onError }}
     >
-      <FormularioEstancia />
+      <FormularioEstancia editando />
     </Edit>
   );
 };

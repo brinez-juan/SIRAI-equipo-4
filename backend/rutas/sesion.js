@@ -9,13 +9,18 @@ const MAX_INTENTOS=5;
 const MINUTOS_BLOQUEO=15;
 const DURACION_TOKEN="8h"; // un turno
 
-// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md), modificado con el prompt #30. Revisado por: pendiente
 // Única ruta pública del backend. Recibe {username (correo), password} y devuelve un JWT.
 // Tras MAX_INTENTOS fallidos la cuenta se bloquea MINUTOS_BLOQUEO minutos.
 router.post("/login", async (req, res)=>{
 	try{
-		let correo=req.body.username;
-		let pass=req.body.password;
+		let correo=req.body?.username;
+		let pass=req.body?.password;
+		// Prompt #30: correo y contraseña deben ser texto. Un objeto en el correo llegaba a la consulta SQL
+		// (mysql2 lo convierte en "columna = valor") y una contraseña que no es texto hacía fallar argon2 con un 500.
+		if(typeof correo!="string" || typeof pass!="string"){
+			return res.status(400).json({message: "Faltan el correo y la contraseña."});
+		}
 		let [usuarios]=await db.query("SELECT * FROM usuarios WHERE correo=? AND deleted_at IS NULL", [correo]);
 		let data=usuarios[0];
 		if(data==null || !data.activo){

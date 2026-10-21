@@ -22,14 +22,23 @@ import {
   listarUsuarios,
 } from "./recursos/Usuarios";
 import { ListarAsistencias } from "./recursos/Asistencias";
+import { Bandeja } from "./paginas/Bandeja";
+import { Seguimiento } from "./paginas/Seguimiento";
+import InboxIcon from "@mui/icons-material/Inbox";
+import { ListarBitacora, VerBitacora } from "./recursos/Bitacora";
+import HistoryIcon from "@mui/icons-material/History";
 import type { ComponentType } from "react";
 import { Route } from "react-router-dom";
 import { PaseLista } from "./paginas/PaseLista";
+import { Expediente } from "./paginas/Expediente";
+import { Reportes } from "./paginas/Reportes";
 import { ESCRITURA, PAGINAS, RECURSOS, puedeVer } from "./permisos";
 
 // Páginas propias por ruta (deben estar también en PAGINAS de permisos.ts, con sus roles).
 const COMPONENTES_PAGINA: Record<string, ComponentType> = {
   "pase-lista": PaseLista,
+  "expediente/:infanteId": Expediente,
+  reportes: Reportes,
 };
 
 // Cada issue agrega aquí su línea (y su entrada en permisos.ts con los roles).
@@ -70,6 +79,23 @@ const COMPONENTES_RECURSO: Record<string, Omit<ResourceProps, "name">> = {
   Asistencias: {
     list: ListarAsistencias,
     options: { label: "Historial de asistencia" },
+  },
+  // En minúsculas porque es la ruta del backend (GET /seguimientos y /seguimientos/:id)
+  seguimientos: {
+    list: Bandeja,
+    show: Seguimiento,
+    icon: InboxIcon,
+    options: { label: "Bandeja de seguimiento" },
+    recordRepresentation: (caso) =>
+      `${caso.nombre ?? caso.infante?.nombre} ${caso.primer_apellido ?? caso.infante?.primer_apellido}`,
+  },
+  // Solo lectura: sin create ni edit (el backend no tiene POST, PUT ni DELETE)
+  Bitacora: {
+    list: ListarBitacora,
+    show: VerBitacora,
+    icon: HistoryIcon,
+    options: { label: "Bitácora" },
+    recordRepresentation: (registro) => `#${registro.id}`,
   },
 };
 

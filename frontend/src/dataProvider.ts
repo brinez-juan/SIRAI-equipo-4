@@ -20,6 +20,13 @@ const tutoresUrl = (infanteId: Identifier) =>
 // Se usan con useDataProvider<typeof dataProvider>().
 export const dataProvider = {
   ...jsonServerProvider(import.meta.env.VITE_BACKEND, fetchJsonUtil),
+  // [IA] Generado con Claude (prompt #41 en docs/ia/prompts.md). Revisado por: pendiente
+  // Vuelve a activar una región o estancia desactivada (POST /<recurso>/:id/activar).
+  activar: (resource: string, id: Identifier) =>
+    fetchJsonUtil(
+      `${import.meta.env.VITE_BACKEND}/${resource}/${encodeURIComponent(id)}/activar`,
+      { method: "POST" },
+    ).then(({ json }) => json as RaRecord),
   tutoresDeInfante: (infanteId: Identifier) =>
     fetchJsonUtil(tutoresUrl(infanteId)).then(({ json }) => json as RaRecord[]),
   vincularTutor: (
@@ -91,4 +98,34 @@ export const dataProvider = {
       `${import.meta.env.VITE_BACKEND}/pase-lista/${encodeURIComponent(infanteId)}/salida`,
       { method: "PUT", body: JSON.stringify(datos) },
     ).then(({ json }) => json as RaRecord),
+  // [IA] Generado con Claude (prompt #22 en docs/ia/prompts.md). Revisado por: pendiente
+  // Registrar una llamada de un seguimiento (issue 22): a un tutor o a un contacto de emergencia (solo uno).
+  registrarLlamada: (
+    seguimientoId: Identifier,
+    datos: {
+      tutor_id?: Identifier;
+      contacto_emergencia_id?: Identifier;
+      resultado: string;
+      notas?: string;
+    },
+  ) =>
+    fetchJsonUtil(
+      `${import.meta.env.VITE_BACKEND}/seguimientos/${encodeURIComponent(seguimientoId)}/llamadas`,
+      { method: "POST", body: JSON.stringify(datos) },
+    ).then(({ json }) => json as RaRecord),
+  // [IA] Generado con Claude (prompt #27 en docs/ia/prompts.md). Revisado por: pendiente
+  // Tablero semáforo (issue 26/27): una fila anónima por estancia del día pedido (AAAA-MM-DD).
+  tablero: (fecha: string) =>
+    fetchJsonUtil(
+      `${import.meta.env.VITE_BACKEND}/tablero?fecha=${encodeURIComponent(fecha)}`,
+    ).then(
+      ({ json }) =>
+        json as {
+          estancia: string;
+          total: number;
+          presentes: number;
+          porcentaje: number | null;
+          semaforo: string;
+        }[],
+    ),
 };

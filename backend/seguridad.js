@@ -50,16 +50,30 @@ async function log(sujeto, accion, entidad, entidadId, antes, despues, req){
 	}
 }
 
-// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md), modificado con el prompt #30. Revisado por: pendiente
 // Verifica el JWT del header "Authentication". Si es válido deja sus datos en req.usuario
 // ({usuario, rol, estancia_id, region_id}); si falta, expiró o fue alterado responde 401.
-function autenticar(req, res, next){
+// Prompt #30: además revisa en la base que el usuario siga activo y con el mismo rol y alcance que dice el token.
+// Sin esto, un usuario desactivado (o al que le cambiaron el rol) conservaba su acceso hasta que el token expirara (8 h).
+async function autenticar(req, res, next){
+	let sujeto;
 	try{
-		req.usuario=jwt.verify(req.get("Authentication"), process.env.LLAVESECRETA);
-		next();
+		sujeto=jwt.verify(req.get("Authentication"), process.env.LLAVESECRETA);
 	}catch{
-		res.sendStatus(401);
+		return res.sendStatus(401);
 	}
+	try{
+		let [usuarios]=await db.query("SELECT rol, estancia_id, region_id, activo FROM usuarios WHERE id=? AND deleted_at IS NULL", [sujeto.usuario]);
+		let actual=usuarios[0];
+		if(actual==null || !actual.activo || actual.rol!=sujeto.rol || actual.estancia_id!=sujeto.estancia_id || actual.region_id!=sujeto.region_id){
+			return res.sendStatus(401);
+		}
+	}catch(error){
+		console.error(error);
+		return res.sendStatus(500);
+	}
+	req.usuario=sujeto;
+	next();
 }
 
 // [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente

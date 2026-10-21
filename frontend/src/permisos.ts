@@ -27,6 +27,10 @@ export const RECURSOS: Record<string, Rol[]> = {
   Tutores: ["DIRECTORA", "TRABAJO_SOCIAL"],
   Usuarios: ["ADMIN_CENTRAL"],
   Asistencias: ["DIRECTORA", "DOCENTE", "TRABAJO_SOCIAL", "MEDICO"],
+  // Bandeja y detalle de seguimiento (issue 21). DOCENTE no ve notas ni seguimientos (tabla 2.5)
+  seguimientos: ["TRABAJO_SOCIAL", "MEDICO", "DIRECTORA"],
+  // Visor de la bitácora (issue 29), solo lectura
+  Bitacora: ["ADMIN_CENTRAL"],
 };
 
 // [IA] Generado con Claude (prompt #9 en docs/ia/prompts.md). Revisado por: pendiente
@@ -43,7 +47,22 @@ export const ESCRITURA: Record<string, Rol[]> = {
 // Páginas propias (no son <Resource>): ruta -> roles que la ven en el menú y pueden abrirla.
 export const PAGINAS: Record<string, Rol[]> = {
   "pase-lista": ["DOCENTE", "DIRECTORA", "TRABAJO_SOCIAL", "MEDICO"],
+  // Expediente imprimible (issue 25); se abre desde el detalle del seguimiento, no desde el menú
+  "expediente/:infanteId": ["TRABAJO_SOCIAL", "MEDICO", "DIRECTORA"],
+  // Cortes de asistencia en CSV y PDF (issue 28): sin nombres; el backend filtra por estancia o región
+  reportes: ["DIRECTORA", "SUPERVISOR", "ADMIN_CENTRAL"],
 };
+
+// Tablero semáforo (issue 27): es su pantalla de Inicio, no una ruta propia. Debe coincidir con backend/rutas/tablero.js
+export const TABLERO: Rol[] = ["SUPERVISOR", "ADMIN_CENTRAL"];
+
+// Feature 42: quién lee la nota de la justificación de una inasistencia. DOCENTE la escribe pero no la lee
+// (no ve notas ni seguimientos, tabla 2.5). Debe coincidir con LEEN_NOTA en backend/rutas/asistencia.js
+export const LEEN_NOTA_JUSTIFICACION: Rol[] = [
+  "DIRECTORA",
+  "TRABAJO_SOCIAL",
+  "MEDICO",
+];
 
 export const puedeVer = (
   permitidos: Rol[] | undefined,
