@@ -20,6 +20,7 @@ const rutasInfanteTutor=require("./rutas/infanteTutor");
 const rutasContactos=require("./rutas/contactos");
 const rutasAsistencia=require("./rutas/asistencia");
 const rutasSalida=require("./rutas/salida");
+const rutasHistorial=require("./rutas/historial");
 
 const PORT=3000;
 const app=express();
@@ -41,6 +42,7 @@ app.use(rutasInfanteTutor);
 app.use(rutasContactos);
 app.use(rutasAsistencia);
 app.use(rutasSalida);
+app.use(rutasHistorial);
 
 // [Humano] Escrito por: pendiente. Arranque HTTPS del servidor con los certificados backend.key y backend.crt
 const options={

@@ -21,6 +21,7 @@ import {
   editarUsuario,
   listarUsuarios,
 } from "./recursos/Usuarios";
+import { ListarAsistencias } from "./recursos/Asistencias";
 import { ESCRITURA, RECURSOS, puedeVer } from "./permisos";
 
 // Cada issue agrega aquí su línea (y su entrada en permisos.ts con los roles).
@@ -57,6 +58,10 @@ const COMPONENTES_RECURSO: Record<string, Omit<ResourceProps, "name">> = {
     edit: editarUsuario,
     recordRepresentation: (usuario) =>
       `${usuario.nombre} ${usuario.primer_apellido}`,
+  },
+  Asistencias: {
+    list: ListarAsistencias,
+    options: { label: "Historial de asistencia" },
   },
 };
 
