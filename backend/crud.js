@@ -16,8 +16,6 @@ const {cifrar, descifrar}=require("./cifrado");
 // Opcional: alcance: (req)=>({sql, valores}), para tablas sin estancia_id propio (ej. tutores). Devuelve una
 // condición " AND ..." con "?" que se aplica a toda lectura, edición y borrado; debe salir del token
 // (req.usuario.estancia_id), nunca del request. Igual que porEstancia, un usuario sin estancia recibe 403.
-// Opcional: generados: {columna: ()=>valor}, columnas que llena el servidor al crear (ej. un código de credencial);
-// no van en "columnas", así el request no puede escribirlas ni cambiarlas.
 // Opcional: validar: (req, creando)=>mensaje|null, revisa el body antes de escribir; si devuelve un mensaje, responde 400.
 // Opcional: alCrear: async (conexion, req, id)=>[{tabla, id, fila}], corre en la misma transacción que el INSERT
 // (si falla, no se guarda nada) y devuelve las filas extra que insertó para registrarlas en audit_log.
@@ -163,7 +161,7 @@ async function deleteData(recurso, id, req, res){
 }
 
 // [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md), modificado con los prompts #9 y #10. Revisado por: pendiente
-// id (uuid), estancia_id (porEstancia) y las columnas "generados" los pone el servidor; lo que mande el request
+// id (uuid) y estancia_id (porEstancia) los pone el servidor; lo que mande el request
 // en esos campos se ignora. Con "alCrear", el INSERT y las filas extra van en una transacción: o se guardan todas o ninguna.
 async function createData(recurso, req, res){
 	let invalido=recurso.validar?.(req, true);
@@ -182,10 +180,6 @@ async function createData(recurso, req, res){
 	if(recurso.porEstancia){
 		campos.push("estancia_id");
 		valores.push(req.usuario.estancia_id);
-	}
-	for(let campo in recurso.generados){
-		campos.push(campo);
-		valores.push(recurso.generados[campo]());
 	}
 	let sql="INSERT INTO "+mysql.escapeId(recurso.tabla)+" ("+campos.map(campo=>mysql.escapeId(campo)).join(", ")+") VALUES (?)";
 	let resultado;
