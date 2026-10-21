@@ -43,6 +43,8 @@ export const ESCRITURA: Record<string, Rol[]> = {
 // Páginas propias (no son <Resource>): ruta -> roles que la ven en el menú y pueden abrirla.
 export const PAGINAS: Record<string, Rol[]> = {
   "pase-lista": ["DOCENTE", "DIRECTORA", "TRABAJO_SOCIAL", "MEDICO"],
+  // Expediente imprimible (issue 25); se abre desde el detalle del seguimiento, no desde el menú
+  "expediente/:infanteId": ["TRABAJO_SOCIAL", "MEDICO", "DIRECTORA"],
 };
 
 export const puedeVer = (
