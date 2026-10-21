@@ -1,23 +1,15 @@
 // Datos sintéticos y usuarios iniciales para la demo.
 // Uso: sobre una base recién creada con docs/schema.sql, desde backend/: node seed.js
 process.loadEnvFile(".env");
-if(!process.env.DATABASE_URL){
-	console.error("Falta DATABASE_URL en backend/.env (ver .env.example)");
+if(!process.env.DATABASE_URL || !process.env.LLAVE_CIFRADO){
+	console.error("Faltan DATABASE_URL o LLAVE_CIFRADO en backend/.env (ver .env.example)");
 	process.exit(1);
 }
 
 const argon2=require("argon2");
 const {db, uuidv7}=require("./db");
 
-// cifrar() llega con el issue 07 (cifrado.js). Mientras no exista, los teléfonos se guardan en claro.
-// TODO: quitar este respaldo cuando cifrado.js esté en develop.
-let cifrar;
-try{
-	({cifrar}=require("./cifrado"));
-}catch{
-	console.warn("AVISO: no existe cifrado.js (issue 07); los teléfonos se guardan SIN cifrar.");
-	cifrar=texto=>texto;
-}
+const {cifrar}=require("./cifrado");
 
 const PASSWORD_DEMO="Sirai#2026";
 const INFANTES_POR_ESTANCIA=20;
