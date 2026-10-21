@@ -24,6 +24,7 @@ const rutasHistorial=require("./rutas/historial");
 const rutasCierres=require("./rutas/cierres");
 const rutasSeguimientos=require("./rutas/seguimientos");
 const rutasLlamadas=require("./rutas/llamadas");
+const rutasCausas=require("./rutas/causas");
 const {iniciarCierreAutomatico}=require("./cierreTurno");
 
 const PORT=3000;
@@ -50,6 +51,7 @@ app.use(rutasHistorial);
 app.use(rutasCierres);
 app.use(rutasSeguimientos);
 app.use(rutasLlamadas);
+app.use(rutasCausas);
 
 // [Humano] Escrito por: pendiente. Arranque HTTPS del servidor con los certificados backend.key y backend.crt
 const options={

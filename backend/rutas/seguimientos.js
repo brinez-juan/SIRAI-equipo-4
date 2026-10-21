@@ -1,7 +1,7 @@
 const express=require("express");
 const {db, responderError}=require("../db");
 const {log, permitir}=require("../seguridad");
-const {descifrar}=require("../cifrado");
+const {cifrar, descifrar}=require("../cifrado");
 
 const router=express.Router();
 
@@ -125,6 +125,96 @@ router.get("/seguimientos/:id", acceso, async (req, res)=>{
 			alta: alta?.id??null
 		}, req);
 		res.json(detalle);
+	}catch(error){
+		responderError(res, error);
+	}
+});
+
+// Estados desde los que se puede clasificar. Un caso CLASIFICADO se puede volver a clasificar (corregir la causa);
+// uno CERRADO ya no se toca.
+const CLASIFICABLES=["ABIERTO", "EN_CONTACTO", "CLASIFICADO"];
+const MAX_DETALLE=2000;
+
+// [IA] Generado con Claude (prompt #23 en docs/ia/prompts.md). Revisado por: pendiente
+// Fecha AAAA-MM-DD que exista en el calendario.
+function esFecha(texto){
+	return typeof texto=="string" && /^\d{4}-\d{2}-\d{2}$/.test(texto) && new Date(texto+"T00:00:00Z").toISOString().slice(0, 10)==texto;
+}
+
+// [IA] Generado con Claude (prompt #23 en docs/ia/prompts.md). Revisado por: pendiente
+// Revisa el body de clasificar. detalle y fecha_probable_retorno son opcionales (null o vacío = sin dato).
+// Exigir texto evita que un objeto o arreglo llegue a la consulta SQL.
+function validarClasificacion(cuerpo){
+	if(typeof cuerpo.causa_codigo!="string" || cuerpo.causa_codigo==""){
+		return "Falta la causa.";
+	}
+	if(cuerpo.detalle!=null && (typeof cuerpo.detalle!="string" || cuerpo.detalle.length>MAX_DETALLE)){
+		return "El detalle debe ser un texto de hasta "+MAX_DETALLE+" caracteres.";
+	}
+	if(cuerpo.fecha_probable_retorno!=null && !esFecha(cuerpo.fecha_probable_retorno)){
+		return "La fecha probable de retorno debe tener el formato AAAA-MM-DD.";
+	}
+	return null;
+}
+
+// [IA] Generado con Claude (prompt #23 en docs/ia/prompts.md). Revisado por: pendiente
+// Clasifica la causa de la inasistencia y pasa el caso a CLASIFICADO. PUT reemplaza la clasificación completa:
+// lo que no venga (detalle, fecha) queda en NULL. El detalle es confidencial: se guarda cifrado y en la bitácora
+// solo entra cifrado, con el antes y el después. Es un solo UPDATE condicionado al estado, así que si el caso se
+// cerró mientras tanto no se sobrescribe (409). El seguimiento es de mi estancia (por su asistencia) o 404.
+// Body: {causa_codigo, detalle, fecha_probable_retorno}.
+router.put("/seguimientos/:id/clasificar", acceso, async (req, res)=>{
+	try{
+		let cuerpo=req.body??{};
+		let invalido=validarClasificacion(cuerpo);
+		if(invalido){
+			return res.status(400).json({message: invalido});
+		}
+		let [filas]=await db.query(
+			"SELECT s.id, s.estado, s.causa_codigo, s.detalle_causa_cifrado, DATE_FORMAT(s.fecha_probable_retorno, '%Y-%m-%d') AS fecha_probable_retorno,"+
+			" DATE_FORMAT(a.fecha, '%Y-%m-%d') AS fecha"+DESDE+
+			" WHERE s.id=? AND a.estancia_id=? AND s.deleted_at IS NULL AND a.deleted_at IS NULL",
+			[req.params.id, req.usuario.estancia_id]
+		);
+		let actual=filas[0];
+		if(actual==null){
+			return res.sendStatus(404);
+		}
+		if(!CLASIFICABLES.includes(actual.estado)){
+			return res.status(409).json({message: "El caso ya no se puede clasificar."});
+		}
+		let [causas]=await db.query(
+			"SELECT codigo, nombre, asesoria, requiere_alta, justifica_falta, notifica_emergencia FROM causas_inasistencia WHERE codigo=?",
+			[cuerpo.causa_codigo]
+		);
+		if(causas.length==0){
+			return res.status(400).json({message: "La causa no es válida."});
+		}
+		let retorno=cuerpo.fecha_probable_retorno??null;
+		if(retorno!=null && retorno<actual.fecha){
+			return res.status(400).json({message: "La fecha probable de retorno no puede ser anterior a la inasistencia."});
+		}
+		let detalle=typeof cuerpo.detalle=="string" && cuerpo.detalle.trim()!=""?cuerpo.detalle.trim():null;
+		let [resultado]=await db.query(
+			"UPDATE seguimientos SET estado='CLASIFICADO', causa_codigo=?, detalle_causa_cifrado=?, fecha_probable_retorno=?, updated_at=CURRENT_TIMESTAMP(3)"+
+			" WHERE id=? AND estado IN (?) AND deleted_at IS NULL",
+			[cuerpo.causa_codigo, cifrar(detalle), retorno, actual.id, CLASIFICABLES]
+		);
+		if(resultado.affectedRows==0){
+			return res.status(409).json({message: "El caso ya no se puede clasificar."});
+		}
+		let [despuesFilas]=await db.query(
+			"SELECT estado, causa_codigo, detalle_causa_cifrado, DATE_FORMAT(fecha_probable_retorno, '%Y-%m-%d') AS fecha_probable_retorno FROM seguimientos WHERE id=?",
+			[actual.id]
+		);
+		let antes={estado: actual.estado, causa_codigo: actual.causa_codigo, detalle_causa_cifrado: actual.detalle_causa_cifrado, fecha_probable_retorno: actual.fecha_probable_retorno};
+		await log(req.usuario, "UPDATE", "seguimientos", actual.id, antes, despuesFilas[0], req);
+		res.json({
+			id: actual.id,
+			estado: despuesFilas[0].estado,
+			fecha_probable_retorno: despuesFilas[0].fecha_probable_retorno,
+			causa: {...causas[0], detalle: descifrar(despuesFilas[0].detalle_causa_cifrado)}
+		});
 	}catch(error){
 		responderError(res, error);
 	}
