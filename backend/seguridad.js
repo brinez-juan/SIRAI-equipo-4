@@ -18,6 +18,7 @@ function jsonCanonico(valor){
 // [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
 // audit_log es una cadena: hash = SHA-256(hash_prev + jsonCanonico(registro)).
 // El lock evita que dos inserts concurrentes tomen el mismo hash_prev.
+// Sin req (procesos del sistema como el cierre automático) la ip y el user_agent quedan en NULL.
 async function log(sujeto, accion, entidad, entidadId, antes, despues, req){
 	let conn=await db.getConnection();
 	try{
@@ -28,8 +29,8 @@ async function log(sujeto, accion, entidad, entidadId, antes, despues, req){
 		nuevoLog["ts"]=new Date().toISOString();
 		nuevoLog["usuario_id"]=sujeto?sujeto.usuario:null;
 		nuevoLog["rol"]=sujeto?sujeto.rol:null;
-		nuevoLog["ip"]=req.ip??null;
-		nuevoLog["user_agent"]=req.get("User-Agent")?.slice(0,255)??null;
+		nuevoLog["ip"]=req?.ip??null;
+		nuevoLog["user_agent"]=req?.get("User-Agent")?.slice(0,255)??null;
 		nuevoLog["request_id"]=crypto.randomUUID();
 		nuevoLog["accion"]=accion;
 		nuevoLog["entidad"]=entidad.slice(0,50);
