@@ -27,6 +27,8 @@ export const RECURSOS: Record<string, Rol[]> = {
   Tutores: ["DIRECTORA", "TRABAJO_SOCIAL"],
   Usuarios: ["ADMIN_CENTRAL"],
   Asistencias: ["DIRECTORA", "DOCENTE", "TRABAJO_SOCIAL", "MEDICO"],
+  // Bandeja y detalle de seguimiento (issue 21). DOCENTE no ve notas ni seguimientos (tabla 2.5)
+  seguimientos: ["TRABAJO_SOCIAL", "MEDICO", "DIRECTORA"],
 };
 
 // [IA] Generado con Claude (prompt #9 en docs/ia/prompts.md). Revisado por: pendiente

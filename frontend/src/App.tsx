@@ -22,6 +22,9 @@ import {
   listarUsuarios,
 } from "./recursos/Usuarios";
 import { ListarAsistencias } from "./recursos/Asistencias";
+import { Bandeja } from "./paginas/Bandeja";
+import { Seguimiento } from "./paginas/Seguimiento";
+import InboxIcon from "@mui/icons-material/Inbox";
 import type { ComponentType } from "react";
 import { Route } from "react-router-dom";
 import { PaseLista } from "./paginas/PaseLista";
@@ -70,6 +73,15 @@ const COMPONENTES_RECURSO: Record<string, Omit<ResourceProps, "name">> = {
   Asistencias: {
     list: ListarAsistencias,
     options: { label: "Historial de asistencia" },
+  },
+  // En minúsculas porque es la ruta del backend (GET /seguimientos y /seguimientos/:id)
+  seguimientos: {
+    list: Bandeja,
+    show: Seguimiento,
+    icon: InboxIcon,
+    options: { label: "Bandeja de seguimiento" },
+    recordRepresentation: (caso) =>
+      `${caso.nombre ?? caso.infante?.nombre} ${caso.primer_apellido ?? caso.infante?.primer_apellido}`,
   },
 };
 
