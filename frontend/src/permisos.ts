@@ -26,7 +26,6 @@ export const RECURSOS: Record<string, Rol[]> = {
   Infantes: ["DIRECTORA", "DOCENTE", "TRABAJO_SOCIAL", "MEDICO"],
   Tutores: ["DIRECTORA", "TRABAJO_SOCIAL"],
   Usuarios: ["ADMIN_CENTRAL"],
-  Asistencias: ["DIRECTORA", "DOCENTE", "TRABAJO_SOCIAL", "MEDICO"],
 };
 
 // [IA] Generado con Claude (prompt #9 en docs/ia/prompts.md). Revisado por: pendiente
@@ -34,13 +33,6 @@ export const RECURSOS: Record<string, Rol[]> = {
 // aquí, escriben los mismos de RECURSOS. Debe coincidir con "escritura" en el backend.
 export const ESCRITURA: Record<string, Rol[]> = {
   Infantes: ["DIRECTORA"],
-  PaseLista: ["DOCENTE", "DIRECTORA"],
-};
-
-// [IA] Generado con Claude (prompt #14 en docs/ia/prompts.md). Revisado por: pendiente
-// Páginas propias (no son <Resource>): ruta -> roles que la ven en el menú y pueden abrirla.
-export const PAGINAS: Record<string, Rol[]> = {
-  "pase-lista": ["DOCENTE", "DIRECTORA", "TRABAJO_SOCIAL", "MEDICO"],
 };
 
 export const puedeVer = (

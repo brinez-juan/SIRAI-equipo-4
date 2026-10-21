@@ -1,4 +1,5 @@
 const express=require("express");
+const crypto=require("crypto");
 const {registrarRecurso}=require("../crud");
 const {uuidv7}=require("../db");
 
@@ -64,7 +65,8 @@ async function registrarConsentimiento(conexion, req, tutorId){
 }
 
 // [IA] Generado con Claude (prompt #10 en docs/ia/prompts.md). Revisado por: pendiente
-// DIRECTORA y TRABAJO_SOCIAL gestionan tutores (plan, issue 10). El teléfono se guarda cifrado.
+// DIRECTORA y TRABAJO_SOCIAL gestionan tutores (plan, issue 10). El teléfono se guarda cifrado y el
+// código de credencial (QR del tutor) lo genera el servidor al azar: no se captura ni se puede cambiar.
 registrarRecurso(router, "Tutores", {
 	tabla: "tutores",
 	columnas: ["nombre", "primer_apellido", "segundo_apellido", "correo", "telefono_cifrado"],
@@ -73,6 +75,7 @@ registrarRecurso(router, "Tutores", {
 	uuid: true,
 	alcance: alcanceTutores,
 	busqueda: ["nombre", "primer_apellido", "segundo_apellido"],
+	generados: {codigo_credencial: ()=>"TUT-"+crypto.randomBytes(8).toString("hex").toUpperCase()},
 	validar: validarTutor,
 	alCrear: registrarConsentimiento,
 });

@@ -19,7 +19,8 @@ import { useErrorAlGuardar } from "./errores";
 import { TutoresDelInfante } from "./TutoresDelInfante";
 import { ContactosEmergencia } from "./ContactosEmergencia";
 
-const DUPLICADO = "Ya existe un infante con esa matrícula.";
+const DUPLICADO =
+  "Ya existe un infante con esa matrícula o ese código de credencial.";
 
 // fecha_nacimiento es DATE, pero llega como "2023-05-10T00:00:00.000Z". En la hora de México
 // eso cae el día anterior, así que se muestra en UTC y el formulario usa solo "AAAA-MM-DD".
@@ -82,6 +83,12 @@ const FormularioInfante = () => (
       label="Fecha de nacimiento"
       format={soloFecha}
       validate={required()}
+    />
+    <TextInput
+      source="codigo_credencial"
+      label="Código de credencial"
+      helperText="Contenido del QR o código de barras de la credencial"
+      validate={[required(), maxLength(64)]}
     />
   </SimpleForm>
 );
