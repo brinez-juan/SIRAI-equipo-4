@@ -19,6 +19,11 @@ const {cifrar, descifrar}=require("./cifrado");
 // Opcional: validar: (req, creando)=>mensaje|null, revisa el body antes de escribir; si devuelve un mensaje, responde 400.
 // Opcional: alCrear: async (conexion, req, id)=>[{tabla, id, fila}], corre en la misma transacción que el INSERT
 // (si falla, no se guarda nada) y devuelve las filas extra que insertó para registrarlas en audit_log.
+// Opcional: alBorrar: async (id)=>mensaje|null, revisa antes del borrado lógico; si devuelve un mensaje, responde 409
+// (por ejemplo, una región que todavía tiene estancias activas).
+// Opcional: reactivable: true, lo desactivado (borrado lógico) se puede volver a activar: la lista acepta
+// ?desactivadas=true para ver solo esos registros y POST /<nombre>/:id/activar limpia deleted_at.
+// Opcional: alActivar: async (fila)=>mensaje|null, revisa antes de activar; si devuelve un mensaje, responde 409.
 // Los nombres de columna solo salen de esa configuración, nunca del request, para no inyectar SQL.
 
 // [IA] Generado con Claude (prompt #7 en docs/ia/prompts.md). Revisado por: pendiente
@@ -54,8 +59,10 @@ function deMiEstancia(recurso, req){
 // Filtros de react-admin (?campo=valor), solo sobre columnas conocidas; excluye borrados lógicos.
 // Un campo repetido (?campo=1&campo=2) llega como arreglo y se filtra con IN; antes armaba "campo=1, 2" y daba 500.
 // ?q= busca texto en las columnas de "busqueda"; %, _ y \ se escapan para que el usuario no arme comodines.
+// Modificado con el prompt #41: en un recurso reactivable, ?desactivadas=true lista solo los borrados lógicos.
 function filtros(recurso, query, req){
-	let condiciones=["deleted_at IS NULL"];
+	let desactivadas=recurso.reactivable && query.desactivadas=="true";
+	let condiciones=[desactivadas?"deleted_at IS NOT NULL":"deleted_at IS NULL"];
 	let valores=[];
 	for(let campo in query){
 		if(recurso.lectura.includes(campo)){
@@ -100,10 +107,13 @@ async function getList(recurso, req, res){
 
 // [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
 // Varios registros por id (?id=1&id=2)
+// Modificado con el prompt #41: en un recurso reactivable también trae los desactivados, para que una referencia
+// (la región de una estancia desactivada, la estancia de un usuario) siga mostrando su nombre.
 async function getMany(recurso, req, res){
 	let ids=[].concat(req.query.id);
 	let estancia=deMiEstancia(recurso, req);
-	let [data]=await db.query("SELECT * FROM "+mysql.escapeId(recurso.tabla)+" WHERE id IN (?) AND deleted_at IS NULL"+estancia.sql, [ids, ...estancia.valores]);
+	let vigentes=recurso.reactivable?"":" AND deleted_at IS NULL";
+	let [data]=await db.query("SELECT * FROM "+mysql.escapeId(recurso.tabla)+" WHERE id IN (?)"+vigentes+estancia.sql, [ids, ...estancia.valores]);
 	res.json(data.map(fila=>paraRespuesta(recurso, fila)));
 }
 
@@ -151,14 +161,39 @@ async function updateData(recurso, id, req, res){
 
 // [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
 // Borrado lógico: solo llena deleted_at, el registro sigue en la tabla
+// Modificado con el prompt #41: si el recurso tiene alBorrar y devuelve un mensaje, no se borra (409).
 async function deleteData(recurso, id, req, res){
 	let antes=await buscarPorId(recurso, id, req);
 	if(antes==null){
 		return res.sendStatus(404);
 	}
+	let impedimento=await recurso.alBorrar?.(antes.id);
+	if(impedimento){
+		return res.status(409).json({message: impedimento});
+	}
 	await db.query("UPDATE "+mysql.escapeId(recurso.tabla)+" SET deleted_at=CURRENT_TIMESTAMP(3) WHERE id=?", [id]);
 	await log(req.usuario, "SOFT_DELETE", recurso.tabla, id, antes, null, req);
 	res.json(paraRespuesta(recurso, antes));
+}
+
+// [IA] Generado con Claude (prompt #41 en docs/ia/prompts.md). Revisado por: pendiente
+// Deshace el borrado lógico de un recurso reactivable: limpia deleted_at. 404 si no existe o no está desactivado;
+// 409 si alActivar lo impide (por ejemplo, una estancia cuya región sigue desactivada).
+async function activarData(recurso, id, req, res){
+	let estancia=deMiEstancia(recurso, req);
+	let [filas]=await db.query("SELECT * FROM "+mysql.escapeId(recurso.tabla)+" WHERE id=? AND deleted_at IS NOT NULL"+estancia.sql, [id, ...estancia.valores]);
+	let antes=filas[0];
+	if(antes==null){
+		return res.sendStatus(404);
+	}
+	let impedimento=await recurso.alActivar?.(antes);
+	if(impedimento){
+		return res.status(409).json({message: impedimento});
+	}
+	await db.query("UPDATE "+mysql.escapeId(recurso.tabla)+" SET deleted_at=NULL, updated_at=CURRENT_TIMESTAMP(3) WHERE id=?", [antes.id]);
+	let data=await buscarPorId(recurso, antes.id, req);
+	await log(req.usuario, "REACTIVAR", recurso.tabla, antes.id, antes, data, req);
+	res.json(paraRespuesta(recurso, data));
 }
 
 // [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md), modificado con los prompts #9 y #10. Revisado por: pendiente
@@ -212,6 +247,7 @@ async function createData(recurso, req, res){
 // [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md), modificado con el prompt #9. Revisado por: pendiente
 // Registra en el router las 5 rutas de react-admin para un recurso, protegidas por sus roles.
 // GET para "roles"; POST, PUT y DELETE solo para "escritura" (si se indica).
+// Modificado con el prompt #41: un recurso reactivable agrega POST /<nombre>/:id/activar, también solo para "escritura".
 // Ejemplo: registrarRecurso(router, "Estancias", {tabla: "estancias", columnas: [...], roles: ["ADMIN_CENTRAL"]})
 function registrarRecurso(router, nombre, recurso){
 	// Las columnas cifradas no sirven para filtrar ni ordenar: en la base solo hay texto cifrado.
@@ -265,6 +301,16 @@ function registrarRecurso(router, nombre, recurso){
 			responderError(res, error);
 		}
 	});
+
+	if(recurso.reactivable){
+		router.post("/"+nombre+"/:id/activar", soloEscritura, async(req, res)=>{
+			try{
+				await activarData(recurso, req.params.id, req, res);
+			}catch(error){
+				responderError(res, error);
+			}
+		});
+	}
 }
 
 module.exports={registrarRecurso};

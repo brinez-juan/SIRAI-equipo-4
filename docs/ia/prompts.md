@@ -157,3 +157,17 @@ Herramienta: Claude (Claude Code).
   - Carga: `npx autocannon -c 212 -d 30 https://localhost:3000/pase-lista...` (212 = una petición por estancia, lo que pide el SRS).
   - Tabla de CPU y RAM por proceso, más los requisitos mínimos recomendados, en `docs/infraestructura.md`.
   ```
+
+## #41 · Feature 41: Desactivar regiones y estancias (sin issue en el plan)
+- **Quién:** Jesús
+- **Para qué:** botón "Desactivar" (borrado lógico) en la edición de regiones y estancias, y la regla del backend que lo rechaza con 409 mientras tengan estancias, infantes o usuarios activos. Después, "Mostrar desactivadas" en las listas y el botón "Activar" (`POST /<recurso>/:id/activar`, bitácora `REACTIVAR`); una estancia no se activa si su región sigue desactivada. Claude generó el código; Jesús lo revisa y hace los commits.
+- **Citado en:** `backend/crud.js` (opciones `alBorrar`, `reactivable` y `alActivar`), `backend/rutas/catalogos.js`, `frontend/src/dataProvider.ts`, `frontend/src/recursos/Desactivadas.tsx`, `Regiones.tsx`, `Estancias.tsx`.
+- **Prompt:**
+  ```
+  Admin: Estancias: No existe la posibilidad de eliminar regiones o desactivarlas.
+  Regiones: No existe la posibilidad de eliminar regiones o desactivarlas.
+
+  Haz estos cambios siguiendo las reglas impuestas por el claude md, las skills y dime cuando y a donde probar cada uno de los features
+
+  cuando se desactiva debe de salir la opcion de activar para no tener que crear nuevamente la estancia
+  ```
