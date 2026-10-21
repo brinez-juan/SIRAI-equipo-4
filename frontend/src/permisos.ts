@@ -56,6 +56,14 @@ export const PAGINAS: Record<string, Rol[]> = {
 // Tablero semáforo (issue 27): es su pantalla de Inicio, no una ruta propia. Debe coincidir con backend/rutas/tablero.js
 export const TABLERO: Rol[] = ["SUPERVISOR", "ADMIN_CENTRAL"];
 
+// Feature 42: quién lee la nota de la justificación de una inasistencia. DOCENTE la escribe pero no la lee
+// (no ve notas ni seguimientos, tabla 2.5). Debe coincidir con LEEN_NOTA en backend/rutas/asistencia.js
+export const LEEN_NOTA_JUSTIFICACION: Rol[] = [
+  "DIRECTORA",
+  "TRABAJO_SOCIAL",
+  "MEDICO",
+];
+
 export const puedeVer = (
   permitidos: Rol[] | undefined,
   rol: string | undefined,

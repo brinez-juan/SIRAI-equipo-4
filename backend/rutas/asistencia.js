@@ -1,12 +1,22 @@
 const express=require("express");
 const {db, uuidv7, responderError}=require("../db");
 const {log, permitir}=require("../seguridad");
+const {cifrar, descifrar}=require("../cifrado");
 
 const router=express.Router();
 const TURNOS=["MATUTINO", "VESPERTINO"];
 const CERRADO="El pase de lista ya se cerró.";
 const REQUIERE_ALTA="Requiere alta para ingresar.";
-const COLUMNAS="id, estancia_id, infante_id, fecha, turno, estado_codigo, hora_entrada, hora_salida, capturado_en, created_by, created_at, updated_at";
+const COLUMNAS="id, estancia_id, infante_id, fecha, turno, estado_codigo, justificacion_causa_codigo, justificacion_cifrado,"+
+	" hora_entrada, hora_salida, capturado_en, created_by, created_at, updated_at";
+// Feature 42: el estado que pide motivo, el tope de la nota y quién puede leerla (DOCENTE la escribe pero no la lee,
+// igual que no ve el detalle de los seguimientos en la tabla 2.5).
+const JUSTIFICADO="AUSENTE_JUSTIFICADO";
+const MAX_NOTA=500;
+const LEEN_NOTA=["DIRECTORA", "TRABAJO_SOCIAL", "MEDICO"];
+// Motivos con los que se puede justificar: las causas del catálogo menos "Sin respuesta" (NO_LOC, la única que
+// notifica a emergencia), que es justo cuando nadie avisó.
+const MOTIVOS="SELECT codigo, nombre FROM causas_inasistencia WHERE notifica_emergencia=0 ORDER BY nombre";
 
 // [IA] Generado con Claude (prompt #13 en docs/ia/prompts.md). Revisado por: pendiente
 // Tabla 2.5 del plan: DOCENTE y DIRECTORA pasan lista; TRABAJO_SOCIAL y MEDICO solo consultan.
@@ -72,6 +82,53 @@ async function requierenAlta(conexion, infanteIds, fecha){
 	return new Set(filas.map(fila=>fila.infante_id));
 }
 
+// [IA] Generado con Claude (prompt #42 en docs/ia/prompts.md). Revisado por: pendiente
+// Justificación de una asistencia para la respuesta: {causa_codigo, causa_nombre, nota} o null si no tiene.
+// La nota sale descifrada solo para LEEN_NOTA; a los demás roles ni siquiera les llega la llave "nota".
+// nombres: {codigo: nombre} de los motivos.
+function justificacionDe(fila, usuario, nombres){
+	if(fila.justificacion_causa_codigo==null){
+		return null;
+	}
+	let justificacion={causa_codigo: fila.justificacion_causa_codigo, causa_nombre: nombres[fila.justificacion_causa_codigo]??fila.justificacion_causa_codigo};
+	if(LEEN_NOTA.includes(usuario.rol)){
+		justificacion.nota=descifrar(fila.justificacion_cifrado);
+	}
+	return justificacion;
+}
+
+// [IA] Generado con Claude (prompt #42 en docs/ia/prompts.md). Revisado por: pendiente
+// {codigo: nombre} de los motivos con los que se puede justificar.
+async function nombresDeMotivos(conexion){
+	let [motivos]=await conexion.query(MOTIVOS);
+	return Object.fromEntries(motivos.map(motivo=>[motivo.codigo, motivo.nombre]));
+}
+
+// [IA] Generado con Claude (prompt #42 en docs/ia/prompts.md). Revisado por: pendiente
+// Revisa body.justificacion al marcar AUSENTE_JUSTIFICADO: {causa_codigo (obligatorio, de MOTIVOS), nota (opcional,
+// hasta MAX_NOTA)}. Exigir texto evita que un objeto llegue al SQL. Devuelve un mensaje o null.
+function validarJustificacion(justificacion, nombres){
+	if(justificacion==null || typeof justificacion!="object" || typeof justificacion.causa_codigo!="string" || !(justificacion.causa_codigo in nombres)){
+		return "Elija el motivo de la inasistencia justificada.";
+	}
+	if(justificacion.nota!=null && (typeof justificacion.nota!="string" || justificacion.nota.length>MAX_NOTA)){
+		return "La nota debe ser un texto de hasta "+MAX_NOTA+" caracteres.";
+	}
+	return null;
+}
+
+// [IA] Generado con Claude (prompt #42 en docs/ia/prompts.md). Revisado por: pendiente
+// Si la respuesta lleva notas descifradas, cada una queda en audit_log como READ_CONFIDENCIAL de su asistencia
+// (la bitácora nunca guarda la nota en claro). historial.js usa esta misma función.
+async function registrarLecturaDeNotas(req, asistenciaIds){
+	if(!LEEN_NOTA.includes(req.usuario.rol)){
+		return;
+	}
+	for(let id of asistenciaIds){
+		await log(req.usuario, "READ_CONFIDENCIAL", "asistencias", id, null, {campo: "justificacion_cifrado"}, req);
+	}
+}
+
 // [IA] Generado con Claude (prompt #13 en docs/ia/prompts.md). Revisado por: pendiente
 // Corre fn(conexion) en una transacción; si algo falla no se guarda nada.
 async function enTransaccion(fn){
@@ -89,9 +146,11 @@ async function enTransaccion(fn){
 	}
 }
 
-// [IA+Humano] Base generada con Claude (prompt #13), modificada con el prompt #24 (requiere_alta)
+// [IA+Humano] Base generada con Claude (prompt #13), modificada con el prompt #24 (requiere_alta) y el #42 (justificación)
 // Infantes de mi estancia, cada uno con su asistencia de ese día y turno (o null), y si el turno ya se cerró.
 // requiere_alta: el candado del issue 24 está activo y no se le puede marcar PRESENTE.
+// Feature 42: cada asistencia trae su justificación (ver justificacionDe) y la respuesta trae motivos_justificacion,
+// el catálogo para el diálogo (DOCENTE no puede leer GET /causas).
 // GET /pase-lista?fecha=2026-10-20&turno=MATUTINO
 router.get("/pase-lista", lectura, async (req, res)=>{
 	try{
@@ -106,16 +165,20 @@ router.get("/pase-lista", lectura, async (req, res)=>{
 		}
 		let [filas]=await db.query(
 			"SELECT i.id, i.matricula, i.nombre, i.primer_apellido, i.segundo_apellido,"+
-			" a.id AS asistencia_id, a.estado_codigo, a.hora_entrada, a.hora_salida, a.capturado_en"+
+			" a.id AS asistencia_id, a.estado_codigo, a.justificacion_causa_codigo, a.justificacion_cifrado, a.hora_entrada, a.hora_salida, a.capturado_en"+
 			" FROM infantes i LEFT JOIN asistencias a ON a.infante_id=i.id AND a.estancia_id=i.estancia_id AND a.fecha=? AND a.turno=? AND a.deleted_at IS NULL"+
 			" WHERE i.estancia_id=? AND i.deleted_at IS NULL ORDER BY i.primer_apellido, i.segundo_apellido, i.nombre",
 			[fecha, turno, estanciaId]
 		);
 		let bloqueados=await requierenAlta(db, filas.map(fila=>fila.id), fecha);
+		let [motivos]=await db.query(MOTIVOS);
+		let nombres=Object.fromEntries(motivos.map(motivo=>[motivo.codigo, motivo.nombre]));
+		await registrarLecturaDeNotas(req, filas.filter(fila=>fila.justificacion_cifrado!=null).map(fila=>fila.asistencia_id));
 		res.json({
 			fecha: fecha,
 			turno: turno,
 			cerrado: await estaCerrado(db, estanciaId, fecha, turno, false),
+			motivos_justificacion: motivos,
 			infantes: filas.map(fila=>({
 				id: fila.id,
 				matricula: fila.matricula,
@@ -126,6 +189,7 @@ router.get("/pase-lista", lectura, async (req, res)=>{
 				asistencia: fila.asistencia_id==null?null:{
 					id: fila.asistencia_id,
 					estado_codigo: fila.estado_codigo,
+					justificacion: justificacionDe(fila, req.usuario, nombres),
 					hora_entrada: fila.hora_entrada,
 					hora_salida: fila.hora_salida,
 					capturado_en: fila.capturado_en,
@@ -137,12 +201,15 @@ router.get("/pase-lista", lectura, async (req, res)=>{
 	}
 });
 
-// [IA+Humano] Base generada con Claude (prompt #13), modificada con el prompt #24 (candado de reingreso)
+// [IA+Humano] Base generada con Claude (prompt #13), modificada con el prompt #24 (candado de reingreso) y el #42 (justificación)
 // Registra o corrige la asistencia de un infante: upsert sobre uq_asistencia_dia (estancia, infante, fecha, turno).
 // PRESENTE pone hora_entrada (si ya la tenía, se conserva la primera); cualquier otro estado la deja en NULL.
 // Si el infante tiene el candado del issue 24, PRESENTE responde 409 "Requiere alta para ingresar."
 // Las horas se toman de Node (new Date()) y no de NOW(): mysql2 las guarda en UTC sin importar la zona del servidor MySQL.
 // created_by es quien capturó primero; quien corrige queda en audit_log.
+// Feature 42: AUSENTE_JUSTIFICADO exige body.justificacion {causa_codigo, nota?}. La nota se guarda cifrada; si no se
+// manda y la asistencia ya estaba justificada, se conserva la anterior (DOCENTE puede cambiar el motivo sin leerla).
+// Con cualquier otro estado, motivo y nota quedan en NULL. La respuesta nunca trae la nota cifrada.
 router.put("/pase-lista/:infanteId", escritura, async (req, res)=>{
 	try{
 		let cuerpo=req.body??{};
@@ -157,6 +224,15 @@ router.put("/pase-lista/:infanteId", escritura, async (req, res)=>{
 		if(estados.length==0){
 			return res.status(400).json({message: "El estado de asistencia no es válido."});
 		}
+		let justificado=cuerpo.estado_codigo==JUSTIFICADO;
+		let nombres=await nombresDeMotivos(db);
+		if(justificado){
+			let invalida=validarJustificacion(cuerpo.justificacion, nombres);
+			if(invalida){
+				return res.status(400).json({message: invalida});
+			}
+		}
+		let nota=justificado && typeof cuerpo.justificacion.nota=="string" && cuerpo.justificacion.nota.trim()!=""?cuerpo.justificacion.nota.trim():null;
 		let estanciaId=req.usuario.estancia_id;
 		let [infantes]=await db.query("SELECT id FROM infantes WHERE id=? AND estancia_id=? AND deleted_at IS NULL", [req.params.infanteId, estanciaId]);
 		if(infantes.length==0){
@@ -174,13 +250,18 @@ router.put("/pase-lista/:infanteId", escritura, async (req, res)=>{
 				return {mensaje: REQUIERE_ALTA};
 			}
 			let antes=await buscarAsistencia(conexion, estanciaId, req.params.infanteId, cuerpo.fecha, cuerpo.turno);
+			// Nota que queda: la nueva, o la que ya tenía si seguía justificada y no mandaron otra
+			let notaCifrada=!justificado?null:nota!=null?cifrar(nota):antes?.estado_codigo==JUSTIFICADO?antes.justificacion_cifrado:null;
 			await conexion.query(
-				"INSERT INTO asistencias (id, estancia_id, infante_id, fecha, turno, estado_codigo, hora_entrada, capturado_en, created_by)"+
-				" VALUES (?,?,?,?,?,?,?,?,?) AS nuevo"+
+				"INSERT INTO asistencias (id, estancia_id, infante_id, fecha, turno, estado_codigo, justificacion_causa_codigo, justificacion_cifrado,"+
+				" hora_entrada, capturado_en, created_by)"+
+				" VALUES (?,?,?,?,?,?,?,?,?,?,?) AS nuevo"+
 				" ON DUPLICATE KEY UPDATE estado_codigo=nuevo.estado_codigo,"+
+				" justificacion_causa_codigo=nuevo.justificacion_causa_codigo, justificacion_cifrado=nuevo.justificacion_cifrado,"+
 				" hora_entrada=IF(nuevo.estado_codigo='PRESENTE', COALESCE(asistencias.hora_entrada, nuevo.hora_entrada), NULL),"+
 				" capturado_en=nuevo.capturado_en, updated_at=CURRENT_TIMESTAMP(3)",
 				[uuidv7(), estanciaId, req.params.infanteId, cuerpo.fecha, cuerpo.turno, cuerpo.estado_codigo,
+				justificado?cuerpo.justificacion.causa_codigo:null, notaCifrada,
 				cuerpo.estado_codigo=="PRESENTE"?ahora:null, ahora, req.usuario.usuario]
 			);
 			let despues=await buscarAsistencia(conexion, estanciaId, req.params.infanteId, cuerpo.fecha, cuerpo.turno);
@@ -189,8 +270,10 @@ router.put("/pase-lista/:infanteId", escritura, async (req, res)=>{
 		if(resultado.mensaje){
 			return res.status(409).json({message: resultado.mensaje});
 		}
+		// La bitácora guarda la fila tal cual (nota cifrada); la respuesta lleva la justificación ya armada
 		await log(req.usuario, resultado.antes==null?"CREATE":"UPDATE", "asistencias", resultado.despues.id, resultado.antes??null, resultado.despues, req);
-		res.json(resultado.despues);
+		let {justificacion_causa_codigo, justificacion_cifrado, ...asistencia}=resultado.despues;
+		res.json({...asistencia, justificacion: justificacionDe({justificacion_causa_codigo, justificacion_cifrado}, req.usuario, nombres)});
 	}catch(error){
 		responderError(res, error);
 	}
@@ -251,3 +334,5 @@ router.post("/pase-lista/todos-presentes", escritura, async (req, res)=>{
 });
 
 module.exports=router;
+module.exports.LEEN_NOTA=LEEN_NOTA;
+module.exports.registrarLecturaDeNotas=registrarLecturaDeNotas;

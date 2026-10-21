@@ -1,6 +1,9 @@
 const express=require("express");
 const {db, responderError}=require("../db");
 const {permitir}=require("../seguridad");
+const {descifrar}=require("../cifrado");
+// Feature 42: quién lee la nota de la justificación y cómo se registra esa lectura (definidos en asistencia.js)
+const {LEEN_NOTA, registrarLecturaDeNotas}=require("./asistencia");
 
 const router=express.Router();
 const TURNOS=["MATUTINO", "VESPERTINO"];
@@ -54,9 +57,11 @@ function filtros(query, req){
 	return {where: " WHERE "+condiciones.join(" AND "), valores};
 }
 
-// [IA] Generado con Claude (prompt #19 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA+Humano] Base generada con Claude (prompt #19 en docs/ia/prompts.md), modificada con el prompt #42. Revisado por: pendiente
 // Historial de asistencia de mi estancia, paginado como lo pide react-admin (?_sort=&_order=&_start=&_end=).
 // fecha sale como texto AAAA-MM-DD: es un DATE y como objeto Date se correría un día en la hora de México.
+// Feature 42: cada renglón trae justificacion_causa_nombre (el motivo de un AUSENTE_JUSTIFICADO) para todos, y
+// justificacion_nota descifrada solo para LEEN_NOTA; cada nota que sale queda como READ_CONFIDENCIAL de su asistencia.
 router.get("/Asistencias", lectura, async (req, res)=>{
 	try{
 		let {where, valores, error}=filtros(req.query, req);
@@ -67,17 +72,21 @@ router.get("/Asistencias", lectura, async (req, res)=>{
 		let sortOrder=req.query._order=="ASC"?"ASC":"DESC";
 		let inicio=Number(req.query._start)||0;
 		let fin=Number(req.query._end)||inicio+25;
-		let desde=" FROM asistencias a JOIN infantes i ON i.id=a.infante_id JOIN estados_asistencia e ON e.codigo=a.estado_codigo";
+		let desde=" FROM asistencias a JOIN infantes i ON i.id=a.infante_id JOIN estados_asistencia e ON e.codigo=a.estado_codigo"+
+			" LEFT JOIN causas_inasistencia c ON c.codigo=a.justificacion_causa_codigo";
 		let [[{total}]]=await db.query("SELECT COUNT(*) AS total"+desde+where, valores);
 		let [filas]=await db.query(
 			"SELECT a.id, DATE_FORMAT(a.fecha, '%Y-%m-%d') AS fecha, a.turno, a.estado_codigo, e.nombre AS estado_nombre,"+
+			" a.justificacion_causa_codigo, c.nombre AS justificacion_causa_nombre, a.justificacion_cifrado,"+
 			" a.hora_entrada, a.hora_salida, a.infante_id, i.matricula, i.nombre, i.primer_apellido, i.segundo_apellido"+
 			desde+where+" ORDER BY "+sortBy+" "+sortOrder+", i.primer_apellido ASC, a.id ASC LIMIT ? OFFSET ?",
 			[...valores, Math.max(fin-inicio, 0), inicio]
 		);
+		let leeNota=LEEN_NOTA.includes(req.usuario.rol);
+		await registrarLecturaDeNotas(req, filas.filter(fila=>fila.justificacion_cifrado!=null).map(fila=>fila.id));
 		res.set("Access-Control-Expose-Headers", "X-Total-Count");
 		res.set("X-Total-Count", total);
-		res.json(filas);
+		res.json(filas.map(({justificacion_cifrado, ...fila})=>leeNota?{...fila, justificacion_nota: descifrar(justificacion_cifrado)}:fila));
 	}catch(error){
 		responderError(res, error);
 	}
