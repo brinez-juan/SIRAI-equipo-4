@@ -21,10 +21,12 @@ function uuidv7(){
 
 // [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
 // Traduce errores de MySQL a códigos HTTP: datos duplicados = 409, datos inválidos = 400.
+// Modificado con el prompt #9: falta un campo obligatorio o una fecha inválida también son 400.
 function responderError(res, error){
 	if(error.code=="ER_DUP_ENTRY"){
 		res.sendStatus(409);
-	}else if(["ER_NO_REFERENCED_ROW_2", "ER_ROW_IS_REFERENCED_2", "ER_CHECK_CONSTRAINT_VIOLATED", "ER_BAD_NULL_ERROR", "ER_DATA_TOO_LONG", "ER_TRUNCATED_WRONG_VALUE_FOR_FIELD", "WARN_DATA_TRUNCATED"].includes(error.code)){
+	}else if(["ER_NO_REFERENCED_ROW_2", "ER_ROW_IS_REFERENCED_2", "ER_CHECK_CONSTRAINT_VIOLATED", "ER_BAD_NULL_ERROR", "ER_DATA_TOO_LONG", "ER_TRUNCATED_WRONG_VALUE_FOR_FIELD", "WARN_DATA_TRUNCATED",
+		"ER_NO_DEFAULT_FOR_FIELD", "ER_TRUNCATED_WRONG_VALUE"].includes(error.code)){
 		res.sendStatus(400);
 	}else{
 		console.error(error);
