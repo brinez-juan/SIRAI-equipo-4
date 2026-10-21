@@ -12,7 +12,15 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import { ListButton, Show, TopToolbar, useRecordContext } from "react-admin";
+import {
+  Button,
+  ListButton,
+  Show,
+  TopToolbar,
+  useRecordContext,
+} from "react-admin";
+import { Link as RouterLink } from "react-router-dom";
+import DescriptionIcon from "@mui/icons-material/Description";
 import {
   ESTADOS_CASO,
   TURNOS,
@@ -53,7 +61,7 @@ const PARENTESCOS: Record<string, string> = {
   TUTOR_LEGAL: "Tutor legal",
   OTRO: "Otro",
 };
-const RESULTADOS: Record<string, string> = {
+export const RESULTADOS: Record<string, string> = {
   CONTACTO_EXITOSO: "Contacto exitoso",
   SIN_RESPUESTA: "Sin respuesta",
   NUMERO_EQUIVOCADO: "Número equivocado",
@@ -310,7 +318,25 @@ const DetalleSeguimiento = () => {
   );
 };
 
-// [IA] Generado con Claude (prompt #21 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Generado con Claude (prompt #25 en docs/ia/prompts.md). Revisado por: pendiente
+// Abre el expediente imprimible del infante de este caso (issue 25). No aparece mientras llega el detalle.
+const BotonExpediente = () => {
+  const caso = useRecordContext();
+  if (!caso?.infante) {
+    return null;
+  }
+  return (
+    <Button
+      component={RouterLink}
+      to={`/expediente/${caso.infante.id}`}
+      label="Ver expediente"
+    >
+      <DescriptionIcon />
+    </Button>
+  );
+};
+
+// [IA+Humano] Base generada con Claude (prompt #21 en docs/ia/prompts.md), modificada con el prompt #25. Revisado por: pendiente
 // Detalle de un seguimiento (issue 21): datos, tutores, contactos, llamadas, clasificación y alta.
 // Solo consulta; los formularios de llamada, clasificación y alta llegan con los issues 22, 23 y 24.
 export const Seguimiento = () => (
@@ -318,6 +344,7 @@ export const Seguimiento = () => (
     title="Seguimiento"
     actions={
       <TopToolbar>
+        <BotonExpediente />
         <ListButton label="Volver a la bandeja" />
       </TopToolbar>
     }
