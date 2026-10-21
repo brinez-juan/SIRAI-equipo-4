@@ -15,6 +15,7 @@ const rutasSesion=require("./rutas/sesion");
 const rutasCatalogos=require("./rutas/catalogos");
 const rutasUsuarios=require("./rutas/usuarios");
 const rutasInfantes=require("./rutas/infantes");
+const rutasTutores=require("./rutas/tutores");
 
 const PORT=3000;
 const app=express();
@@ -31,6 +32,7 @@ app.use(registrarPeticion);
 app.use(rutasCatalogos);
 app.use(rutasUsuarios);
 app.use(rutasInfantes);
+app.use(rutasTutores);
 
 // [Humano] Escrito por: pendiente. Arranque HTTPS del servidor con los certificados backend.key y backend.crt
 const options={
