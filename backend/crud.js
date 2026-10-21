@@ -13,6 +13,14 @@ const {cifrar, descifrar}=require("./cifrado");
 // Opcional: porEstancia: true, todo se filtra y se asigna con req.usuario.estancia_id (el del token),
 // nunca con la estancia que mande el request; un usuario sin estancia recibe 403.
 // Opcional: busqueda: [columnas], el ?q= de react-admin busca con LIKE en esas columnas unidas.
+// Opcional: alcance: (req)=>({sql, valores}), para tablas sin estancia_id propio (ej. tutores). Devuelve una
+// condición " AND ..." con "?" que se aplica a toda lectura, edición y borrado; debe salir del token
+// (req.usuario.estancia_id), nunca del request. Igual que porEstancia, un usuario sin estancia recibe 403.
+// Opcional: generados: {columna: ()=>valor}, columnas que llena el servidor al crear (ej. un código de credencial);
+// no van en "columnas", así el request no puede escribirlas ni cambiarlas.
+// Opcional: validar: (req, creando)=>mensaje|null, revisa el body antes de escribir; si devuelve un mensaje, responde 400.
+// Opcional: alCrear: async (conexion, req, id)=>[{tabla, id, fila}], corre en la misma transacción que el INSERT
+// (si falla, no se guarda nada) y devuelve las filas extra que insertó para registrarlas en audit_log.
 // Los nombres de columna solo salen de esa configuración, nunca del request, para no inyectar SQL.
 
 // [IA] Generado con Claude (prompt #7 en docs/ia/prompts.md). Revisado por: pendiente
@@ -35,9 +43,12 @@ function valoresParaEscribir(recurso, campos, body){
 	return campos.map(campo=>(recurso.cifrados??[]).includes(campo)?cifrar(body[campo]):body[campo]);
 }
 
-// [IA] Generado con Claude (prompt #9 en docs/ia/prompts.md). Revisado por: pendiente
-// Condición extra para recursos porEstancia: solo filas de la estancia del token.
+// [IA] Generado con Claude (prompt #9 en docs/ia/prompts.md), modificado con el prompt #10. Revisado por: pendiente
+// Condición extra para recursos porEstancia (solo filas de la estancia del token) o con "alcance" propio.
 function deMiEstancia(recurso, req){
+	if(recurso.alcance){
+		return recurso.alcance(req);
+	}
 	return recurso.porEstancia?{sql: " AND estancia_id=?", valores: [req.usuario.estancia_id]}:{sql: "", valores: []};
 }
 
@@ -117,9 +128,13 @@ async function getOne(recurso, id, req, res){
 	}
 }
 
-// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md), modificado con el prompt #10. Revisado por: pendiente
 // Solo actualiza las columnas permitidas y guarda en la bitácora el antes y el después
 async function updateData(recurso, id, req, res){
+	let invalido=recurso.validar?.(req, false);
+	if(invalido){
+		return res.status(400).json({message: invalido});
+	}
 	let antes=await buscarPorId(recurso, id, req);
 	if(antes==null){
 		return res.sendStatus(404);
@@ -147,9 +162,14 @@ async function deleteData(recurso, id, req, res){
 	res.json(paraRespuesta(recurso, antes));
 }
 
-// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md), modificado con el prompt #9. Revisado por: pendiente
-// id (uuid) y estancia_id (porEstancia) los pone el servidor; lo que mande el request en esos campos se ignora.
+// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md), modificado con los prompts #9 y #10. Revisado por: pendiente
+// id (uuid), estancia_id (porEstancia) y las columnas "generados" los pone el servidor; lo que mande el request
+// en esos campos se ignora. Con "alCrear", el INSERT y las filas extra van en una transacción: o se guardan todas o ninguna.
 async function createData(recurso, req, res){
+	let invalido=recurso.validar?.(req, true);
+	if(invalido){
+		return res.status(400).json({message: invalido});
+	}
 	let campos=recurso.columnas.filter(campo=>campo in req.body);
 	let valores=valoresParaEscribir(recurso, campos, req.body);
 	campos.push("created_by");
@@ -163,12 +183,34 @@ async function createData(recurso, req, res){
 		campos.push("estancia_id");
 		valores.push(req.usuario.estancia_id);
 	}
-	let [resultado]=await db.query(
-		"INSERT INTO "+mysql.escapeId(recurso.tabla)+" ("+campos.map(campo=>mysql.escapeId(campo)).join(", ")+") VALUES (?)",
-		[valores]
-	);
+	for(let campo in recurso.generados){
+		campos.push(campo);
+		valores.push(recurso.generados[campo]());
+	}
+	let sql="INSERT INTO "+mysql.escapeId(recurso.tabla)+" ("+campos.map(campo=>mysql.escapeId(campo)).join(", ")+") VALUES (?)";
+	let resultado;
+	let extras=[];
+	if(recurso.alCrear){
+		let conexion=await db.getConnection();
+		try{
+			await conexion.beginTransaction();
+			[resultado]=await conexion.query(sql, [valores]);
+			extras=await recurso.alCrear(conexion, req, id);
+			await conexion.commit();
+		}catch(error){
+			await conexion.rollback();
+			throw error;
+		}finally{
+			conexion.release();
+		}
+	}else{
+		[resultado]=await db.query(sql, [valores]);
+	}
 	let data=await buscarPorId(recurso, recurso.uuid?id:resultado.insertId, req);
 	await log(req.usuario, "CREATE", recurso.tabla, data.id, null, data, req);
+	for(let extra of extras){
+		await log(req.usuario, "CREATE", extra.tabla, extra.id, null, extra.fila, req);
+	}
 	res.status(201).json(paraRespuesta(recurso, data));
 }
 
@@ -179,7 +221,7 @@ async function createData(recurso, req, res){
 function registrarRecurso(router, nombre, recurso){
 	// Las columnas cifradas no sirven para filtrar ni ordenar: en la base solo hay texto cifrado.
 	recurso.lectura=["id", ...recurso.columnas.filter(campo=>!(recurso.cifrados??[]).includes(campo)), "created_at", "updated_at"];
-	let conEstancia=(req, res, next)=>recurso.porEstancia && req.usuario.estancia_id==null?res.sendStatus(403):next();
+	let conEstancia=(req, res, next)=>(recurso.porEstancia || recurso.alcance) && req.usuario.estancia_id==null?res.sendStatus(403):next();
 	let soloRoles=[permitir(...recurso.roles), conEstancia];
 	let soloEscritura=[permitir(...(recurso.escritura??recurso.roles)), conEstancia];
 
