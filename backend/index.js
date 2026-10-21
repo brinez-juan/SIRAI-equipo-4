@@ -28,6 +28,7 @@ const rutasCausas=require("./rutas/causas");
 const rutasExpediente=require("./rutas/expediente");
 const rutasTablero=require("./rutas/tablero");
 const rutasReportes=require("./rutas/reportes");
+const rutasBitacora=require("./rutas/bitacora");
 const {iniciarCierreAutomatico}=require("./cierreTurno");
 
 const PORT=3000;
@@ -58,6 +59,7 @@ app.use(rutasCausas);
 app.use(rutasExpediente);
 app.use(rutasTablero);
 app.use(rutasReportes);
+app.use(rutasBitacora);
 
 // [Humano] Escrito por: pendiente. Arranque HTTPS del servidor con los certificados backend.key y backend.crt
 const options={

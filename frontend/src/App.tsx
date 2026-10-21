@@ -25,6 +25,8 @@ import { ListarAsistencias } from "./recursos/Asistencias";
 import { Bandeja } from "./paginas/Bandeja";
 import { Seguimiento } from "./paginas/Seguimiento";
 import InboxIcon from "@mui/icons-material/Inbox";
+import { ListarBitacora, VerBitacora } from "./recursos/Bitacora";
+import HistoryIcon from "@mui/icons-material/History";
 import type { ComponentType } from "react";
 import { Route } from "react-router-dom";
 import { PaseLista } from "./paginas/PaseLista";
@@ -86,6 +88,14 @@ const COMPONENTES_RECURSO: Record<string, Omit<ResourceProps, "name">> = {
     options: { label: "Bandeja de seguimiento" },
     recordRepresentation: (caso) =>
       `${caso.nombre ?? caso.infante?.nombre} ${caso.primer_apellido ?? caso.infante?.primer_apellido}`,
+  },
+  // Solo lectura: sin create ni edit (el backend no tiene POST, PUT ni DELETE)
+  Bitacora: {
+    list: ListarBitacora,
+    show: VerBitacora,
+    icon: HistoryIcon,
+    options: { label: "Bitácora" },
+    recordRepresentation: (registro) => `#${registro.id}`,
   },
 };
 
