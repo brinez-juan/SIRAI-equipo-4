@@ -110,9 +110,9 @@ async function sembrar(conn){
 			let infanteId=uuidv7();
 			let folio=String(i+1).padStart(4, "0");
 			await conn.query(
-				"INSERT INTO infantes (id, estancia_id, matricula, nombre, primer_apellido, segundo_apellido, fecha_nacimiento, codigo_credencial, created_by) VALUES (?,?,?,?,?,?,?,?,?)",
+				"INSERT INTO infantes (id, estancia_id, matricula, nombre, primer_apellido, segundo_apellido, fecha_nacimiento, created_by) VALUES (?,?,?,?,?,?,?,?)",
 				[infanteId, estanciaIds[e], ESTANCIAS[e].clave+"-"+folio, NOMBRES[(n+e)%NOMBRES.length], apellido1, apellido2,
-				fechaNacimiento(n), "INF-"+ESTANCIAS[e].clave+"-"+folio, adminId]
+				fechaNacimiento(n), adminId]
 			);
 
 			// Madre autorizada para recoger; el padre solo en la mitad de los casos
@@ -124,8 +124,8 @@ async function sembrar(conn){
 				let tutor=tutores[t];
 				let tutorId=uuidv7();
 				await conn.query(
-					"INSERT INTO tutores (id, nombre, primer_apellido, telefono_cifrado, codigo_credencial, created_by) VALUES (?,?,?,?,?,?)",
-					[tutorId, tutor.nombre, tutor.apellido, cifrar(telefono(n*10+t)), "TUT-"+ESTANCIAS[e].clave+"-"+folio+"-"+(t+1), adminId]
+					"INSERT INTO tutores (id, nombre, primer_apellido, telefono_cifrado, created_by) VALUES (?,?,?,?,?)",
+					[tutorId, tutor.nombre, tutor.apellido, cifrar(telefono(n*10+t)), adminId]
 				);
 				// El parentesco y la autorización para recoger viven en el vínculo, no en el tutor
 				await conn.query(
