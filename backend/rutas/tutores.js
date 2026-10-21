@@ -81,3 +81,5 @@ registrarRecurso(router, "Tutores", {
 });
 
 module.exports=router;
+// rutas/infanteTutor.js lo usa para revisar que el tutor que se vincula sea visible para el usuario
+module.exports.alcanceTutores=alcanceTutores;
