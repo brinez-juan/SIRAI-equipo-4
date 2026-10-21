@@ -27,14 +27,15 @@ function errorUsuario(res, error){
 	}
 }
 
-// [IA] Generado con Claude (issue 05, registrar prompt en docs/ia/prompts.md). Revisado por: pendiente
-// Filtros de react-admin (?campo=valor) solo sobre columnas conocidas; excluye borrados lógicos
+// [IA] Generado con Claude (issue 05, registrar prompt en docs/ia/prompts.md), modificado con el prompt #30. Revisado por: pendiente
+// Filtros de react-admin (?campo=valor) solo sobre columnas conocidas; excluye borrados lógicos.
+// Un campo repetido (?rol=A&rol=B) llega como arreglo y se filtra con IN (antes daba 500).
 function filtros(query){
 	let condiciones=["deleted_at IS NULL"];
 	let valores=[];
 	for(let campo in query){
 		if(LECTURA.includes(campo) && campo!="id"){
-			condiciones.push(mysql.escapeId(campo)+"=?");
+			condiciones.push(mysql.escapeId(campo)+(Array.isArray(query[campo])?" IN (?)":"=?"));
 			valores.push(query[campo]);
 		}
 	}

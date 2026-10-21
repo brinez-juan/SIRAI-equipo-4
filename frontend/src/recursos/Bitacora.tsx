@@ -142,7 +142,7 @@ export const ListarBitacora = () => (
 );
 
 // [IA] Generado con Claude (prompt #29 en docs/ia/prompts.md). Revisado por: pendiente
-// Muestra un JSON (antes / después) con sangría; los campos cifrados se quedan como texto cifrado.
+// Muestra un JSON (antes / después) con sangría; los campos cifrados llegan del backend como "[cifrado]".
 const Json = ({ valor }: { valor: unknown }) =>
   valor == null ? (
     <Typography variant="body2">—</Typography>
