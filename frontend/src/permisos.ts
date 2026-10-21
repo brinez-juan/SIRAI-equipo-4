@@ -23,7 +23,14 @@ export const TODOS_LOS_ROLES: Rol[] = [
 export const RECURSOS: Record<string, Rol[]> = {
   Regiones: ["ADMIN_CENTRAL"],
   Estancias: ["ADMIN_CENTRAL"],
-  Usuarios: ["ADMIN_CENTRAL"],
+  Infantes: ["DIRECTORA", "DOCENTE", "TRABAJO_SOCIAL", "MEDICO"],
+};
+
+// [IA] Generado con Claude (prompt #9 en docs/ia/prompts.md). Revisado por: pendiente
+// Roles que pueden crear y editar, cuando son menos que los que ven. Si un recurso no aparece
+// aquí, escriben los mismos de RECURSOS. Debe coincidir con "escritura" en el backend.
+export const ESCRITURA: Record<string, Rol[]> = {
+  Infantes: ["DIRECTORA"],
 };
 
 export const puedeVer = (

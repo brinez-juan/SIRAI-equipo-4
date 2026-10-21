@@ -1,7 +1,7 @@
 // Las variables del .env se cargan antes de todo: db.js las lee al importarse.
 process.loadEnvFile(".env");
-if(!process.env.DATABASE_URL || !process.env.LLAVESECRETA){
-	console.error("Faltan DATABASE_URL o LLAVESECRETA en backend/.env (ver .env.example)");
+if(!process.env.DATABASE_URL || !process.env.LLAVESECRETA || !process.env.LLAVE_CIFRADO){
+	console.error("Faltan DATABASE_URL, LLAVESECRETA o LLAVE_CIFRADO en backend/.env (ver .env.example)");
 	process.exit(1);
 }
 
@@ -14,6 +14,7 @@ const {autenticar, registrarPeticion}=require("./seguridad");
 const rutasSesion=require("./rutas/sesion");
 const rutasCatalogos=require("./rutas/catalogos");
 const rutasUsuarios=require("./rutas/usuarios");
+const rutasInfantes=require("./rutas/infantes");
 
 const PORT=3000;
 const app=express();
@@ -29,6 +30,7 @@ app.use(autenticar);
 app.use(registrarPeticion);
 app.use(rutasCatalogos);
 app.use(rutasUsuarios);
+app.use(rutasInfantes);
 
 // [Humano] Escrito por: pendiente. Arranque HTTPS del servidor con los certificados backend.key y backend.crt
 const options={
