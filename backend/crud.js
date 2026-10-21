@@ -50,15 +50,16 @@ function deMiEstancia(recurso, req){
 	return recurso.porEstancia?{sql: " AND estancia_id=?", valores: [req.usuario.estancia_id]}:{sql: "", valores: []};
 }
 
-// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md), modificado con el prompt #9. Revisado por: pendiente
+// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md), modificado con los prompts #9 y #30. Revisado por: pendiente
 // Filtros de react-admin (?campo=valor), solo sobre columnas conocidas; excluye borrados lógicos.
+// Un campo repetido (?campo=1&campo=2) llega como arreglo y se filtra con IN; antes armaba "campo=1, 2" y daba 500.
 // ?q= busca texto en las columnas de "busqueda"; %, _ y \ se escapan para que el usuario no arme comodines.
 function filtros(recurso, query, req){
 	let condiciones=["deleted_at IS NULL"];
 	let valores=[];
 	for(let campo in query){
 		if(recurso.lectura.includes(campo)){
-			condiciones.push(mysql.escapeId(campo)+"=?");
+			condiciones.push(mysql.escapeId(campo)+(Array.isArray(query[campo])?" IN (?)":"=?"));
 			valores.push(query[campo]);
 		}
 	}
