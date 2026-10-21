@@ -21,6 +21,7 @@ const ACCIONES = [
   { id: "CREATE", name: "Alta de registro" },
   { id: "UPDATE", name: "Cambio de registro" },
   { id: "SOFT_DELETE", name: "Baja lógica" },
+  { id: "REACTIVAR", name: "Reactivar registro" },
   { id: "DESACTIVAR", name: "Desactivar usuario" },
   { id: "READ_CONFIDENCIAL", name: "Consulta confidencial" },
   { id: "GET", name: "Petición GET" },

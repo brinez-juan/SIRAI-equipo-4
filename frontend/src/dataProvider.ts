@@ -20,6 +20,13 @@ const tutoresUrl = (infanteId: Identifier) =>
 // Se usan con useDataProvider<typeof dataProvider>().
 export const dataProvider = {
   ...jsonServerProvider(import.meta.env.VITE_BACKEND, fetchJsonUtil),
+  // [IA] Generado con Claude (prompt #41 en docs/ia/prompts.md). Revisado por: pendiente
+  // Vuelve a activar una región o estancia desactivada (POST /<recurso>/:id/activar).
+  activar: (resource: string, id: Identifier) =>
+    fetchJsonUtil(
+      `${import.meta.env.VITE_BACKEND}/${resource}/${encodeURIComponent(id)}/activar`,
+      { method: "POST" },
+    ).then(({ json }) => json as RaRecord),
   tutoresDeInfante: (infanteId: Identifier) =>
     fetchJsonUtil(tutoresUrl(infanteId)).then(({ json }) => json as RaRecord[]),
   vincularTutor: (
