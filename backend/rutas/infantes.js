@@ -9,7 +9,7 @@ const router=express.Router();
 // lo pone el servidor con el del token y no se puede cambiar desde el request.
 registrarRecurso(router, "Infantes", {
 	tabla: "infantes",
-	columnas: ["matricula", "nombre", "primer_apellido", "segundo_apellido", "fecha_nacimiento", "codigo_credencial"],
+	columnas: ["matricula", "nombre", "primer_apellido", "segundo_apellido", "fecha_nacimiento"],
 	roles: ["DIRECTORA", "DOCENTE", "TRABAJO_SOCIAL", "MEDICO"],
 	escritura: ["DIRECTORA"],
 	uuid: true,
