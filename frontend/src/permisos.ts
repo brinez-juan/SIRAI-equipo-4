@@ -1,4 +1,4 @@
-// [IA] Generado con Claude (prompt #F3-1 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Generado con Claude (prompt #3 en docs/ia/prompts.md). Revisado por: pendiente
 // Fuente única de permisos del frontend (tabla 2.5 del plan). Cada issue agrega su línea
 // a RECURSOS con los roles que pueden verlo; App.tsx solo lee esta tabla.
 

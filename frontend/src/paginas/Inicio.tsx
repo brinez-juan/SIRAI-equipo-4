@@ -10,7 +10,7 @@ const ROLES: Record<string, string> = {
   DOCENTE: "Docente",
 };
 
-// [IA] Generado con Claude (prompt #F3-1 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Generado con Claude (prompt #3 en docs/ia/prompts.md). Revisado por: pendiente
 // Pantalla de inicio: confirma quién entró y con qué rol; el menú de la izquierda ya viene filtrado.
 export const Inicio = () => {
   const { data: identidad } = useGetIdentity();
