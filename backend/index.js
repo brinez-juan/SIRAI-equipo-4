@@ -20,7 +20,9 @@ const rutasInfanteTutor=require("./rutas/infanteTutor");
 const rutasContactos=require("./rutas/contactos");
 const rutasAsistencia=require("./rutas/asistencia");
 const rutasSalida=require("./rutas/salida");
+const rutasHistorial=require("./rutas/historial");
 const rutasCierres=require("./rutas/cierres");
+const {iniciarCierreAutomatico}=require("./cierreTurno");
 
 const PORT=3000;
 const app=express();
@@ -42,6 +44,7 @@ app.use(rutasInfanteTutor);
 app.use(rutasContactos);
 app.use(rutasAsistencia);
 app.use(rutasSalida);
+app.use(rutasHistorial);
 app.use(rutasCierres);
 
 // [Humano] Escrito por: pendiente. Arranque HTTPS del servidor con los certificados backend.key y backend.crt
@@ -54,6 +57,8 @@ https.createServer(options,app).listen(PORT, async ()=>{
 	await db.query("SELECT 1");
 	console.log("conectado a la base de datos");
 	console.log("Backend corriendo en puerto 3000");
+	// Issue 18: cada minuto cierra los turnos cuya hora_cierre ya pasó
+	iniciarCierreAutomatico();
 });
 
 
