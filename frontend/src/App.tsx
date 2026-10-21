@@ -16,6 +16,11 @@ import {
   EditarInfante,
 } from "./recursos/Infantes";
 import { ListarTutores, CrearTutor, EditarTutor } from "./recursos/Tutores";
+import {
+  crearUsuario,
+  editarUsuario,
+  listarUsuarios,
+} from "./recursos/Usuarios";
 import { ESCRITURA, RECURSOS, puedeVer } from "./permisos";
 
 // Cada issue agrega aquí su línea (y su entrada en permisos.ts con los roles).
@@ -45,6 +50,13 @@ const COMPONENTES_RECURSO: Record<string, Omit<ResourceProps, "name">> = {
     create: CrearTutor,
     edit: EditarTutor,
     recordRepresentation: (tutor) => `${tutor.nombre} ${tutor.primer_apellido}`,
+  },
+  Usuarios: {
+    list: listarUsuarios,
+    create: crearUsuario,
+    edit: editarUsuario,
+    recordRepresentation: (usuario) =>
+      `${usuario.nombre} ${usuario.primer_apellido}`,
   },
 };
 
