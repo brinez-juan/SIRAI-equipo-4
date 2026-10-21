@@ -106,4 +106,19 @@ export const dataProvider = {
       `${import.meta.env.VITE_BACKEND}/seguimientos/${encodeURIComponent(seguimientoId)}/llamadas`,
       { method: "POST", body: JSON.stringify(datos) },
     ).then(({ json }) => json as RaRecord),
+  // [IA] Generado con Claude (prompt #27 en docs/ia/prompts.md). Revisado por: pendiente
+  // Tablero semáforo (issue 26/27): una fila anónima por estancia del día pedido (AAAA-MM-DD).
+  tablero: (fecha: string) =>
+    fetchJsonUtil(
+      `${import.meta.env.VITE_BACKEND}/tablero?fecha=${encodeURIComponent(fecha)}`,
+    ).then(
+      ({ json }) =>
+        json as {
+          estancia: string;
+          total: number;
+          presentes: number;
+          porcentaje: number | null;
+          semaforo: string;
+        }[],
+    ),
 };

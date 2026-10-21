@@ -1,5 +1,7 @@
 import { Card, CardContent, Typography } from "@mui/material";
 import { useGetIdentity, usePermissions, Title } from "react-admin";
+import { TABLERO, puedeVer } from "../permisos";
+import { Tablero } from "./Tablero";
 
 const ROLES: Record<string, string> = {
   ADMIN_CENTRAL: "Administración central",
@@ -12,9 +14,13 @@ const ROLES: Record<string, string> = {
 
 // [IA] Generado con Claude (prompt #3 en docs/ia/prompts.md). Revisado por: pendiente
 // Pantalla de inicio: confirma quién entró y con qué rol; el menú de la izquierda ya viene filtrado.
+// Modificado con el prompt #27: para SUPERVISOR y ADMIN_CENTRAL la pantalla principal es el tablero semáforo.
 export const Inicio = () => {
   const { data: identidad } = useGetIdentity();
   const { permissions: rol } = usePermissions();
+  if (puedeVer(TABLERO, rol)) {
+    return <Tablero />;
+  }
   return (
     <Card sx={{ mt: 2 }}>
       <Title title="Inicio" />
