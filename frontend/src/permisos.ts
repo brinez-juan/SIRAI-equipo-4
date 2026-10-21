@@ -51,6 +51,9 @@ export const PAGINAS: Record<string, Rol[]> = {
   "expediente/:infanteId": ["TRABAJO_SOCIAL", "MEDICO", "DIRECTORA"],
 };
 
+// Tablero semáforo (issue 27): es su pantalla de Inicio, no una ruta propia. Debe coincidir con backend/rutas/tablero.js
+export const TABLERO: Rol[] = ["SUPERVISOR", "ADMIN_CENTRAL"];
+
 export const puedeVer = (
   permitidos: Rol[] | undefined,
   rol: string | undefined,
