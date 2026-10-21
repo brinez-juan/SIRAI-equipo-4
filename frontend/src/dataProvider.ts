@@ -76,4 +76,19 @@ export const dataProvider = {
       `${import.meta.env.VITE_BACKEND}/pase-lista/${encodeURIComponent(infanteId)}/salida`,
       { method: "PUT", body: JSON.stringify(datos) },
     ).then(({ json }) => json as RaRecord),
+  // [IA] Generado con Claude (prompt #22 en docs/ia/prompts.md). Revisado por: pendiente
+  // Registrar una llamada de un seguimiento (issue 22): a un tutor o a un contacto de emergencia (solo uno).
+  registrarLlamada: (
+    seguimientoId: Identifier,
+    datos: {
+      tutor_id?: Identifier;
+      contacto_emergencia_id?: Identifier;
+      resultado: string;
+      notas?: string;
+    },
+  ) =>
+    fetchJsonUtil(
+      `${import.meta.env.VITE_BACKEND}/seguimientos/${encodeURIComponent(seguimientoId)}/llamadas`,
+      { method: "POST", body: JSON.stringify(datos) },
+    ).then(({ json }) => json as RaRecord),
 };
