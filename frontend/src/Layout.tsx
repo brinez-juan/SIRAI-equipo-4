@@ -6,6 +6,7 @@ import {
   usePermissions,
 } from "react-admin";
 import FactCheckIcon from "@mui/icons-material/FactCheck";
+import AssessmentIcon from "@mui/icons-material/Assessment";
 import { PAGINAS, puedeVer } from "./permisos";
 
 // [IA] Generado con Claude (prompt #14 en docs/ia/prompts.md). Revisado por: pendiente
@@ -21,6 +22,13 @@ const MenuPorRol = () => {
           to="/pase-lista"
           primaryText="Pase de lista"
           leftIcon={<FactCheckIcon />}
+        />
+      )}
+      {puedeVer(PAGINAS.reportes, rol) && (
+        <Menu.Item
+          to="/reportes"
+          primaryText="Reportes de asistencia"
+          leftIcon={<AssessmentIcon />}
         />
       )}
       <Menu.ResourceItems />
