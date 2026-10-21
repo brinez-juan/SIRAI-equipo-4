@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Box, Typography } from "@mui/material";
+import { Paper, Typography } from "@mui/material";
 import {
   AutocompleteInput,
   BooleanInput,
@@ -26,7 +26,7 @@ const PARENTESCOS = [
   { id: "MADRE", name: "Madre" },
   { id: "PADRE", name: "Padre" },
   { id: "ABUELO_A", name: "Abuelo(a)" },
-  { id: "TIO_A", name: "TÃ­o(a)" },
+  { id: "TIO_A", name: "Tío(a)" },
   { id: "HERMANO_A", name: "Hermano(a)" },
   { id: "TUTOR_LEGAL", name: "Tutor legal" },
   { id: "OTRO", name: "Otro" },
@@ -38,7 +38,7 @@ const nombreTutor = (tutor: RaRecord) =>
     .join(" ");
 
 // [IA] Generado con Claude (prompt #11 en docs/ia/prompts.md). Revisado por: pendiente
-// Quita el vÃ­nculo del tutor de la fila (borrado lÃ³gico en el backend) y avisa para recargar la tabla.
+// Quita el vínculo del tutor de la fila (borrado lógico en el backend) y avisa para recargar la tabla.
 const BotonQuitar = ({
   infanteId,
   alQuitar,
@@ -72,15 +72,15 @@ const BotonQuitar = ({
 };
 
 // [IA] Generado con Claude (prompt #11 en docs/ia/prompts.md). Revisado por: pendiente
-// SecciÃ³n de la ficha del infante: tabla de sus tutores y formulario para vincular uno
-// (tutor, parentesco y si puede recoger). Solo se monta en la ediciÃ³n, que abre DIRECTORA.
+// Sección de la ficha del infante: tabla de sus tutores y formulario para vincular uno
+// (tutor, parentesco y si puede recoger). Solo se monta en la edición, que abre DIRECTORA.
 export const TutoresDelInfante = () => {
   const infante = useRecordContext();
   const api = useDataProvider<typeof dataProvider>();
   const notify = useNotify();
   const [tutores, setTutores] = useState<RaRecord[]>([]);
   const [cargando, setCargando] = useState(true);
-  // Cambia despuÃ©s de agregar o quitar: recarga la tabla y limpia el formulario
+  // Cambia después de agregar o quitar: recarga la tabla y limpia el formulario
   const [version, setVersion] = useState(0);
   const recargar = () => setVersion((v) => v + 1);
 
@@ -113,9 +113,16 @@ export const TutoresDelInfante = () => {
       })
       .catch((error: Error) => notify(error.message, { type: "error" }));
 
+  // Modificado con el prompt #14: recuadro propio y nota, para que "Agregar tutor" no parezca
+  // parte del formulario del infante (sus campos obligatorios no aplican al botón Guardar de arriba).
   return (
-    <Box sx={{ p: 2 }}>
-      <Typography variant="h6" component="h2" gutterBottom>
+    <Paper
+      variant="outlined"
+      component="section"
+      aria-labelledby="titulo-tutores"
+      sx={{ p: 2, m: 2 }}
+    >
+      <Typography id="titulo-tutores" variant="h6" component="h2" gutterBottom>
         Tutores
       </Typography>
       <ListContextProvider value={listContext}>
@@ -133,7 +140,7 @@ export const TutoresDelInfante = () => {
           <FunctionField
             label="Puede recoger"
             render={(tutor: RaRecord) =>
-              tutor.autorizado_recoger ? "SÃ­" : "No"
+              tutor.autorizado_recoger ? "Sí" : "No"
             }
           />
           <BotonQuitar infanteId={infante.id} alQuitar={recargar} />
@@ -143,7 +150,11 @@ export const TutoresDelInfante = () => {
       <Typography variant="subtitle1" component="h3" sx={{ mt: 3 }}>
         Agregar tutor
       </Typography>
-      {/* record vacÃ­o: si no, el formulario tomarÃ­a los datos del infante */}
+      <Typography variant="body2" color="text.secondary">
+        Se guarda con el botón Agregar. No es necesario para guardar los datos
+        del infante.
+      </Typography>
+      {/* record vacío: si no, el formulario tomaría los datos del infante */}
       <Form key={version} record={{}} onSubmit={agregar}>
         <ReferenceInput source="tutor_id" reference="Tutores">
           <AutocompleteInput
@@ -166,6 +177,6 @@ export const TutoresDelInfante = () => {
         />
         <SaveButton label="Agregar" />
       </Form>
-    </Box>
+    </Paper>
   );
 };
