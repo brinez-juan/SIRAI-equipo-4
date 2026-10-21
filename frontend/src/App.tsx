@@ -1,4 +1,4 @@
-import { Admin, Resource, type ResourceProps } from "react-admin";
+import { Admin, CustomRoutes, Resource, type ResourceProps } from "react-admin";
 import { Layout } from "./Layout";
 import { dataProvider } from "./dataProvider";
 import authProvider from "./authProvider";
@@ -22,7 +22,15 @@ import {
   listarUsuarios,
 } from "./recursos/Usuarios";
 import { ListarAsistencias } from "./recursos/Asistencias";
-import { ESCRITURA, RECURSOS, puedeVer } from "./permisos";
+import type { ComponentType } from "react";
+import { Route } from "react-router-dom";
+import { PaseLista } from "./paginas/PaseLista";
+import { ESCRITURA, PAGINAS, RECURSOS, puedeVer } from "./permisos";
+
+// Páginas propias por ruta (deben estar también en PAGINAS de permisos.ts, con sus roles).
+const COMPONENTES_PAGINA: Record<string, ComponentType> = {
+  "pase-lista": PaseLista,
+};
 
 // Cada issue agrega aquí su línea (y su entrada en permisos.ts con los roles).
 // recordRepresentation: lo que se muestra cuando otro recurso apunta a este (ej. la región de una estancia).
@@ -75,8 +83,9 @@ const vistasDelRol = (nombre: string, rol: string) => {
     : resto;
 };
 
-// [IA+Humano] Base generada con Claude (prompt #3 en docs/ia/prompts.md), modificada por: pendiente. Modificado con el prompt #9.
-// react-admin llama a getPermissions (el rol) y este render solo monta lo que ese rol puede ver.
+// [IA+Humano] Base generada con Claude (prompt #3 en docs/ia/prompts.md), modificada por: pendiente. Modificado con los prompts #9 y #14.
+// react-admin llama a getPermissions (el rol) y este render solo monta lo que ese rol puede ver:
+// sus <Resource> y sus páginas propias (CustomRoutes, como el pase de lista).
 export const App = () => (
   <Admin
     layout={Layout}
@@ -86,12 +95,19 @@ export const App = () => (
     i18nProvider={i18nProvider}
     requireAuth
   >
-    {(rol: string) =>
-      Object.keys(COMPONENTES_RECURSO)
+    {(rol: string) => [
+      ...Object.keys(COMPONENTES_RECURSO)
         .filter((nombre) => puedeVer(RECURSOS[nombre], rol))
         .map((nombre) => (
           <Resource key={nombre} name={nombre} {...vistasDelRol(nombre, rol)} />
-        ))
-    }
+        )),
+      <CustomRoutes key="paginas">
+        {Object.entries(COMPONENTES_PAGINA)
+          .filter(([ruta]) => puedeVer(PAGINAS[ruta], rol))
+          .map(([ruta, Pagina]) => (
+            <Route key={ruta} path={`/${ruta}`} element={<Pagina />} />
+          ))}
+      </CustomRoutes>,
+    ]}
   </Admin>
 );
