@@ -184,3 +184,18 @@ Herramienta: Claude (Claude Code).
 
   (Decisiones elegidas: pedir motivo y nota al marcar; motivo visible para todos y nota restringida; script de migración.)
   ```
+
+## #34 · Issue 34: Arquitectura y justificación de la base de datos
+- **Quién:** Jesús (responsable en el plan: Oscar)
+- **Para qué:** `docs/arquitectura.md` en lenguaje sencillo: las tres piezas del sistema y el camino de una petición (con diagrama Mermaid), por qué MySQL (relaciones, `CHECK`, transacciones, llaves únicas, bitácora inmutable, índices y lo que pide el SRS), la normalización a 3FN con ejemplos reales y las decisiones de diseño justificadas, el diagrama entidad-relación en Mermaid, el diagrama exportado de Workbench (con guía para leer sus símbolos), un resumen del consumo de CPU, memoria y disco tomado de `docs/infraestructura.md` (issue 33) y lo que el SRS pedía y no se hizo. Claude leyó el esquema, el backend y el SRS y redactó el documento; Jesús exportó el diagrama de Workbench, lo revisa y hace los commits.
+- **Citado en:** `docs/arquitectura.md` (documento, sin código), con `docs/arquitectura/er-workbench.pdf` y sus dos páginas en PNG.
+- **Prompt:**
+  ```
+  vamos a hacer el issue 34, sigue las reglas estipuladas y antes de empezar dime de que trata la issue y el porque de esa forma de hacerse
+
+  no este lo voy a hacer yo, haz esto pero con un formato de texto que sea clara y explicativa. No uses lenguaje muy complicado y se claro con cada elemento de esta justificacion
+
+  aqui esta el diagrama, incluyelo a la documentacion
+
+  agrega esto a la documentacion que habla sobre el uso de espacio utilizando estas tecnologias y base de datos
+  ```
