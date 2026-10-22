@@ -61,24 +61,33 @@ const temaAltoContraste: RaThemeOptions = {
   },
 };
 
+// «Resaltar el foco»: amarillo fosforescente, igual en todos los controles, modos y contrastes
+const AMARILLO_FOSFORESCENTE = "#FFFF00";
+
 // [IA] Generado con Claude (prompt #32 en docs/ia/prompts.md). Revisado por: pendiente
-// Anillo de foco: 3 px normal, 4 px con halo si se pide «Resaltar el foco». En alto contraste,
-// borde negro con amarillo por fuera para que se vea sobre fondos claros y oscuros.
+// Anillo de foco. Normal: 3 px azul con separación. Alto contraste: borde negro con amarillo por fuera.
+// «Resaltar el foco»: 4 px amarillo fosforescente entre dos bordes negros, para que se vea igual
+// sobre fondos claros, oscuros y de cualquier color.
 const anilloDeFoco = (prefs: Preferencias, modo: "claro" | "oscuro") => {
-  const grosor = prefs.focoReforzado ? 4 : 3;
+  if (prefs.focoReforzado) {
+    return {
+      outline: `4px solid ${AMARILLO_FOSFORESCENTE}`,
+      outlineOffset: 2,
+      boxShadow: `0 0 0 2px ${NEGRO}, 0 0 0 8px ${NEGRO}`,
+    };
+  }
   if (prefs.contraste == "alto") {
     return {
-      outline: `${grosor}px solid ${NEGRO}`,
+      outline: `3px solid ${NEGRO}`,
       outlineOffset: 0,
-      boxShadow: `0 0 0 ${grosor * 2}px ${AMARILLO_FOCO}`,
+      boxShadow: `0 0 0 6px ${AMARILLO_FOCO}`,
     };
   }
   const { color, separacion } = FOCO[modo];
-  const halo = prefs.focoReforzado ? `, 0 0 0 ${grosor + 6}px ${color}66` : "";
   return {
-    outline: `${grosor}px solid ${color}`,
+    outline: `3px solid ${color}`,
     outlineOffset: 2,
-    boxShadow: `0 0 0 2px ${separacion}${halo}`,
+    boxShadow: `0 0 0 2px ${separacion}`,
   };
 };
 
@@ -102,8 +111,16 @@ const conPreferencias = (
       MuiCssBaseline: {
         styleOverrides: {
           html: { fontSize: `${prefs.escala}%` },
-          // "html *" para ganarle al outline: 0 de los botones de MUI
-          "html *:focus-visible": anilloDeFoco(prefs, modo),
+          // "html *" para ganarle al outline: 0 de los botones de MUI. .Mui-focusVisible es el control
+          // visible de radios, casillas e interruptores: el <input> que recibe el foco es invisible.
+          "html *:focus-visible, html .Mui-focusVisible": anilloDeFoco(
+            prefs,
+            modo,
+          ),
+          // Con «Resaltar el foco» se quita la onda de color de MUI al enfocar: solo queda el amarillo
+          ...(prefs.focoReforzado
+            ? { "html .MuiTouchRipple-ripplePulsate": { display: "none" } }
+            : {}),
         },
       },
       ...(sinAnimaciones
