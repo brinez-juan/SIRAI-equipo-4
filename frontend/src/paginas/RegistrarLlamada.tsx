@@ -30,7 +30,7 @@ type Destinatario = {
   primer_apellido?: string;
   segundo_apellido?: string | null;
   parentesco: string;
-  telefono: string;
+  telefono: string | null;
 };
 
 // [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
@@ -85,11 +85,11 @@ export const RegistrarLlamada = ({
   const destinatarios = [
     ...tutores.map((tutor) => ({
       id: `tutor:${tutor.id}`,
-      name: `Tutor · ${nombreCompleto(tutor)} (${tutor.parentesco}) · ${tutor.telefono}`,
+      name: `Tutor · ${nombreCompleto(tutor)} (${tutor.parentesco}) · ${tutor.telefono ?? "sin teléfono"}`,
     })),
     ...contactos.map((contacto) => ({
       id: `contacto:${contacto.id}`,
-      name: `Contacto de emergencia · ${contacto.nombre} (${contacto.parentesco}) · ${contacto.telefono}`,
+      name: `Contacto de emergencia · ${contacto.nombre} (${contacto.parentesco}) · ${contacto.telefono ?? "sin teléfono"}`,
     })),
   ];
 
