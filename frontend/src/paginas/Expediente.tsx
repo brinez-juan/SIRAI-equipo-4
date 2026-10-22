@@ -131,7 +131,7 @@ const CasoDelExpediente = ({
     component="section"
     sx={{ border: 1, borderColor: "divider", borderRadius: 1, p: 2, mb: 2 }}
   >
-    <Typography variant="h6" component="h3" gutterBottom>
+    <Typography variant="h6" component="h4" gutterBottom>
       Caso {numero} · Falta del {fechaLegible(caso.fecha)} (
       {TURNOS[caso.turno] ?? caso.turno})
     </Typography>
@@ -157,7 +157,7 @@ const CasoDelExpediente = ({
           : "No aplica"}
     </Dato>
 
-    <Typography variant="subtitle2" component="h4" sx={{ mt: 1.5 }}>
+    <Typography variant="subtitle2" component="h5" sx={{ mt: 1.5 }}>
       Llamadas
     </Typography>
     {caso.llamadas.length == 0 ? (
@@ -256,7 +256,7 @@ export const Expediente = () => {
           component="article"
           sx={{ bgcolor: "background.paper", p: 3, borderRadius: 1 }}
         >
-          <Typography variant="h5" component="h1">
+          <Typography variant="h5" component="h2">
             Expediente de seguimiento de inasistencias
           </Typography>
           <Typography variant="body2" color="text.secondary" gutterBottom>
@@ -265,7 +265,7 @@ export const Expediente = () => {
             {fechaHora(datos.generado_en)}
           </Typography>
 
-          <Typography variant="h6" component="h2" sx={{ mt: 2 }}>
+          <Typography variant="h6" component="h3" sx={{ mt: 2 }}>
             Datos del infante
           </Typography>
           <Dato etiqueta="Nombre">{nombreCompleto(datos.infante)}</Dato>
@@ -275,7 +275,7 @@ export const Expediente = () => {
           </Dato>
           <Dato etiqueta="Casos registrados">{datos.seguimientos.length}</Dato>
 
-          <Typography variant="h6" component="h2" sx={{ mt: 2, mb: 1 }}>
+          <Typography variant="h6" component="h3" sx={{ mt: 2, mb: 1 }}>
             Seguimientos
           </Typography>
           {datos.seguimientos.length == 0 ? (

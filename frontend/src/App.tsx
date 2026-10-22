@@ -132,6 +132,7 @@ const vistasDelRol = (nombre: string, rol: string) => {
 // sus <Resource> y sus páginas propias (CustomRoutes, como el pase de lista).
 export const App = () => (
   <Admin
+    title="SIRAI"
     theme={temaClaro}
     darkTheme={temaOscuro}
     layout={Layout}

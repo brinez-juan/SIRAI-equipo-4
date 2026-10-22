@@ -49,7 +49,7 @@ export const PreferenciasForm = () => {
     <Card sx={{ mt: 2 }}>
       <Title title="Preferencias de accesibilidad" />
       <Box sx={{ px: 2, pt: 2 }}>
-        <Typography variant="h5" component="h1">
+        <Typography variant="h5" component="h2">
           Preferencias de accesibilidad
         </Typography>
         <Typography variant="body2" color="text.secondary">
