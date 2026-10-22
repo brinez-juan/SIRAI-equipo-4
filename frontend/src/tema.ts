@@ -151,6 +151,67 @@ const temaGuinda: RaThemeOptions = {
   },
 };
 
+// [IA] Generado con Claude (prompt #43 en docs/ia/prompts.md). Revisado por: pendiente
+// Colores del modo oscuro. El Figma no tiene versión oscura: se midieron contra el fondo #313131 de
+// react-admin. Sobre el guinda claro el texto va en negro (10.35:1); en blanco sería 2.03:1.
+const OSCURO = {
+  primario: "#E8A3B6", // 6.41:1 sobre #313131
+  primarioTinte: "#45282F", // fondo de la opción activa del menú; el guinda claro encima da 6.48:1
+  error: "#F28B82", // el #F44336 de MUI da 3.53:1 como texto y 3.68:1 en el chip «Rojo»; este da 5.45:1 y 8.79:1 con negro
+};
+
+// [IA] Generado con Claude (prompt #43 en docs/ia/prompts.md). Revisado por: pendiente
+// Tema oscuro guinda. La barra superior queda en guinda oscuro con texto blanco (14.98:1) para que
+// SIRAI se reconozca igual en los dos modos: MUI la pintaría gris porque en oscuro ignora secondary.
+// Éxito, advertencia e info se quedan con los de MUI para fondo oscuro (≥ 5.5:1); el error se aclara.
+const temaGuindaOscuro: RaThemeOptions = {
+  ...defaultDarkTheme,
+  palette: {
+    ...defaultDarkTheme.palette,
+    primary: { main: OSCURO.primario, contrastText: COLORES.negro },
+    secondary: { main: OSCURO.primario, contrastText: COLORES.negro },
+    error: { main: OSCURO.error, contrastText: COLORES.negro },
+  },
+  components: {
+    ...defaultDarkTheme.components,
+    ...CAMPOS_DE_FORMULARIO,
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          backgroundColor: COLORES.primarioOscuro,
+          backgroundImage: "none",
+          color: "#FFFFFF",
+        },
+      },
+    },
+    RaMenuItemLink: {
+      styleOverrides: {
+        root: {
+          "&.RaMenuItemLink-active": {
+            backgroundColor: OSCURO.primarioTinte,
+            borderLeft: `3px solid ${OSCURO.primario}`,
+            paddingLeft: 13,
+            color: OSCURO.primario,
+            fontWeight: 700,
+            "& .RaMenuItemLink-icon": { color: OSCURO.primario },
+          },
+        },
+      },
+    },
+    RaLogin: {
+      styleOverrides: {
+        root: {
+          backgroundImage: "none",
+          backgroundColor: COLORES.primarioOscuro,
+          justifyContent: "center",
+          "& .RaLogin-card": { marginTop: 0 },
+          "& .RaLogin-icon": { backgroundColor: OSCURO.primario },
+        },
+      },
+    },
+  },
+};
+
 // Foco visible (P7): azul del documento de accesibilidad y una separación del color del fondo
 const FOCO = {
   claro: { color: COLORES.foco, separacion: "#FFFFFF" },
@@ -282,7 +343,7 @@ export const crearTema = (prefs: Preferencias): RaThemeOptions =>
     "claro",
   );
 
-// [IA] Generado con Claude (prompt #32 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA+Humano] Base generada con Claude (prompt #32 en docs/ia/prompts.md), modificada por: pendiente. Modificado con el prompt #43.
 // Con alto contraste no hay tema oscuro (no se diseñó): App.tsx pasa darkTheme={null}.
 export const crearTemaOscuro = (prefs: Preferencias): RaThemeOptions =>
-  conPreferencias(defaultDarkTheme, prefs, "oscuro");
+  conPreferencias(temaGuindaOscuro, prefs, "oscuro");
