@@ -8,7 +8,7 @@ const PARENTESCOS=["MADRE", "PADRE", "ABUELO_A", "TIO_A", "HERMANO_A", "TUTOR_LE
 const MAX_PRIORIDAD=10;
 const COLUMNAS="id, infante_id, nombre, parentesco, telefono_cifrado, prioridad, created_at, updated_at";
 
-// [IA] Generado con Claude (prompt #12 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Solo DIRECTORA (ficha del infante). TRABAJO_SOCIAL y MEDICO ven estos contactos desde el seguimiento (issue 20).
 // El token debe traer estancia: la estancia nunca sale del request.
 const soloDirectora=[
@@ -16,26 +16,26 @@ const soloDirectora=[
 	(req, res, next)=>req.usuario.estancia_id==null?res.sendStatus(403):next()
 ];
 
-// [IA] Generado con Claude (prompt #12 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // El infante de la URL debe ser de la estancia del token; si es de otra se comporta como si no existiera (404).
 async function infanteDeMiEstancia(req){
 	let [filas]=await db.query("SELECT id FROM infantes WHERE id=? AND estancia_id=? AND deleted_at IS NULL", [req.params.id, req.usuario.estancia_id]);
 	return filas[0];
 }
 
-// [IA] Generado con Claude (prompt #12 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 async function buscarContacto(req){
 	let [filas]=await db.query("SELECT "+COLUMNAS+" FROM contactos_emergencia WHERE id=? AND infante_id=? AND deleted_at IS NULL", [req.params.contactoId, req.params.id]);
 	return filas[0];
 }
 
-// [IA] Generado con Claude (prompt #12 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Copia de la fila con el teléfono descifrado. La fila original (cifrada) es la que va a la bitácora.
 function paraRespuesta(fila){
 	return {...fila, telefono_cifrado: descifrar(fila.telefono_cifrado)};
 }
 
-// [IA] Generado con Claude (prompt #12 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Revisa el body antes de tocar la base. Al crear exige los cuatro campos; al editar solo revisa los que vengan.
 // Exigir tipo evita que un objeto o arreglo llegue a la consulta SQL. La prioridad va de 1 a MAX_PRIORIDAD:
 // los números negativos quedan reservados para los contactos borrados (ver borrar).
@@ -62,7 +62,7 @@ function validarContacto(cuerpo, creando){
 	return null;
 }
 
-// [IA] Generado con Claude (prompt #12 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Contactos del infante, ordenados por prioridad (1 = primero en llamarse), con el teléfono descifrado.
 router.get("/infantes/:id/contactos", soloDirectora, async (req, res)=>{
 	try{
@@ -76,7 +76,7 @@ router.get("/infantes/:id/contactos", soloDirectora, async (req, res)=>{
 	}
 });
 
-// [IA] Generado con Claude (prompt #12 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Agrega un contacto. El id, el infante y created_by los pone el servidor. Una prioridad ya usada por
 // otro contacto del infante responde 409 (clave única infante_id + prioridad).
 router.post("/infantes/:id/contactos", soloDirectora, async (req, res)=>{
@@ -103,7 +103,7 @@ router.post("/infantes/:id/contactos", soloDirectora, async (req, res)=>{
 	}
 });
 
-// [IA] Generado con Claude (prompt #12 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Edita solo nombre, parentesco, teléfono y prioridad, y guarda en la bitácora el antes y el después.
 router.put("/infantes/:id/contactos/:contactoId", soloDirectora, async (req, res)=>{
 	try{
@@ -139,7 +139,7 @@ router.put("/infantes/:id/contactos/:contactoId", soloDirectora, async (req, res
 	}
 });
 
-// [IA] Generado con Claude (prompt #12 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Borrado lógico. La clave única (infante_id, prioridad) no mira deleted_at, así que un contacto borrado
 // seguiría ocupando su prioridad y no se podría volver a usar. Por eso, al borrar, su prioridad pasa a un
 // número negativo libre (el activo siempre es 1 o más). La bitácora conserva la prioridad original en "antes".

@@ -5,7 +5,7 @@ const {cifrar, descifrar}=require("../cifrado");
 
 const router=express.Router();
 
-// [IA] Generado con Claude (prompt #20 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Tabla 2.5 del plan: TRABAJO_SOCIAL, MEDICO y DIRECTORA llevan los seguimientos; DOCENTE no ve notas ni
 // seguimientos. El token debe traer estancia: la estancia nunca sale del request.
 const conEstancia=(req, res, next)=>req.usuario.estancia_id==null?res.sendStatus(403):next();
@@ -19,7 +19,7 @@ const DESDE=" FROM seguimientos s JOIN asistencias a ON a.id=s.asistencia_id JOI
 // Reintento agendado por la llamada más reciente (issue 22). NULL si no hay llamadas o si no hace falta reintentar.
 const SIGUIENTE_INTENTO="(SELECT l.siguiente_intento_en FROM llamadas l WHERE l.seguimiento_id=s.id AND l.deleted_at IS NULL ORDER BY l.intento DESC LIMIT 1)";
 
-// [IA] Generado con Claude (prompt #20 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Bandeja: casos no cerrados de mi estancia. Primero los que tienen el reintento vencido (el más atrasado arriba),
 // luego los que tienen un reintento agendado y al final el resto, de la falta más antigua a la más reciente.
 // "Ahora" se pasa desde Node porque las fechas se guardan en UTC y el NOW() de MySQL usa la zona del servidor.
@@ -48,7 +48,7 @@ router.get("/seguimientos", acceso, async (req, res)=>{
 	}
 });
 
-// [IA] Generado con Claude (prompt #20 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Detalle de un seguimiento de mi estancia (si es de otra, 404 como si no existiera): infante, tutores y contactos
 // con su teléfono descifrado, llamadas con sus notas descifradas, causa con su asesoría y alta médica si existe.
 // Los campos descifrados salen sin el sufijo _cifrado. Como expone datos confidenciales, cada consulta exitosa
@@ -144,13 +144,13 @@ router.get("/seguimientos/:id", acceso, async (req, res)=>{
 const CLASIFICABLES=["ABIERTO", "EN_CONTACTO", "CLASIFICADO"];
 const MAX_DETALLE=2000;
 
-// [IA] Generado con Claude (prompt #23 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Fecha AAAA-MM-DD que exista en el calendario.
 function esFecha(texto){
 	return typeof texto=="string" && /^\d{4}-\d{2}-\d{2}$/.test(texto) && new Date(texto+"T00:00:00Z").toISOString().slice(0, 10)==texto;
 }
 
-// [IA] Generado con Claude (prompt #23 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Revisa el body de clasificar. detalle y fecha_probable_retorno son opcionales (null o vacío = sin dato).
 // Exigir texto evita que un objeto o arreglo llegue a la consulta SQL.
 function validarClasificacion(cuerpo){
@@ -166,7 +166,7 @@ function validarClasificacion(cuerpo){
 	return null;
 }
 
-// [IA] Generado con Claude (prompt #23 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Clasifica la causa de la inasistencia y pasa el caso a CLASIFICADO. PUT reemplaza la clasificación completa:
 // lo que no venga (detalle, fecha) queda en NULL. El detalle es confidencial: se guarda cifrado y en la bitácora
 // solo entra cifrado, con el antes y el después. Es un solo UPDATE condicionado al estado, así que si el caso se
@@ -234,7 +234,7 @@ const MAX_OBSERVACIONES=2000;
 // FOR UPDATE OF s: alta y cierre del mismo caso se forman en fila, así no se cierra un caso mientras se le da de alta.
 const BLOQUEAR_SEGUIMIENTO=" WHERE s.id=? AND a.estancia_id=? AND s.deleted_at IS NULL AND a.deleted_at IS NULL FOR UPDATE OF s";
 
-// [IA] Generado con Claude (prompt #24 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Corre fn(conexion) en una transacción; si algo falla no se guarda nada.
 async function enTransaccion(fn){
 	let conexion=await db.getConnection();
@@ -251,7 +251,7 @@ async function enTransaccion(fn){
 	}
 }
 
-// [IA] Generado con Claude (prompt #24 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Alta médica vigente de un seguimiento (la que no tiene borrado lógico), o undefined.
 async function buscarAlta(conexion, seguimientoId){
 	let [altas]=await conexion.query(
@@ -263,7 +263,7 @@ async function buscarAlta(conexion, seguimientoId){
 	return altas[0];
 }
 
-// [IA] Generado con Claude (prompt #24 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Revisa el body de la alta: folio obligatorio, observaciones opcionales. Exigir texto evita que un objeto o
 // arreglo llegue a la consulta SQL.
 function validarAlta(cuerpo){
@@ -276,7 +276,7 @@ function validarAlta(cuerpo){
 	return null;
 }
 
-// [IA] Generado con Claude (prompt #24 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Registra la alta médica de un seguimiento de mi estancia (si es de otra, 404). Quita el candado de reingreso
 // del pase de lista y permite cerrar los casos cuya causa requiere alta. Una alta por caso (409 si ya tiene) y
 // no se emite sobre un caso cerrado (409). Las observaciones son confidenciales: se guardan cifradas y así entran
@@ -322,7 +322,7 @@ router.post("/seguimientos/:id/alta", accesoAlta, async (req, res)=>{
 	}
 });
 
-// [IA] Generado con Claude (prompt #24 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Cierra un seguimiento de mi estancia (si es de otra, 404). Solo se cierra un caso clasificado
 // (chk_clasificado_con_causa) y, si su causa tiene requiere_alta = 1, solo con alta médica: si no, 409.
 // cerrado_por es quien lo cierra, tomado del token. Un caso cerrado ya no se clasifica ni recibe alta.

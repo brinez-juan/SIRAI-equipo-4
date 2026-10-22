@@ -4,7 +4,7 @@ const {registrarRecurso}=require("../crud");
 
 const router=express.Router();
 
-// [IA] Generado con Claude (prompt #41 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Cuántas filas activas (sin borrado lógico) de cada tabla apuntan a un id. "dependientes" es
 // [[tabla, columna, texto], ...] fijo en este archivo, nunca del request. Devuelve el mensaje para el 409,
 // o null si no hay nada activo y se puede desactivar.
@@ -19,7 +19,7 @@ async function sinDependientes(id, dependientes, que){
 	return encontrados.length==0?null:"No se puede desactivar "+que+": todavía tiene "+encontrados.join(" y ")+". Muévalos a otra o desactívelos primero.";
 }
 
-// [IA] Generado con Claude (prompt #41 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Una estancia solo se activa si su región está activa; si no, quedaría viva dentro de una región que no aparece.
 async function regionActiva(estancia){
 	let [[region]]=await db.query("SELECT nombre, deleted_at FROM regiones WHERE id=?", [estancia.region_id]);

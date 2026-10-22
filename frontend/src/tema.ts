@@ -9,7 +9,7 @@ import type { Preferencias } from "./preferencias";
 // Tema de MUI que recibe <Admin>. Parte de los temas de react-admin con la paleta guinda del Figma v3
 // (página 00, colección «SIRAI · Colores»). Las preferencias de accesibilidad se aplican encima.
 
-// [IA] Generado con Claude (prompt #43 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Variables de color del Figma. Si un color cambia en el Figma, se cambia aquí y en ningún otro lado:
 // ninguna pantalla escribe colores, todas usan las claves del tema (color="error", text.secondary…).
 export const COLORES = {
@@ -40,7 +40,7 @@ export const COLORES = {
   negro: "#000000",
 };
 
-// [IA] Generado con Claude (prompt #43 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Ajustes del Figma que no dependen del color: los comparten los temas claro, oscuro y alto contraste.
 // Donde hace falta un color se toma de la paleta de cada tema.
 const COMPONENTES_COMUNES: RaThemeOptions["components"] = {
@@ -73,7 +73,7 @@ const COMPONENTES_COMUNES: RaThemeOptions["components"] = {
   },
 };
 
-// [IA] Generado con Claude (prompt #43 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Paleta guinda sobre el tema claro de react-admin. secondary también es guinda porque la barra
 // superior de react-admin usa color="secondary". info es el azul del foco (avisos y alertas de info).
 const temaGuinda: RaThemeOptions = {
@@ -98,7 +98,7 @@ const temaGuinda: RaThemeOptions = {
     divider: COLORES.linea,
     background: { default: COLORES.fondo, paper: COLORES.papel },
   },
-  // [IA] Generado con Claude (prompt #43 en docs/ia/prompts.md). Revisado por: pendiente
+  // [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
   // Componentes de la página 00 del Figma. El aviso de useNotify no se toca: el de info ya sale en
   // #323232 (MUI lo calcula del fondo) y los de éxito, error y advertencia toman la paleta.
   components: {
@@ -173,7 +173,7 @@ const temaGuinda: RaThemeOptions = {
   },
 };
 
-// [IA] Generado con Claude (prompt #43 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Colores del modo oscuro. El Figma no tiene versión oscura: se midieron contra el fondo #313131 de
 // react-admin. Sobre el guinda claro el texto va en negro (10.35:1); en blanco sería 2.03:1.
 const OSCURO = {
@@ -184,7 +184,7 @@ const OSCURO = {
   error: "#F4A39C",
 };
 
-// [IA] Generado con Claude (prompt #43 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Tema oscuro guinda. La barra superior queda en guinda oscuro con texto blanco (14.98:1) para que
 // SIRAI se reconozca igual en los dos modos: MUI la pintaría gris porque en oscuro ignora secondary.
 // Éxito, advertencia e info se quedan con los de MUI para fondo oscuro (≥ 5.5:1); el error se aclara.
@@ -293,7 +293,7 @@ const temaAltoContraste: RaThemeOptions = {
 // «Resaltar el foco»: amarillo fosforescente, igual en todos los controles, modos y contrastes
 const AMARILLO_FOSFORESCENTE = "#FFFF00";
 
-// [IA] Generado con Claude (prompt #32 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Anillo de foco. Normal: 3 px azul con separación. Alto contraste: borde negro con amarillo por fuera.
 // «Resaltar el foco»: 4 px amarillo fosforescente entre dos bordes negros, para que se vea igual
 // sobre fondos claros, oscuros y de cualquier color.
@@ -320,7 +320,7 @@ const anilloDeFoco = (prefs: Preferencias, modo: "claro" | "oscuro") => {
   };
 };
 
-// [IA] Generado con Claude (prompt #32 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Aplica las preferencias sobre un tema base. Todo pasa por el tema de MUI; no se toca el DOM.
 // - Tamaño del texto: MUI mide en rem, así que basta con cambiar el font-size de <html>.
 // - Reducir animaciones: si el usuario lo pide o si el sistema operativo lo pide.

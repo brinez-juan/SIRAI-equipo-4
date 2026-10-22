@@ -41,7 +41,7 @@ const ROLES = [
 // Roles que llevan estancia (chk_usuarios_alcance); SUPERVISOR lleva región; ADMIN_CENTRAL ninguna
 const ROLES_ESTANCIA = ["DOCENTE", "TRABAJO_SOCIAL", "MEDICO", "DIRECTORA"];
 
-// [IA] Generado con Claude (issue 06, registrar prompt en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Antes de enviar, limpia la estancia o región que no le toca al rol (por si se cambió de rol
 // en el formulario) para no chocar con chk_usuarios_alcance en el backend.
 const ajustarAlcance = (data: RaRecord) => ({
@@ -50,7 +50,7 @@ const ajustarAlcance = (data: RaRecord) => ({
   region_id: data.rol == "SUPERVISOR" ? (data.region_id ?? null) : null,
 });
 
-// [IA] Generado con Claude (issue 06, registrar prompt en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Activa o desactiva al usuario del registro actual. El backend no borra usuarios (issue 05).
 const BotonActivo = () => {
   const record = useRecordContext();
@@ -85,7 +85,7 @@ const BotonActivo = () => {
   );
 };
 
-// [IA] Generado con Claude (issue 06, registrar prompt en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 export const listarUsuarios = () => (
   <List sort={{ field: "nombre", order: "ASC" }}>
     <Datagrid rowClick="edit" bulkActionButtons={false}>
@@ -117,7 +117,7 @@ export const listarUsuarios = () => (
   </List>
 );
 
-// [IA] Generado con Claude (issue 06, registrar prompt en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Muestra estancia o región según el rol elegido en el formulario
 const CamposAlcance = () => {
   const rol = useWatch({ name: "rol" });
@@ -152,7 +152,7 @@ const CamposAlcance = () => {
   return null;
 };
 
-// [IA] Generado con Claude (issue 06, registrar prompt en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Campos comunes de crear y editar. Al crear la contraseña es obligatoria; al editar, vacía = no cambia.
 const CamposUsuario = ({ esNuevo }: { esNuevo: boolean }) => (
   <>
@@ -193,7 +193,7 @@ const BarraEditar = () => (
   </Toolbar>
 );
 
-// [IA] Generado con Claude (issue 06, registrar prompt en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 export const crearUsuario = () => (
   <Create transform={ajustarAlcance} redirect="list">
     <SimpleForm>
@@ -202,7 +202,7 @@ export const crearUsuario = () => (
   </Create>
 );
 
-// [IA] Generado con Claude (issue 06, registrar prompt en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // pessimistic: espera la respuesta del backend para mostrar sus mensajes (rol/alcance, correo repetido)
 export const editarUsuario = () => (
   <Edit

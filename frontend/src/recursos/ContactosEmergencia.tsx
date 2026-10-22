@@ -43,7 +43,7 @@ const TELEFONO = /^[0-9+()\s-]{7,20}$/;
 
 const VACIO = { nombre: "", parentesco: "", telefono: "", prioridad: "" };
 
-// [IA] Generado con Claude (prompt #12 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Primera prioridad libre de 1 a MAX_PRIORIDAD, para sugerirla al agregar un contacto.
 const siguientePrioridad = (contactos: Contacto[]) => {
   const usadas = contactos.map((contacto) => contacto.prioridad);
@@ -55,7 +55,7 @@ const siguientePrioridad = (contactos: Contacto[]) => {
   return "";
 };
 
-// [IA] Generado con Claude (prompt #12 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Contactos de emergencia en la ficha del infante (debajo del formulario): tabla ordenada por prioridad
 // (1 = primero en llamarse) y formulario para agregar o editar. Habla con /Infantes/:id/contactos; el
 // teléfono viaja y se guarda cifrado en el backend, aquí solo se ve el que el backend ya descifró.

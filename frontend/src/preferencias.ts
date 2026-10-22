@@ -1,4 +1,4 @@
-// [IA] Generado con Claude (prompt #32 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Preferencias de accesibilidad (pantalla X-01). Se guardan en este navegador, no en la cuenta,
 // y solo cambian la presentación: no tocan permisos ni datos. Lo que se lee de localStorage
 // nunca se usa sin validar contra los valores permitidos; si algo falla, valor por defecto.
@@ -21,7 +21,7 @@ export const POR_DEFECTO: Preferencias = {
 
 const LLAVE = "sirai.preferencias";
 
-// [IA] Generado con Claude (prompt #32 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Deja solo valores permitidos, venga del navegador o del formulario.
 const validar = (datos: Record<string, unknown>): Preferencias => ({
   escala:
@@ -32,7 +32,7 @@ const validar = (datos: Record<string, unknown>): Preferencias => ({
   reducirAnimaciones: datos.reducirAnimaciones === true,
 });
 
-// [IA] Generado con Claude (prompt #32 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Se llama una vez al cargar la app (App.tsx).
 export const leerPreferencias = (): Preferencias => {
   try {
@@ -45,7 +45,7 @@ export const leerPreferencias = (): Preferencias => {
   }
 };
 
-// [IA] Generado con Claude (prompt #32 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Valida y guarda. Lanza error si el navegador bloquea el almacenamiento: quien la llame avisa.
 export const guardarPreferencias = (
   datos: Record<string, unknown>,

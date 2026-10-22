@@ -33,7 +33,7 @@ type Destinatario = {
   telefono: string;
 };
 
-// [IA] Generado con Claude (prompt #22 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Texto de la bandeja para un reintento agendado (siguiente_intento_en de GET /seguimientos):
 // "Reintentar a las 13:40" si es hoy, o "Reintentar el 21/10 a las 13:40" si es otro día. En hora de México.
 export const textoReintento = (siguienteIntento: string | null | undefined) => {
@@ -61,7 +61,7 @@ const nombreCompleto = (persona: Destinatario) =>
     .filter(Boolean)
     .join(" ");
 
-// [IA] Generado con Claude (prompt #22 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Formulario para registrar una llamada, pensado para la sección "Llamadas" de Seguimiento.tsx (issue 21).
 // Recibe los tutores y contactos que ya trae el detalle del seguimiento, con su teléfono, para elegir a quién
 // se llamó. Un solo selector para los dos: el valor lleva el tipo ("tutor:" o "contacto:") y aquí se separa.

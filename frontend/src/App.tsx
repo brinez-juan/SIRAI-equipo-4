@@ -117,7 +117,7 @@ const COMPONENTES_RECURSO: Record<string, Omit<ResourceProps, "name">> = {
   },
 };
 
-// [IA] Generado con Claude (prompt #9 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Quita create y edit a los roles que solo consultan (tabla ESCRITURA de permisos.ts);
 // así react-admin no muestra el botón Crear ni abre el formulario de edición.
 const vistasDelRol = (nombre: string, rol: string) => {

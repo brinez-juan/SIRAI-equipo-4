@@ -51,7 +51,7 @@ const fechaHora = (valor: string) =>
     timeZone: "America/Mexico_City",
   });
 
-// [IA] Generado con Claude (prompt #24 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Secciones "Alta médica" y "Cierre del caso" para Seguimiento.tsx (issue 21). La alta la registran MEDICO y
 // DIRECTORA (folio y observaciones confidenciales) y quita el candado "Requiere alta para ingresar" del pase de lista.
 // El caso se cierra con confirmación; el botón explica con texto por qué no se puede cerrar (sin clasificar o sin

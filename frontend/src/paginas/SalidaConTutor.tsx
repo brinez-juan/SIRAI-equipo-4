@@ -41,7 +41,7 @@ type Props = {
   alRegistrar: () => void;
 };
 
-// [IA] Generado con Claude (prompt #16 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Celda "salida" del renglón de un infante en el pase de lista (issue 14). Solo los presentes tienen botón
 // "Registrar salida"; al abrirlo muestra únicamente los tutores con autorizado_recoger. Quien ya salió muestra
 // la hora con texto. La autorización real la revisa el backend (403 "Tutor no autorizado").

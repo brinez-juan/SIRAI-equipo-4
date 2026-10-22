@@ -86,11 +86,11 @@ const REQUIERE_ALTA = "Requiere alta para ingresar.";
 // asistencias.fecha es el día local de la estancia
 const ZONA = "America/Mexico_City";
 
-// [IA] Generado con Claude (prompt #14 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Fecha de hoy en la zona de la estancia, como "AAAA-MM-DD" (en-CA da ese formato).
 const hoy = () => new Date().toLocaleDateString("en-CA", { timeZone: ZONA });
 
-// [IA] Generado con Claude (prompt #14 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // "07:32" a partir de la fecha UTC que manda el backend.
 const hora = (valor: string | null) =>
   valor
@@ -101,7 +101,7 @@ const hora = (valor: string | null) =>
       })
     : "";
 
-// [IA] Generado con Claude (prompt #14 en docs/ia/prompts.md), modificado con el prompt #42. Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Texto del estado actual del renglón: el estado no se comunica solo con color.
 // Un ausente justificado dice también el motivo: "Ausente justificado — Enfermedad en casa".
 const textoEstado = (asistencia: Asistencia | null) => {

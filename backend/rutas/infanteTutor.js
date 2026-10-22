@@ -16,14 +16,14 @@ const SELECT_VINCULO="SELECT t.id, t.nombre, t.primer_apellido, t.segundo_apelli
 	+" FROM infante_tutor it JOIN tutores t ON t.id=it.tutor_id"
 	+" WHERE it.infante_id=? AND it.deleted_at IS NULL AND t.deleted_at IS NULL";
 
-// [IA] Generado con Claude (prompt #11 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // El infante debe ser de la estancia del token; si es de otra, se responde como si no existiera.
 async function infanteDeMiEstancia(req){
 	let [filas]=await db.query("SELECT id FROM infantes WHERE id=? AND estancia_id=? AND deleted_at IS NULL", [req.params.id, req.usuario.estancia_id]);
 	return filas.length>0;
 }
 
-// [IA] Generado con Claude (prompt #11 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Revisa el body de POST: tutor_id texto, parentesco del ENUM y autorizado_recoger booleano (opcional, false).
 function validarVinculo(cuerpo){
 	if(typeof cuerpo?.tutor_id!="string" || cuerpo.tutor_id==""){
@@ -38,7 +38,7 @@ function validarVinculo(cuerpo){
 	return null;
 }
 
-// [IA] Generado con Claude (prompt #11 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Tutores vinculados a un infante de mi estancia
 router.get("/Infantes/:id/tutores", lectura, async (req, res)=>{
 	try{
@@ -52,7 +52,7 @@ router.get("/Infantes/:id/tutores", lectura, async (req, res)=>{
 	}
 });
 
-// [IA] Generado con Claude (prompt #11 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Vincula un tutor al infante. El tutor debe ser visible para el usuario (mismo alcance que /Tutores).
 // La llave primaria es (infante_id, tutor_id): si el vínculo se había quitado, se reactiva en vez de insertar.
 router.post("/Infantes/:id/tutores", escritura, async (req, res)=>{
@@ -94,7 +94,7 @@ router.post("/Infantes/:id/tutores", escritura, async (req, res)=>{
 	}
 });
 
-// [IA] Generado con Claude (prompt #11 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Quita el vínculo con borrado lógico (deleted_at); el tutor y el infante no se tocan.
 router.delete("/Infantes/:id/tutores/:tutorId", escritura, async (req, res)=>{
 	try{

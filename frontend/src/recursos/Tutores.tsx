@@ -30,7 +30,7 @@ const filtros = [
   />,
 ];
 
-// [IA] Generado con Claude (prompt #10 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Mismo formato que valida el backend (rutas/tutores.js): 7 a 20 caracteres entre números, +, -, paréntesis y espacios.
 const validarTelefono = [
   required(),
@@ -40,7 +40,7 @@ const validarTelefono = [
   ),
 ];
 
-// [IA] Generado con Claude (prompt #10 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // required() deja pasar false en una casilla, por eso se compara con true. El backend repite la
 // revisión y responde 400 si no llega aceptada.
 const debeAceptar = (valor?: boolean) =>
@@ -48,7 +48,7 @@ const debeAceptar = (valor?: boolean) =>
     ? undefined
     : "Debe aceptar el aviso de privacidad y el contacto telefónico";
 
-// [IA] Generado con Claude (prompt #10 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Solo guardar: el plan no pide borrar tutores desde la pantalla.
 const BarraGuardar = () => (
   <Toolbar>
@@ -56,7 +56,7 @@ const BarraGuardar = () => (
   </Toolbar>
 );
 
-// [IA] Generado con Claude (prompt #10 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Límites iguales a las columnas de tutores en schema.sql. El teléfono viaja como "telefono_cifrado"
 // y se guarda cifrado.
 const CamposTutor = () => (
@@ -91,7 +91,7 @@ const CamposTutor = () => (
   </>
 );
 
-// [IA] Generado con Claude (prompt #10 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Cualquiera de los dos roles que gestionan tutores abre la ficha al dar clic.
 export const ListarTutores = () => {
   const { hasEdit } = useResourceDefinition();
@@ -108,7 +108,7 @@ export const ListarTutores = () => {
   );
 };
 
-// [IA] Generado con Claude (prompt #10 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // La casilla obligatoria solo existe al crear: el consentimiento se registra una vez, con la versión
 // vigente del aviso (2026.1). El backend guarda quién lo registró y cuándo.
 export const CrearTutor = () => {
@@ -129,7 +129,7 @@ export const CrearTutor = () => {
   );
 };
 
-// [IA] Generado con Claude (prompt #10 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // pessimistic: espera la respuesta del backend antes de mostrar el cambio, así un error no deja datos falsos en pantalla.
 export const EditarTutor = () => {
   const onError = useErrorAlGuardar(DUPLICADO);

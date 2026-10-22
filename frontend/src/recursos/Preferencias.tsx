@@ -23,7 +23,7 @@ const CONTRASTES = [
   { id: "alto", name: "Alto contraste" },
 ];
 
-// [IA] Generado con Claude (prompt #32 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Pantalla X-01 (Figma): list del <Resource name="preferencias">, como el formulario de perfil del
 // Reporte de Hooks. No usa dataProvider: SimpleForm guarda en el navegador y la página se recarga
 // para que App.tsx arme el tema con las preferencias nuevas.

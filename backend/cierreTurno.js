@@ -1,7 +1,7 @@
 const {db, uuidv7}=require("./db");
 const {log}=require("./seguridad");
 
-// [IA] Generado con Claude (prompt #17 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Fecha de hoy (AAAA-MM-DD) en la hora local de México, que es el "día" de asistencias.fecha.
 function hoy(){
 	return new Intl.DateTimeFormat("en-CA", {timeZone: "America/Mexico_City"}).format(new Date());
@@ -76,7 +76,7 @@ async function cerrarTurno(estanciaId, fecha, turno, usuarioId){
 	}
 }
 
-// [IA] Generado con Claude (prompt #18 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Cierre automático (issue 18): cierra hoy cada turno activo cuya hora_cierre (hora local de México) ya pasó y que
 // todavía no tenga cierre. Sábado y domingo no se cierra nada: las estancias no operan y marcaría falta a todos.
 // Si dos procesos cierran el mismo turno a la vez, la clave única del cierre deja pasar solo a uno.
@@ -111,7 +111,7 @@ async function cerrarTurnosVencidos(){
 	}
 }
 
-// [IA] Generado con Claude (prompt #18 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Revisa cada minuto si hay turnos por cerrar. Si una vuelta tarda más de un minuto, la siguiente se salta.
 function iniciarCierreAutomatico(){
 	let enCurso=false;

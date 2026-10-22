@@ -5,7 +5,7 @@ const crypto=require("crypto");
 // timezone "Z": las fechas se guardan y se leen en UTC.
 const db=mysql.createPool({uri: process.env.DATABASE_URL, timezone: "Z"});
 
-// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // UUID v7: los primeros 48 bits son la hora, así los ids nuevos quedan ordenados en el índice.
 function uuidv7(){
 	let bytes=crypto.randomBytes(16);
@@ -19,7 +19,7 @@ function uuidv7(){
 	return hex.slice(0,8)+"-"+hex.slice(8,12)+"-"+hex.slice(12,16)+"-"+hex.slice(16,20)+"-"+hex.slice(20);
 }
 
-// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Traduce errores de MySQL a códigos HTTP: datos duplicados = 409, datos inválidos = 400.
 // Modificado con el prompt #9: falta un campo obligatorio o una fecha inválida también son 400.
 function responderError(res, error){

@@ -7,7 +7,7 @@ const router=express.Router();
 // Un trimestre tiene a lo más 92 días; con un año de tope cabe cualquier corte sin dejar pedir rangos enormes.
 const MAX_DIAS=366;
 
-// [IA] Generado con Claude (prompt #28 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // DIRECTORA (su estancia), SUPERVISOR (su región) y ADMIN_CENTRAL (todas). Un token sin el alcance que su rol
 // necesita se rechaza con 403: tratarlo como "sin filtro" le mostraría todas las estancias.
 const acceso=[
@@ -15,13 +15,13 @@ const acceso=[
 	(req, res, next)=>(req.usuario.rol=="DIRECTORA" && req.usuario.estancia_id==null) || (req.usuario.rol=="SUPERVISOR" && req.usuario.region_id==null)?res.sendStatus(403):next()
 ];
 
-// [IA] Generado con Claude (prompt #28 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // AAAA-MM-DD y que exista en el calendario (igual que esFecha en historial.js)
 function esFecha(valor){
 	return typeof valor=="string" && /^\d{4}-\d{2}-\d{2}$/.test(valor) && new Date(valor+"T00:00:00Z").toISOString().slice(0, 10)==valor;
 }
 
-// [IA] Generado con Claude (prompt #28 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Celda de CSV: entre comillas si trae coma, comillas o salto de línea. Si empieza con = + - @ (o tab/retorno)
 // se le antepone un apóstrofo para que Excel no la ejecute como fórmula (inyección de CSV).
 function celda(valor){
@@ -32,7 +32,7 @@ function celda(valor){
 	return /[",\r\n]/.test(texto)?'"'+texto.replaceAll('"', '""')+'"':texto;
 }
 
-// [IA] Generado con Claude (prompt #28 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Corte de asistencia agregado por estancia y día (?desde=&hasta=, AAAA-MM-DD, ambos incluidos): cuántos registros
 // hubo de cada estado del catálogo, sumando los dos turnos. Solo días con al menos un registro.
 // ANONIMIZADO: la consulta solo cuenta; no lee nombres, matrículas ni ids de infantes.

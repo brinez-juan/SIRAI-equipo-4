@@ -15,12 +15,12 @@ export const TURNOS: Record<string, string> = {
 };
 export const ZONA = "America/Mexico_City";
 
-// [IA] Generado con Claude (prompt #21 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // "AAAA-MM-DD" (un DATE) a DD/MM/AAAA sin pasar por Date, así no se corre un día por la zona horaria.
 export const fechaLegible = (fecha: string | null | undefined) =>
   typeof fecha == "string" ? fecha.split("-").reverse().join("/") : "—";
 
-// [IA] Generado con Claude (prompt #21 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Fecha y hora (UTC en el backend) en la hora de México: "21/10/2026, 13:40".
 export const fechaHora = (valor: string | null | undefined) =>
   valor
@@ -34,7 +34,7 @@ export const fechaHora = (valor: string | null | undefined) =>
       })
     : "—";
 
-// [IA] Generado con Claude (prompt #21 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 export const nombreCompleto = (persona: {
   nombre?: string;
   primer_apellido?: string;
@@ -45,7 +45,7 @@ export const nombreCompleto = (persona: {
     .filter(Boolean)
     .join(" ");
 
-// [IA] Generado con Claude (prompt #21 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Texto del reintento de llamada (issue 22): "Reintentar a las 13:40" si es hoy, con fecha si es otro día,
 // y "Reintento vencido" en negritas cuando ya pasó la hora. Es texto, no solo color.
 const Reintento = ({ caso }: { caso: RaRecord }) => {
@@ -73,7 +73,7 @@ const Reintento = ({ caso }: { caso: RaRecord }) => {
   );
 };
 
-// [IA] Generado con Claude (prompt #21 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Bandeja de seguimiento (issue 21): casos no cerrados de mi estancia, en el orden que decide el backend
 // (reintentos vencidos primero), por eso las columnas no se pueden ordenar. Clic en un renglón abre el detalle.
 // Solo TRABAJO_SOCIAL, MEDICO y DIRECTORA (permisos.ts); DOCENTE no ve seguimientos.

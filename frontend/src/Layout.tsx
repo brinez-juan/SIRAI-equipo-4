@@ -59,7 +59,7 @@ const MenuPorRol = () => {
   );
 };
 
-// [IA] Generado con Claude (prompt #32 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Opción del menú del usuario que abre la pantalla X-01. forwardRef porque el menú de MUI le pasa
 // una referencia para moverse con las flechas; onClose cierra el menú al elegirla.
 const OpcionPreferencias = forwardRef<HTMLAnchorElement>((props, ref) => {
@@ -81,7 +81,7 @@ const OpcionPreferencias = forwardRef<HTMLAnchorElement>((props, ref) => {
 });
 OpcionPreferencias.displayName = "OpcionPreferencias";
 
-// [IA] Generado con Claude (prompt #32 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Menú del usuario (arriba a la derecha). label={nombre}: el botón se anuncia con el nombre de la
 // persona y no con «Perfil» (corrección P2 del issue 32).
 const MenuDelUsuario = () => {
@@ -94,7 +94,7 @@ const MenuDelUsuario = () => {
   );
 };
 
-// [IA] Generado con Claude (prompt #43 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // El título de cada vista (el que react-admin pone en la barra) es el único h1 de la página (P4);
 // los títulos dentro de las páginas empiezan en h2. Se ve igual: solo cambia la etiqueta.
 const BarraSuperior = () => (
@@ -103,7 +103,7 @@ const BarraSuperior = () => (
   </AppBar>
 );
 
-// [IA] Generado con Claude (prompt #43 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Título de la pestaña del navegador por vista (P3): copia el título de la barra superior,
 // por ejemplo «Pase de lista · SIRAI». react-admin no cambia document.title por su cuenta.
 const TituloDeLaPestana = () => {

@@ -33,7 +33,7 @@ type Props = {
   alGuardar: (justificacion: JustificacionCapturada) => void;
 };
 
-// [IA] Generado con Claude (prompt #42 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Diálogo "Justificar inasistencia" del pase de lista (feature 42): al marcar Ausente justificado pide el motivo
 // (obligatorio, del catálogo que manda GET /pase-lista) y una nota opcional, que el backend guarda cifrada.
 // Con "Cambiar motivo" se abre con lo que ya tenía; una nota vacía conserva la anterior.

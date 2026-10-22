@@ -6,7 +6,7 @@ const router=express.Router();
 const TURNOS=["MATUTINO", "VESPERTINO"];
 const COLUMNAS="id, infante_id, fecha, turno, estado_codigo, hora_entrada, hora_salida, tutor_salida_id";
 
-// [IA] Generado con Claude (prompt #16 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Tabla 2.5 del plan: DOCENTE y DIRECTORA registran la salida con tutor. TRABAJO_SOCIAL y MEDICO no.
 // El token debe traer estancia: la estancia nunca sale del request.
 const escritura=[
@@ -14,14 +14,14 @@ const escritura=[
 	(req, res, next)=>req.usuario.estancia_id==null?res.sendStatus(403):next()
 ];
 
-// [IA] Generado con Claude (prompt #16 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Fecha de hoy (AAAA-MM-DD) en la hora local de México, que es el "día" de asistencias.fecha. No la manda
 // el cliente: así la salida siempre queda en el mismo día que la entrada y no hay horas de otro día.
 function hoy(){
 	return new Intl.DateTimeFormat("en-CA", {timeZone: "America/Mexico_City"}).format(new Date());
 }
 
-// [IA] Generado con Claude (prompt #16 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Registra la salida de un infante presente con un tutor autorizado a recogerlo.
 // PUT /pase-lista/:infanteId/salida  {tutor_id, turno}
 // - 403 "Tutor no autorizado": el tutor no está vinculado a ESE infante con autorizado_recoger = 1.

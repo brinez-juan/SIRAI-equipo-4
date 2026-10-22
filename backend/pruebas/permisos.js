@@ -32,7 +32,7 @@ const PASE_LISTA=["DOCENTE", "DIRECTORA"];
 // Llaves que delatan datos de un infante o su familia: SUPERVISOR no debe recibir ninguna
 const LLAVES_PERSONALES=["matricula", "primer_apellido", "segundo_apellido", "fecha_nacimiento", "infante_id", "infante", "infantes", "tutores", "contactos", "telefono", "correo"];
 
-// [IA] Generado con Claude (prompt #30 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Petición HTTPS al backend. rejectUnauthorized: false porque el certificado de desarrollo es autofirmado;
 // solo se usa en este script de pruebas. Devuelve {status, tipo, texto, json}.
 function pedir(metodo, ruta, token, cuerpo){
@@ -71,7 +71,7 @@ function pedir(metodo, ruta, token, cuerpo){
 	});
 }
 
-// [IA] Generado con Claude (prompt #30 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Inicia sesión con cada usuario del seed y devuelve {rol: {token, id}}.
 async function iniciarSesiones(){
 	let sesiones={};
@@ -85,7 +85,7 @@ async function iniciarSesiones(){
 	return sesiones;
 }
 
-// [IA] Generado con Claude (prompt #30 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Con --preparar: como DIRECTORA marca a todos presentes en FECHA_PRUEBA salvo un infante con falta y cierra el turno
 // (se abre un seguimiento); TRABAJO_SOCIAL registra una llamada con notas y clasifica con una causa que requiere alta;
 // MEDICO emite la alta. Así quedan llenos todos los campos cifrados. Si ya se corrió antes, los 409 se ignoran.
@@ -113,7 +113,7 @@ async function preparar(sesiones, infanteId){
 	await pedir("POST", "/seguimientos/"+caso.id+"/alta", sesiones.MEDICO.token, {folio: "PRUEBA-30", observaciones: "Observaciones de prueba del issue 30"});
 }
 
-// [IA] Generado con Claude (prompt #30 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Ids reales para armar las rutas: un infante, un tutor, un seguimiento y un registro de bitácora.
 async function contexto(sesiones, conPreparar){
 	let d=sesiones.DIRECTORA.token;
@@ -139,7 +139,7 @@ async function contexto(sesiones, conPreparar){
 	};
 }
 
-// [IA] Generado con Claude (prompt #30 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Todos los endpoints del backend con los roles que la tabla 2.5 deja pasar. "ruta" lleva ids reales; "nombre" es
 // como se documenta. Las escrituras mandan cuerpos vacíos o ids inexistentes: un rol permitido recibe 400 o 404 y
 // no se cambia nada, un rol no permitido debe recibir 403 antes de que se lea el cuerpo.
@@ -190,7 +190,7 @@ function endpoints(ctx){
 	];
 }
 
-// [IA] Generado con Claude (prompt #30 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // true si el texto es un valor cifrado con cifrar() (AES-256-GCM con LLAVE_CIFRADO): GCM solo lo acepta si es auténtico.
 function esCifrado(valor){
 	if(typeof valor!="string" || valor.length<40 || !/^[A-Za-z0-9+/]+=*$/.test(valor)){
@@ -204,7 +204,7 @@ function esCifrado(valor){
 	}
 }
 
-// [IA] Generado con Claude (prompt #30 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Recorre la respuesta y devuelve los problemas de contenido: password_hash, valores todavía cifrados (con cualquier
 // llave, también dentro de "antes"/"despues" de la bitácora) y, si el rol es SUPERVISOR, datos personales.
 function revisarContenido(respuesta, rol, ctx){
@@ -251,7 +251,7 @@ function revisarContenido(respuesta, rol, ctx){
 	return [...problemas];
 }
 
-// [IA] Generado con Claude (prompt #30 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Prueba un endpoint: sin token y con token alterado (401), con cada rol no permitido (403) y con cada rol permitido
 // (ni 401, ni 403, ni 5xx; en GET además 200 y el contenido limpio). Devuelve el renglón del reporte.
 async function probar(endpoint, sesiones, ctx){
@@ -284,7 +284,7 @@ async function probar(endpoint, sesiones, ctx){
 	return {endpoint, permitidos, fallas};
 }
 
-// [IA] Generado con Claude (prompt #30 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // /login es la única ruta pública: con credenciales válidas da un token sin password_hash, con un usuario que no
 // existe da 401 (no se usa uno real para no sumarle intentos fallidos) y con correo o contraseña que no son texto, 400.
 async function probarLogin(){
@@ -306,7 +306,7 @@ async function probarLogin(){
 	return {endpoint: {nombre: "POST /login"}, permitidos: ["pública: 200 / 401 / 400"], fallas, publica: true};
 }
 
-// [IA] Generado con Claude (prompt #30 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Corre todas las pruebas e imprime el reporte en Markdown (se copia a docs/seguridad/permisos.md).
 async function main(){
 	let conPreparar=process.argv.includes("--preparar");

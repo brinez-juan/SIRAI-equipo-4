@@ -32,7 +32,7 @@ const fechaLarga = (fecha: string) =>
     timeZone: "UTC",
   });
 
-// [IA] Generado con Claude (prompt #17 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Botón "Cerrar pase de lista" para PaseLista.tsx (issue 14), con confirmación. Solo lo ve la DIRECTORA
 // (el backend lo exige de todos modos: otro rol recibe 403). Al confirmar, los infantes sin registro quedan como
 // falta injustificada y se abren los seguimientos; después ya no se puede cambiar el pase de lista.

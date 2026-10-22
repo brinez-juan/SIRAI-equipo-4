@@ -23,7 +23,7 @@ const HORA = {
   timeZone: "America/Mexico_City",
 } as const;
 
-// [IA] Generado con Claude (prompt #19 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // El backend manda la fecha como "AAAA-MM-DD" (es un DATE); se muestra como DD/MM/AAAA sin pasar por Date,
 // así no se corre un día por la zona horaria.
 const fechaLegible = (asistencia: RaRecord) =>
@@ -44,7 +44,7 @@ const filtros = [
   />,
 ];
 
-// [IA] Generado con Claude (prompt #42 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Motivo de un ausente justificado y, debajo, la nota (el backend solo la manda a DIRECTORA, TRABAJO_SOCIAL y MEDICO).
 const Motivo = ({ asistencia }: { asistencia: RaRecord }) =>
   asistencia.justificacion_causa_nombre ? (

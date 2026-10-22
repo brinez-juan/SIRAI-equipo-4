@@ -3,7 +3,7 @@ const {registrarRecurso}=require("../crud");
 
 const router=express.Router();
 
-// [IA] Generado con Claude (prompt #9 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Padrón de infantes de la estancia del usuario (tabla 2.5 del plan): DIRECTORA crea y edita;
 // DOCENTE, TRABAJO_SOCIAL y MEDICO solo consultan. estancia_id no está en "columnas":
 // lo pone el servidor con el del token y no se puede cambiar desde el request.

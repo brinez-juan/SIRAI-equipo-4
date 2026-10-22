@@ -68,7 +68,7 @@ export const RESULTADOS: Record<string, string> = {
   BUZON: "Buzón de voz",
 };
 
-// [IA] Generado con Claude (prompt #21 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Una sección del detalle: tarjeta con título (h2 para lectores de pantalla) y contenido.
 const Seccion = ({
   titulo,
@@ -87,7 +87,7 @@ const Seccion = ({
   </Card>
 );
 
-// [IA] Generado con Claude (prompt #21 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Renglón "Etiqueta: valor" para los datos sueltos.
 const Dato = ({
   etiqueta,
@@ -101,7 +101,7 @@ const Dato = ({
   </Typography>
 );
 
-// [IA] Generado con Claude (prompt #21 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // El teléfono como enlace tel:, para marcar directo desde un teléfono o softphone.
 const Telefono = ({ numero }: { numero: string | null }) =>
   numero ? (
@@ -110,7 +110,7 @@ const Telefono = ({ numero }: { numero: string | null }) =>
     <>—</>
   );
 
-// [IA] Generado con Claude (prompt #21 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Contenido del detalle. El backend ya descifró teléfonos, notas, detalle de la causa y observaciones
 // del alta, y registró la consulta en audit_log como READ_CONFIDENCIAL.
 const DetalleSeguimiento = () => {
@@ -326,7 +326,7 @@ const DetalleSeguimiento = () => {
   );
 };
 
-// [IA] Generado con Claude (prompt #25 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Abre el expediente imprimible del infante de este caso (issue 25). No aparece mientras llega el detalle.
 const BotonExpediente = () => {
   const caso = useRecordContext();

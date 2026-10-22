@@ -36,7 +36,7 @@ const SEMAFOROS: Record<
 
 const hoy = () => new Date().toLocaleDateString("en-CA", { timeZone: ZONA });
 
-// [IA] Generado con Claude (prompt #27 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Indicador con color y texto ("Verde – 93 %"): el color solo no basta para accesibilidad.
 // El porcentaje ya viene truncado a un decimal del backend; aquí no se redondea.
 const Semaforo = ({ fila }: { fila: Fila }) => {
@@ -56,7 +56,7 @@ const Semaforo = ({ fila }: { fila: Fila }) => {
   );
 };
 
-// [IA] Generado con Claude (prompt #27 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Tablero semáforo (issue 27): asistencia por estancia de un día (hoy por defecto), sin datos de infantes.
 // Es la pantalla de Inicio de SUPERVISOR (su región) y ADMIN_CENTRAL (todas); se refresca cada 60 s.
 // Modificado con el prompt #40: tabla de MUI en vez de <Datagrid>. Inicio no es un <Resource> y Datagrid

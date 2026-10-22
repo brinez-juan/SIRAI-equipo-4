@@ -8,7 +8,7 @@ const {LEEN_NOTA, registrarLecturaDeNotas}=require("./asistencia");
 const router=express.Router();
 const TURNOS=["MATUTINO", "VESPERTINO"];
 
-// [IA] Generado con Claude (prompt #19 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Tabla 2.5 del plan: todos los roles de estancia consultan asistencia. El token debe traer estancia.
 const conEstancia=(req, res, next)=>req.usuario.estancia_id==null?res.sendStatus(403):next();
 const lectura=[permitir("DOCENTE", "DIRECTORA", "TRABAJO_SOCIAL", "MEDICO"), conEstancia];
@@ -25,13 +25,13 @@ const ORDEN={
 	hora_salida: "a.hora_salida",
 };
 
-// [IA] Generado con Claude (prompt #19 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // AAAA-MM-DD y que exista en el calendario (igual que validarDia en asistencia.js)
 function esFecha(valor){
 	return typeof valor=="string" && /^\d{4}-\d{2}-\d{2}$/.test(valor) && new Date(valor+"T00:00:00Z").toISOString().slice(0, 10)==valor;
 }
 
-// [IA] Generado con Claude (prompt #19 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Filtros de la lista: ?fecha= (un día), ?fecha_gte= y ?fecha_lte= (rango), ?turno=.
 // La estancia siempre es la del token. Devuelve {where, valores} o {error} para responder 400.
 function filtros(query, req){

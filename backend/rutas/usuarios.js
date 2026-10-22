@@ -15,7 +15,7 @@ const SELECT="SELECT "+LECTURA.map(campo=>mysql.escapeId(campo)).join(", ")+" FR
 // Columnas que el administrador puede escribir. La contraseña llega aparte como "password".
 const ESCRITURA=["nombre", "primer_apellido", "segundo_apellido", "correo", "rol", "estancia_id", "region_id", "activo"];
 
-// [IA] Generado con Claude (issue 05, registrar prompt en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Errores propios de usuarios con mensaje para react-admin ({message}); el resto va a responderError.
 function errorUsuario(res, error){
 	if(error.code=="ER_CHECK_CONSTRAINT_VIOLATED" && error.message.includes("chk_usuarios_alcance")){
@@ -27,7 +27,7 @@ function errorUsuario(res, error){
 	}
 }
 
-// [IA] Generado con Claude (issue 05, registrar prompt en docs/ia/prompts.md), modificado con el prompt #30. Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Filtros de react-admin (?campo=valor) solo sobre columnas conocidas; excluye borrados lógicos.
 // Un campo repetido (?rol=A&rol=B) llega como arreglo y se filtra con IN (antes daba 500).
 function filtros(query){
@@ -42,13 +42,13 @@ function filtros(query){
 	return {where: " WHERE "+condiciones.join(" AND "), valores};
 }
 
-// [IA] Generado con Claude (issue 05, registrar prompt en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 async function buscarPorId(id){
 	let [data]=await db.query(SELECT+" WHERE id=? AND deleted_at IS NULL", [id]);
 	return data[0];
 }
 
-// [IA] Generado con Claude (issue 05, registrar prompt en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Toma del body solo las columnas permitidas; si viene "password" la hashea con argon2id.
 // Devuelve null si la contraseña viene pero no es un texto no vacío.
 async function camposDelBody(body){
@@ -64,7 +64,7 @@ async function camposDelBody(body){
 	return {campos, valores};
 }
 
-// [IA] Generado con Claude (issue 05, registrar prompt en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Lista (?_sort=&_order=&_start=&_end=), varios por id (?id=1&id=2) o referencia (?estancia_id=3)
 router.get("/Usuarios", soloAdmin, async (req, res)=>{
 	try{
@@ -90,7 +90,7 @@ router.get("/Usuarios", soloAdmin, async (req, res)=>{
 	}
 });
 
-// [IA] Generado con Claude (issue 05, registrar prompt en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 router.get("/Usuarios/:id", soloAdmin, async (req, res)=>{
 	try{
 		let data=await buscarPorId(req.params.id);
@@ -103,7 +103,7 @@ router.get("/Usuarios/:id", soloAdmin, async (req, res)=>{
 	}
 });
 
-// [IA] Generado con Claude (issue 05, registrar prompt en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Alta de usuario: la contraseña es obligatoria y se guarda hasheada
 router.post("/Usuarios", soloAdmin, async (req, res)=>{
 	try{
@@ -126,7 +126,7 @@ router.post("/Usuarios", soloAdmin, async (req, res)=>{
 	}
 });
 
-// [IA] Generado con Claude (issue 05, registrar prompt en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Edición: si "password" viene vacío o no viene, la contraseña no cambia
 router.put("/Usuarios/:id", soloAdmin, async (req, res)=>{
 	try{
@@ -155,7 +155,7 @@ router.put("/Usuarios/:id", soloAdmin, async (req, res)=>{
 	}
 });
 
-// [IA] Generado con Claude (issue 05, registrar prompt en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Los usuarios no se borran: DELETE solo los desactiva (activo=0) y ya no pueden iniciar sesión
 router.delete("/Usuarios/:id", soloAdmin, async (req, res)=>{
 	try{

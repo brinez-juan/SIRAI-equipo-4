@@ -2,7 +2,7 @@ import polyglotI18nProvider from "ra-i18n-polyglot";
 import englishMessages from "ra-language-english";
 import type { TranslationMessages } from "ra-core";
 
-// [IA] Generado con Claude (prompt #3 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Mensajes de react-admin en español. Lo que no se traduce aquí cae al inglés.
 const espanol: TranslationMessages = {
   ...englishMessages,

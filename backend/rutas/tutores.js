@@ -5,7 +5,7 @@ const {uuidv7}=require("../db");
 const router=express.Router();
 const VERSION_AVISO="2026.1";
 
-// [IA] Generado con Claude (prompt #10 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // tutores no tiene estancia_id: la estancia llega por el vínculo infante_tutor. Un usuario ve los tutores
 // vinculados a infantes de SU estancia (la del token) y los que creó alguien de su estancia y aún no
 // tienen vínculo (el vínculo se agrega después, issue 11). Nunca se usa una estancia que mande el request.
@@ -19,7 +19,7 @@ function alcanceTutores(req){
 	};
 }
 
-// [IA] Generado con Claude (prompt #10 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Revisa el body antes de tocar la base. Al crear exige nombre, primer apellido, teléfono y la casilla del
 // aviso de privacidad (debe ser el booleano true, no el texto "true"). Al editar solo revisa lo que venga.
 // Exigir string evita que un objeto o arreglo llegue a la consulta SQL.
@@ -50,7 +50,7 @@ function validarTutor(req, creando){
 	return null;
 }
 
-// [IA] Generado con Claude (prompt #10 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Inserta el consentimiento en la misma transacción que el tutor, con la versión vigente del aviso y el
 // usuario que lo registró (del token). Devuelve la fila para que createData la registre en audit_log.
 async function registrarConsentimiento(conexion, req, tutorId){
@@ -63,7 +63,7 @@ async function registrarConsentimiento(conexion, req, tutorId){
 	return [{tabla: "consentimientos", id: id, fila: {tutor_id: tutorId, version_aviso: VERSION_AVISO, acepta_contacto_telefonico: 1, registrado_por: usuario}}];
 }
 
-// [IA] Generado con Claude (prompt #10 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // DIRECTORA y TRABAJO_SOCIAL gestionan tutores (plan, issue 10). El teléfono se guarda cifrado.
 registrarRecurso(router, "Tutores", {
 	tabla: "tutores",
