@@ -176,6 +176,7 @@ export const Reportes = () => {
             </Button>
           ))}
         </Box>
+        {/* fullWidth={false}: react-admin pone todos los campos a lo ancho; aquí van en una fila como en el Figma */}
         <TextField
           label="Desde"
           type="date"
@@ -186,6 +187,7 @@ export const Reportes = () => {
           }
           slotProps={{ inputLabel: { shrink: true } }}
           size="small"
+          fullWidth={false}
         />
         <TextField
           label="Hasta"
@@ -197,6 +199,7 @@ export const Reportes = () => {
           }
           slotProps={{ inputLabel: { shrink: true } }}
           size="small"
+          fullWidth={false}
         />
         <Button
           startIcon={<DownloadIcon />}
@@ -224,7 +227,7 @@ export const Reportes = () => {
           component="article"
           sx={{ bgcolor: "background.paper", p: 3, borderRadius: 1 }}
         >
-          <Typography variant="h5" component="h1">
+          <Typography variant="h5" component="h2">
             Corte de asistencia
           </Typography>
           <Typography variant="body2" color="text.secondary" gutterBottom>

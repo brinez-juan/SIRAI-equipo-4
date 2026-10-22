@@ -103,17 +103,19 @@ export const Tablero = () => {
           mb={2}
         >
           <Box>
-            <Typography variant="h5" component="h1">
+            <Typography variant="h5" component="h2">
               Tablero de asistencia
             </Typography>
             <Typography variant="body2" color="text.secondary">
               Verde: 90 % o más · Amarillo: 75 % a 89.9 % · Rojo: menos de 75 %
             </Typography>
           </Box>
+          {/* fullWidth={false}: react-admin pone todos los campos a lo ancho; aquí van en una fila como en el Figma */}
           <TextField
             type="date"
             label="Día"
             size="small"
+            fullWidth={false}
             value={fecha}
             onChange={(e) => e.target.value && setFecha(e.target.value)}
             slotProps={{

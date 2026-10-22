@@ -274,6 +274,7 @@ export const PaseLista = () => {
             mb: 2,
           }}
         >
+          {/* fullWidth={false}: react-admin pone todos los campos a lo ancho; aquí van en una fila como en el Figma */}
           <TextField
             label="Fecha"
             type="date"
@@ -283,6 +284,7 @@ export const PaseLista = () => {
             }
             slotProps={{ inputLabel: { shrink: true } }}
             size="small"
+            fullWidth={false}
           />
           <TextField
             select
@@ -290,6 +292,7 @@ export const PaseLista = () => {
             value={turno}
             onChange={(evento) => setTurno(evento.target.value)}
             size="small"
+            fullWidth={false}
             sx={{ minWidth: 160 }}
           >
             {Object.entries(TURNOS).map(([codigo, nombre]) => (
@@ -376,6 +379,7 @@ export const PaseLista = () => {
                           Cambiar motivo
                         </Button>
                       )}
+                      {/* Solo texto en negritas y color de advertencia, sin ícono (revisión del Figma v3.1) */}
                       {infante.requiere_alta && (
                         <Typography
                           id={`alta-${infante.id}`}
@@ -383,7 +387,7 @@ export const PaseLista = () => {
                           color="warning.main"
                           fontWeight="bold"
                         >
-                          ⚠ {REQUIERE_ALTA}
+                          {REQUIERE_ALTA}
                         </Typography>
                       )}
                     </TableCell>

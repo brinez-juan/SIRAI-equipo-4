@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Paper, Typography } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 import {
   AutocompleteInput,
   BooleanInput,
@@ -12,6 +13,7 @@ import {
   SaveButton,
   SelectField,
   SelectInput,
+  WrapperField,
   required,
   useDataProvider,
   useList,
@@ -67,7 +69,9 @@ const BotonQuitar = ({
           .catch((error: Error) => notify(error.message, { type: "error" }))
           .finally(() => setEnviando(false));
       }}
-    />
+    >
+      <DeleteIcon />
+    </Button>
   );
 };
 
@@ -143,7 +147,9 @@ export const TutoresDelInfante = () => {
               tutor.autorizado_recoger ? "Sí" : "No"
             }
           />
-          <BotonQuitar infanteId={infante.id} alQuitar={recargar} />
+          <WrapperField label="Acción">
+            <BotonQuitar infanteId={infante.id} alQuitar={recargar} />
+          </WrapperField>
         </Datagrid>
       </ListContextProvider>
 
