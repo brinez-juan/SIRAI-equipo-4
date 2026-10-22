@@ -119,6 +119,7 @@ const Telefono = ({ numero }: { numero: string | null }) =>
 // del alta, y registró la consulta en audit_log como READ_CONFIDENCIAL.
 // Modificado con el prompt #44: los formularios de llamada, clasificación y alta/cierre (issues 22, 23 y 24)
 // van en sus secciones y, al guardar, refresh() vuelve a pedir el detalle. Un caso cerrado solo se consulta.
+// Si la falta es justificada no aparece la clasificación: la causa ya viene del pase de lista.
 const DetalleSeguimiento = () => {
   const caso = useRecordContext();
   const refresh = useRefresh();
@@ -144,6 +145,9 @@ const DetalleSeguimiento = () => {
     return `${nombreCompleto(persona)} (${tipo})`;
   };
   const cerrado = caso.estado == "CERRADO";
+  // Falta justificada: la causa y su detalle vienen del pase de lista (backend/cierreTurno.js ya clasificó el caso),
+  // así que no se muestra la clasificación; las llamadas y el alta/cierre sí.
+  const justificada = caso.asistencia.justificacion != null;
 
   return (
     <Box sx={{ p: 2 }}>
@@ -298,7 +302,7 @@ const DetalleSeguimiento = () => {
       </Seccion>
 
       {/* Abierto: el formulario ya trae la clasificación guardada y su asesoría. Cerrado: solo el resumen */}
-      {!cerrado ? (
+      {justificada ? null : !cerrado ? (
         <Card variant="outlined" sx={{ mb: 2 }}>
           <ClasificarSeguimiento
             seguimiento={
