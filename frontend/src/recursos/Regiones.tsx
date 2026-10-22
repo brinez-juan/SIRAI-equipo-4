@@ -77,7 +77,7 @@ const TablaRegiones = () => {
   );
 };
 
-// [IA+Humano] Base generada con Claude (prompt #3 en docs/ia/prompts.md), modificada con los prompts #8 y #41. Revisado por: pendiente
+// [IA+Humano] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 export const ListarRegiones = () => (
   <List sort={{ field: "nombre", order: "ASC" }} filters={[filtroDesactivadas]}>
     <TablaRegiones />

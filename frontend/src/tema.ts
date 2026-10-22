@@ -359,7 +359,7 @@ const conPreferencias = (
   };
 };
 
-// [IA+Humano] Base generada con Claude (prompt #32 en docs/ia/prompts.md), modificada por: pendiente. Modificado con el prompt #43.
+// [IA+Humano] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 export const crearTema = (prefs: Preferencias): RaThemeOptions =>
   conPreferencias(
     prefs.contraste == "alto" ? temaAltoContraste : temaGuinda,
@@ -367,7 +367,7 @@ export const crearTema = (prefs: Preferencias): RaThemeOptions =>
     "claro",
   );
 
-// [IA+Humano] Base generada con Claude (prompt #32 en docs/ia/prompts.md), modificada por: pendiente. Modificado con el prompt #43.
+// [IA+Humano] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Con alto contraste no hay tema oscuro (no se diseñó): App.tsx pasa darkTheme={null}.
 export const crearTemaOscuro = (prefs: Preferencias): RaThemeOptions =>
   conPreferencias(temaGuindaOscuro, prefs, "oscuro");

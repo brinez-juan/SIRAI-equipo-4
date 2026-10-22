@@ -106,7 +106,7 @@ const TablaEstancias = () => {
   );
 };
 
-// [IA+Humano] Base generada con Claude (prompt #3 en docs/ia/prompts.md), modificada con los prompts #8 y #41. Revisado por: pendiente
+// [IA+Humano] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 export const ListarEstancias = () => (
   <List sort={{ field: "clave", order: "ASC" }} filters={[filtroDesactivadas]}>
     <TablaEstancias />

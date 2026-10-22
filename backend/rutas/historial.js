@@ -57,7 +57,7 @@ function filtros(query, req){
 	return {where: " WHERE "+condiciones.join(" AND "), valores};
 }
 
-// [IA+Humano] Base generada con Claude (prompt #19 en docs/ia/prompts.md), modificada con el prompt #42. Revisado por: pendiente
+// [IA+Humano] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Historial de asistencia de mi estancia, paginado como lo pide react-admin (?_sort=&_order=&_start=&_end=).
 // fecha sale como texto AAAA-MM-DD: es un DATE y como objeto Date se correría un día en la hora de México.
 // Feature 42: cada renglón trae justificacion_causa_nombre (el motivo de un AUSENTE_JUSTIFICADO) para todos, y

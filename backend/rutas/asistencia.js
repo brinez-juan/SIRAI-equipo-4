@@ -146,7 +146,7 @@ async function enTransaccion(fn){
 	}
 }
 
-// [IA+Humano] Base generada con Claude (prompt #13), modificada con el prompt #24 (requiere_alta) y el #42 (justificación)
+// [IA+Humano] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Infantes de mi estancia, cada uno con su asistencia de ese día y turno (o null), y si el turno ya se cerró.
 // requiere_alta: el candado del issue 24 está activo y no se le puede marcar PRESENTE.
 // Feature 42: cada asistencia trae su justificación (ver justificacionDe) y la respuesta trae motivos_justificacion,
@@ -201,7 +201,7 @@ router.get("/pase-lista", lectura, async (req, res)=>{
 	}
 });
 
-// [IA+Humano] Base generada con Claude (prompt #13), modificada con el prompt #24 (candado de reingreso) y el #42 (justificación)
+// [IA+Humano] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Registra o corrige la asistencia de un infante: upsert sobre uq_asistencia_dia (estancia, infante, fecha, turno).
 // PRESENTE pone hora_entrada (si ya la tenía, se conserva la primera); cualquier otro estado la deja en NULL.
 // Si el infante tiene el candado del issue 24, PRESENTE responde 409 "Requiere alta para ingresar."
@@ -279,7 +279,7 @@ router.put("/pase-lista/:infanteId", escritura, async (req, res)=>{
 	}
 });
 
-// [IA+Humano] Base generada con Claude (prompt #13), modificada con el prompt #24 (candado de reingreso)
+// [IA+Humano] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Marca PRESENTE a todos los infantes de mi estancia que aún no tienen registro ese día y turno;
 // los que ya tienen uno (cualquier estado) no se tocan, y los que tienen el candado del issue 24 se saltan.
 // Body: {fecha, turno}. Responde {marcados, requieren_alta} (cuántos se saltaron por el candado).

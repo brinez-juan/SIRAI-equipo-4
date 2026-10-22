@@ -62,7 +62,7 @@ const Motivo = ({ asistencia }: { asistencia: RaRecord }) =>
     <>—</>
   );
 
-// [IA+Humano] Base generada con Claude (prompt #19 en docs/ia/prompts.md), modificada con el prompt #42. Revisado por: pendiente
+// [IA+Humano] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Historial de solo lectura para todos los roles de estancia; el backend siempre filtra por la estancia del token.
 // El estado se muestra con su nombre (texto), no solo con color. "Motivo": por qué se justificó la falta.
 export const ListarAsistencias = () => (

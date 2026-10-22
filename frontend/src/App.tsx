@@ -127,7 +127,7 @@ const vistasDelRol = (nombre: string, rol: string) => {
     : resto;
 };
 
-// [IA+Humano] Base generada con Claude (prompt #3 en docs/ia/prompts.md), modificada por: pendiente. Modificado con los prompts #9, #14 y #32.
+// [IA+Humano] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // react-admin llama a getPermissions (el rol) y este render solo monta lo que ese rol puede ver:
 // sus <Resource> y sus páginas propias (CustomRoutes, como el pase de lista).
 export const App = () => (

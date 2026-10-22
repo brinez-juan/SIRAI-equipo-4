@@ -22,7 +22,7 @@ import { PAGINAS, puedeVer } from "./permisos";
 // Recursos que se abren desde el menú del usuario y no desde el menú lateral
 const FUERA_DEL_MENU_LATERAL = ["preferencias"];
 
-// [IA+Humano] Base generada con Claude (prompt #14 en docs/ia/prompts.md), modificada por: pendiente. Modificado con el prompt #32.
+// [IA+Humano] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Menú lateral: Inicio, las páginas propias que el rol puede abrir (PAGINAS de permisos.ts)
 // y luego los <Resource> que App.tsx ya filtró por rol. Es lo mismo que <Menu.ResourceItems />,
 // pero sin los recursos de FUERA_DEL_MENU_LATERAL.
