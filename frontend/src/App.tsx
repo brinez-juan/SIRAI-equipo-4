@@ -27,6 +27,8 @@ import { Seguimiento } from "./paginas/Seguimiento";
 import InboxIcon from "@mui/icons-material/Inbox";
 import { ListarBitacora, VerBitacora } from "./recursos/Bitacora";
 import HistoryIcon from "@mui/icons-material/History";
+import AccessibilityNewIcon from "@mui/icons-material/AccessibilityNew";
+import { PreferenciasForm } from "./recursos/Preferencias";
 import type { ComponentType } from "react";
 import { Route } from "react-router-dom";
 import { PaseLista } from "./paginas/PaseLista";
@@ -106,6 +108,12 @@ const COMPONENTES_RECURSO: Record<string, Omit<ResourceProps, "name">> = {
     icon: HistoryIcon,
     options: { label: "Bitácora" },
     recordRepresentation: (registro) => `#${registro.id}`,
+  },
+  // Pantalla X-01 (issue 32): se abre desde el menú del usuario; Layout.tsx la quita del menú lateral
+  preferencias: {
+    list: PreferenciasForm,
+    icon: AccessibilityNewIcon,
+    options: { label: "Preferencias de accesibilidad" },
   },
 };
 
