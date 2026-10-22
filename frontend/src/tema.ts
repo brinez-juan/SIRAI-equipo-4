@@ -64,6 +64,78 @@ const temaGuinda: RaThemeOptions = {
     divider: COLORES.linea,
     background: { default: COLORES.fondo, paper: COLORES.papel },
   },
+  // [IA] Generado con Claude (prompt #43 en docs/ia/prompts.md). Revisado por: pendiente
+  // Componentes de la página 00 del Figma. El aviso de useNotify no se toca: el de info ya sale en
+  // #323232 (MUI lo calcula del fondo) y los de éxito, error y advertencia toman la paleta.
+  components: {
+    ...defaultLightTheme.components,
+    // «Opción del menú lateral»: la activa con fondo guinda claro, borde izquierdo de 3 px y negritas.
+    // El padding compensa el borde para que el ícono no se mueva al cambiar de opción.
+    RaMenuItemLink: {
+      styleOverrides: {
+        root: {
+          "&.RaMenuItemLink-active": {
+            backgroundColor: COLORES.primarioTinte,
+            borderLeft: `3px solid ${COLORES.primario}`,
+            paddingLeft: 13,
+            color: COLORES.primario,
+            fontWeight: 700,
+            "& .RaMenuItemLink-icon": { color: COLORES.primario },
+          },
+        },
+      },
+    },
+    // Barra de Guardar de los formularios
+    RaToolbar: {
+      styleOverrides: { root: { backgroundColor: COLORES.barraFormulario } },
+    },
+    // «Campo» (TextInput, SelectInput, DateInput): fondo gris y línea inferior gris oscuro;
+    // al enfocar la línea es guinda (primary) y con error roja, como ya hace MUI.
+    MuiFilledInput: {
+      styleOverrides: {
+        root: {
+          backgroundColor: COLORES.campo,
+          "&.Mui-focused, &.Mui-disabled": { backgroundColor: COLORES.campo },
+          "&::before": { borderBottomColor: COLORES.borde },
+        },
+      },
+    },
+    // G-01: fondo guinda oscuro sin el degradado de react-admin, tarjeta centrada y avatar guinda
+    // (react-admin pide secondary[500], que la paleta no tiene, y el avatar saldría gris)
+    RaLogin: {
+      styleOverrides: {
+        root: {
+          backgroundImage: "none",
+          backgroundColor: COLORES.primarioOscuro,
+          justifyContent: "center",
+          "& .RaLogin-card": { marginTop: 0 },
+          "& .RaLogin-icon": { backgroundColor: COLORES.primario },
+        },
+      },
+    },
+    // «Alert» estándar: fondo claro y texto oscuro de cada severidad; el ícono queda en el color
+    // fuerte de la paleta (info = azul del foco)
+    MuiAlert: {
+      styleOverrides: {
+        standardInfo: {
+          backgroundColor: COLORES.infoFondo,
+          color: COLORES.infoTexto,
+        },
+        standardWarning: {
+          backgroundColor: COLORES.advertenciaFondo,
+          color: COLORES.advertenciaTexto,
+        },
+        standardError: {
+          backgroundColor: COLORES.errorFondo,
+          color: COLORES.errorTexto,
+        },
+        standardSuccess: {
+          backgroundColor: COLORES.exitoFondo,
+          color: COLORES.exitoTexto,
+        },
+      },
+    },
+  },
 };
 
 // Foco visible (P7): azul del documento de accesibilidad y una separación del color del fondo
