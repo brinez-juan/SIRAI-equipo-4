@@ -112,7 +112,8 @@ const TituloDeLaPestana = () => {
     if (!titulo) return;
     const copiar = () => {
       const texto = titulo.textContent?.trim();
-      document.title = texto ? `${texto} · SIRAI` : "SIRAI";
+      // Las vistas sin título propio muestran el de <Admin title="SIRAI">: no se repite
+      document.title = texto && texto != "SIRAI" ? `${texto} · SIRAI` : "SIRAI";
     };
     copiar();
     const observador = new MutationObserver(copiar);

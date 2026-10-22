@@ -3,6 +3,7 @@ import {
   defaultLightTheme,
   type RaThemeOptions,
 } from "react-admin";
+import type { Theme } from "@mui/material";
 import type { Preferencias } from "./preferencias";
 
 // Tema de MUI que recibe <Admin>. Parte de los temas de react-admin con la paleta guinda del Figma v3
@@ -40,15 +41,36 @@ export const COLORES = {
 };
 
 // [IA] Generado con Claude (prompt #43 en docs/ia/prompts.md). Revisado por: pendiente
-// Campos de los formularios de react-admin a 400 px, como en el Figma (Editar infante, Agregar tutor).
-// react-admin 5 los pone a todo lo ancho. Solo se limitan los de texto, selección, fecha y búsqueda:
-// los radios e interruptores no, y los formularios de MUI propios (contactos, diálogos) fijan el suyo.
-// Es acomodo, no color: lo comparten todos los temas.
-const CAMPOS_DE_FORMULARIO: RaThemeOptions["components"] = {
+// Ajustes del Figma que no dependen del color: los comparten los temas claro, oscuro y alto contraste.
+// Donde hace falta un color se toma de la paleta de cada tema.
+const COMPONENTES_COMUNES: RaThemeOptions["components"] = {
+  // Campos de los formularios de react-admin a 400 px, como en el Figma (Editar infante, Agregar tutor).
+  // react-admin 5 los pone a todo lo ancho. Solo se limitan los de texto, selección, fecha y búsqueda:
+  // los radios e interruptores no, y los formularios de MUI propios (contactos, diálogos) fijan el suyo.
   RaTextInput: { styleOverrides: { root: { maxWidth: 400 } } },
   RaSelectInput: { styleOverrides: { root: { maxWidth: 400 } } },
   RaDateInput: { styleOverrides: { root: { maxWidth: 400 } } },
   RaAutocompleteInput: { styleOverrides: { root: { maxWidth: 400 } } },
+  // «ToggleButton (pase de lista)»: texto principal a 14 px. MUI usa 13 px y gris al 54 % en size="small"
+  MuiToggleButton: {
+    styleOverrides: {
+      root: ({ theme }: { theme: Theme }) => ({
+        color: theme.palette.text.primary,
+      }),
+      sizeSmall: { fontSize: "0.875rem" },
+    },
+  },
+  // G-03 «No encontrado»: react-admin baja el texto con opacity 0.5 (3.25:1); se usa text.secondary
+  RaNotFound: {
+    styleOverrides: {
+      root: ({ theme }: { theme: Theme }) => ({
+        "& .RaNotFound-message": {
+          opacity: 1,
+          color: theme.palette.text.secondary,
+        },
+      }),
+    },
+  },
 };
 
 // [IA] Generado con Claude (prompt #43 en docs/ia/prompts.md). Revisado por: pendiente
@@ -81,7 +103,7 @@ const temaGuinda: RaThemeOptions = {
   // #323232 (MUI lo calcula del fondo) y los de éxito, error y advertencia toman la paleta.
   components: {
     ...defaultLightTheme.components,
-    ...CAMPOS_DE_FORMULARIO,
+    ...COMPONENTES_COMUNES,
     // «Opción del menú lateral»: la activa con fondo guinda claro, borde izquierdo de 3 px y negritas.
     // El padding compensa el borde para que el ícono no se mueva al cambiar de opción.
     RaMenuItemLink: {
@@ -157,7 +179,9 @@ const temaGuinda: RaThemeOptions = {
 const OSCURO = {
   primario: "#E8A3B6", // 6.41:1 sobre #313131
   primarioTinte: "#45282F", // fondo de la opción activa del menú; el guinda claro encima da 6.48:1
-  error: "#F28B82", // el #F44336 de MUI da 3.53:1 como texto y 3.68:1 en el chip «Rojo»; este da 5.45:1 y 8.79:1 con negro
+  // El #F44336 de MUI da 3.53:1 como texto y 3.68:1 en el chip «Rojo». Este da 5.06:1 sobre la barra
+  // de Guardar (#424242, el fondo más claro donde va texto rojo) y 10.57:1 con texto negro encima.
+  error: "#F4A39C",
 };
 
 // [IA] Generado con Claude (prompt #43 en docs/ia/prompts.md). Revisado por: pendiente
@@ -174,7 +198,7 @@ const temaGuindaOscuro: RaThemeOptions = {
   },
   components: {
     ...defaultDarkTheme.components,
-    ...CAMPOS_DE_FORMULARIO,
+    ...COMPONENTES_COMUNES,
     MuiAppBar: {
       styleOverrides: {
         root: {
@@ -234,7 +258,7 @@ const temaAltoContraste: RaThemeOptions = {
   },
   components: {
     ...defaultLightTheme.components,
-    ...CAMPOS_DE_FORMULARIO,
+    ...COMPONENTES_COMUNES,
     MuiFilledInput: {
       styleOverrides: {
         root: {
