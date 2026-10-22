@@ -5,18 +5,76 @@ import {
 } from "react-admin";
 import type { Preferencias } from "./preferencias";
 
-// Tema de MUI que recibe <Admin>. Por ahora parte de los temas de react-admin; la paleta guinda
-// del Figma (issue 32.1 / D1) se cambia aquí sin tocar cómo se aplican las preferencias.
+// Tema de MUI que recibe <Admin>. Parte de los temas de react-admin con la paleta guinda del Figma v3
+// (página 00, colección «SIRAI · Colores»). Las preferencias de accesibilidad se aplican encima.
+
+// [IA] Generado con Claude (prompt #43 en docs/ia/prompts.md). Revisado por: pendiente
+// Variables de color del Figma. Si un color cambia en el Figma, se cambia aquí y en ningún otro lado:
+// ninguna pantalla escribe colores, todas usan las claves del tema (color="error", text.secondary…).
+export const COLORES = {
+  primario: "#691C32",
+  primarioOscuro: "#4A1223",
+  primarioTinte: "#F1E6EA",
+  exito: "#235B4E",
+  exitoFondo: "#E6F2EF",
+  exitoTexto: "#1B4A3F",
+  advertencia: "#7A5B2A",
+  advertenciaFondo: "#FBF3E4",
+  advertenciaTexto: "#5A4220",
+  error: "#B42318",
+  errorFondo: "#FEE4E2",
+  errorTexto: "#7A1A12",
+  foco: "#1A56DB",
+  infoFondo: "#EEF3FD",
+  infoTexto: "#0B3A9E",
+  texto: "#1C1B1F",
+  texto2: "#4B5563",
+  borde: "#767B84",
+  linea: "#E0E0E0",
+  campo: "#F0F0F0",
+  fondo: "#FAFAFA",
+  papel: "#FFFFFF",
+  barraFormulario: "#F5F5F5",
+  aviso: "#323232",
+  negro: "#000000",
+};
+
+// [IA] Generado con Claude (prompt #43 en docs/ia/prompts.md). Revisado por: pendiente
+// Paleta guinda sobre el tema claro de react-admin. secondary también es guinda porque la barra
+// superior de react-admin usa color="secondary". info es el azul del foco (avisos y alertas de info).
+const temaGuinda: RaThemeOptions = {
+  ...defaultLightTheme,
+  palette: {
+    ...defaultLightTheme.palette,
+    primary: {
+      main: COLORES.primario,
+      dark: COLORES.primarioOscuro,
+      contrastText: "#FFFFFF",
+    },
+    secondary: {
+      main: COLORES.primario,
+      dark: COLORES.primarioOscuro,
+      contrastText: "#FFFFFF",
+    },
+    success: { main: COLORES.exito, contrastText: "#FFFFFF" },
+    warning: { main: COLORES.advertencia, contrastText: "#FFFFFF" },
+    error: { main: COLORES.error, contrastText: "#FFFFFF" },
+    info: { main: COLORES.foco, contrastText: "#FFFFFF" },
+    text: { primary: COLORES.texto, secondary: COLORES.texto2 },
+    divider: COLORES.linea,
+    background: { default: COLORES.fondo, paper: COLORES.papel },
+  },
+};
 
 // Foco visible (P7): azul del documento de accesibilidad y una separación del color del fondo
 const FOCO = {
-  claro: { color: "#1A56DB", separacion: "#FFFFFF" },
+  claro: { color: COLORES.foco, separacion: "#FFFFFF" },
   oscuro: { color: "#8AB4F8", separacion: "#121212" },
 };
 
 // Alto contraste (≥ 7:1): texto negro, guinda oscuro, bordes de 2 px y foco amarillo con borde negro
-const NEGRO = "#000000";
-const GUINDA_OSCURO = "#4A1223";
+const NEGRO = COLORES.negro;
+const GUINDA_OSCURO = COLORES.primarioOscuro;
 const AMARILLO_FOCO = "#FFD400";
 
 const temaAltoContraste: RaThemeOptions = {
@@ -130,10 +188,10 @@ const conPreferencias = (
   };
 };
 
-// [IA] Generado con Claude (prompt #32 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA+Humano] Base generada con Claude (prompt #32 en docs/ia/prompts.md), modificada por: pendiente. Modificado con el prompt #43.
 export const crearTema = (prefs: Preferencias): RaThemeOptions =>
   conPreferencias(
-    prefs.contraste == "alto" ? temaAltoContraste : defaultLightTheme,
+    prefs.contraste == "alto" ? temaAltoContraste : temaGuinda,
     prefs,
     "claro",
   );

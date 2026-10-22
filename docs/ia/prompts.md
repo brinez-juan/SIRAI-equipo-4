@@ -199,3 +199,16 @@ Herramienta: Claude (Claude Code).
 
   agrega esto a la documentacion que habla sobre el uso de espacio utilizando estas tecnologias y base de datos
   ```
+
+## #43 · Feature 43: Diseño del Figma v3 en el frontend (sin issue en el plan general)
+- **Quién:** Jesús
+- **Para qué:** aplicar el Figma v3 a la app siguiendo `plan_implementacion_diseno.md` (D1 a D6) solo con el tema de MUI que recibe `<Admin>`: variables de color del Figma en `COLORES` y paleta guinda (D1), componentes de React Admin como en el Figma (D2), ajustes por pantalla (D3), tema oscuro guinda (D4) y comparación visual (D5). Claude leyó el Figma y el código y generó los cambios; Jesús los revisa y hace un commit por fase.
+- **Citado en:** `frontend/src/tema.ts`.
+- **Prompt:**
+  ```
+  Te pase un plan de implementacion de diseño que quiero integrar dentro de la plataforma. Quiero que entiendas este plan, entiendas el proyecot usando el CLAUDE.md y que te identifiques con las tareas que vas a generar. Queiroq ue por cada fase estipulada duirante el plan de implemnetacion hagamos un commit, entonces utilizaras las skills proporcionadas para generarme el mensaje con su respectivo comando. Avisame cuando entiendas el proceso de implementacion y quiero que despues de cada fase hagas una verificacion para ver si esto se hizo correctamnte.
+
+  Quiero que todo esta implementacion sea un solo issue y seria un commit por cada fase del issue. El nombre de todo el issue sera el que me proprocionaste. 2. Aja justo pero con los colores piopuestos en este diseño. Te paso el link de figma para que te des una idea de lo que queremos llegar a realizar.
+
+  (Adjuntos: plan_implementacion_diseno.md y el enlace al Figma v3.)
+  ```
