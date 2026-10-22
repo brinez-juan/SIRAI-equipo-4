@@ -73,7 +73,7 @@ export const PreferenciasForm = () => {
         <BooleanInput
           source="focoReforzado"
           label="Resaltar el foco"
-          helperText="Dibuja un borde grueso alrededor del control en el que está al navegar con Tab."
+          helperText="Dibuja un borde amarillo grueso alrededor del control en el que está al navegar con Tab."
         />
         <BooleanInput
           source="reducirAnimaciones"
