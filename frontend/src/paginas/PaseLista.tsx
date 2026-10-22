@@ -376,6 +376,7 @@ export const PaseLista = () => {
                           Cambiar motivo
                         </Button>
                       )}
+                      {/* Solo texto en negritas y color de advertencia, sin ícono (revisión del Figma v3.1) */}
                       {infante.requiere_alta && (
                         <Typography
                           id={`alta-${infante.id}`}
@@ -383,7 +384,7 @@ export const PaseLista = () => {
                           color="warning.main"
                           fontWeight="bold"
                         >
-                          ⚠ {REQUIERE_ALTA}
+                          {REQUIERE_ALTA}
                         </Typography>
                       )}
                     </TableCell>
