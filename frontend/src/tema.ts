@@ -40,6 +40,18 @@ export const COLORES = {
 };
 
 // [IA] Generado con Claude (prompt #43 en docs/ia/prompts.md). Revisado por: pendiente
+// Campos de los formularios de react-admin a 400 px, como en el Figma (Editar infante, Agregar tutor).
+// react-admin 5 los pone a todo lo ancho. Solo se limitan los de texto, selección, fecha y búsqueda:
+// los radios e interruptores no, y los formularios de MUI propios (contactos, diálogos) fijan el suyo.
+// Es acomodo, no color: lo comparten todos los temas.
+const CAMPOS_DE_FORMULARIO: RaThemeOptions["components"] = {
+  RaTextInput: { styleOverrides: { root: { maxWidth: 400 } } },
+  RaSelectInput: { styleOverrides: { root: { maxWidth: 400 } } },
+  RaDateInput: { styleOverrides: { root: { maxWidth: 400 } } },
+  RaAutocompleteInput: { styleOverrides: { root: { maxWidth: 400 } } },
+};
+
+// [IA] Generado con Claude (prompt #43 en docs/ia/prompts.md). Revisado por: pendiente
 // Paleta guinda sobre el tema claro de react-admin. secondary también es guinda porque la barra
 // superior de react-admin usa color="secondary". info es el azul del foco (avisos y alertas de info).
 const temaGuinda: RaThemeOptions = {
@@ -69,6 +81,7 @@ const temaGuinda: RaThemeOptions = {
   // #323232 (MUI lo calcula del fondo) y los de éxito, error y advertencia toman la paleta.
   components: {
     ...defaultLightTheme.components,
+    ...CAMPOS_DE_FORMULARIO,
     // «Opción del menú lateral»: la activa con fondo guinda claro, borde izquierdo de 3 px y negritas.
     // El padding compensa el borde para que el ícono no se mueva al cambiar de opción.
     RaMenuItemLink: {
@@ -160,6 +173,7 @@ const temaAltoContraste: RaThemeOptions = {
   },
   components: {
     ...defaultLightTheme.components,
+    ...CAMPOS_DE_FORMULARIO,
     MuiFilledInput: {
       styleOverrides: {
         root: {
