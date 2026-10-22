@@ -86,13 +86,16 @@ router.get("/seguimientos/:id", acceso, async (req, res)=>{
 			" FROM llamadas l JOIN usuarios u ON u.id=l.realizada_por WHERE l.seguimiento_id=? AND l.deleted_at IS NULL ORDER BY l.intento",
 			[fila.id]
 		);
+		// Una falta justificada que aún no tiene causa (se creó antes de que cierreTurno.js la copiara) usa la de su justificación
+		let sinCausa=fila.causa_codigo==null;
+		let codigoCausa=sinCausa?fila.justificacion_causa_codigo:fila.causa_codigo;
 		let causa=null;
-		if(fila.causa_codigo!=null){
+		if(codigoCausa!=null){
 			let [causas]=await db.query(
 				"SELECT codigo, nombre, asesoria, requiere_alta, justifica_falta, notifica_emergencia FROM causas_inasistencia WHERE codigo=?",
-				[fila.causa_codigo]
+				[codigoCausa]
 			);
-			causa={...causas[0], detalle: descifrar(fila.detalle_causa_cifrado)};
+			causa={...causas[0], detalle: descifrar(sinCausa?fila.justificacion_cifrado:fila.detalle_causa_cifrado)};
 		}
 		let [altas]=await db.query(
 			"SELECT a.id, a.folio_justificante, a.emitida_en, a.emitida_por, CONCAT_WS(' ', u.nombre, u.primer_apellido) AS emitida_por_nombre,"+
@@ -326,12 +329,16 @@ router.post("/seguimientos/:id/alta", accesoAlta, async (req, res)=>{
 // Cierra un seguimiento de mi estancia (si es de otra, 404). Solo se cierra un caso clasificado
 // (chk_clasificado_con_causa) y, si su causa tiene requiere_alta = 1, solo con alta médica: si no, 409.
 // cerrado_por es quien lo cierra, tomado del token. Un caso cerrado ya no se clasifica ni recibe alta.
+// Una falta justificada no se clasifica: se cierra en cuanto tiene al menos una llamada, y si aún no tenía causa
+// se le guarda la de su justificación (la nota va cifrada tal cual).
 router.put("/seguimientos/:id/cerrar", acceso, async (req, res)=>{
 	try{
 		let resultado=await enTransaccion(async conexion=>{
 			let [filas]=await conexion.query(
-				"SELECT s.id, s.estado, s.causa_codigo, s.cerrado_en, s.cerrado_por, c.requiere_alta"+DESDE+
-				" LEFT JOIN causas_inasistencia c ON c.codigo=s.causa_codigo"+BLOQUEAR_SEGUIMIENTO,
+				"SELECT s.id, s.estado, s.causa_codigo, s.detalle_causa_cifrado, s.cerrado_en, s.cerrado_por, c.requiere_alta,"+
+				" a.justificacion_causa_codigo, a.justificacion_cifrado,"+
+				" (SELECT COUNT(*) FROM llamadas l WHERE l.seguimiento_id=s.id AND l.deleted_at IS NULL) AS llamadas"+DESDE+
+				" LEFT JOIN causas_inasistencia c ON c.codigo=COALESCE(s.causa_codigo, a.justificacion_causa_codigo)"+BLOQUEAR_SEGUIMIENTO,
 				[req.params.id, req.usuario.estancia_id]
 			);
 			let seguimiento=filas[0];
@@ -341,16 +348,22 @@ router.put("/seguimientos/:id/cerrar", acceso, async (req, res)=>{
 			if(seguimiento.estado=="CERRADO"){
 				return {status: 409, message: "El caso ya está cerrado."};
 			}
-			if(seguimiento.causa_codigo==null){
+			let justificada=seguimiento.justificacion_causa_codigo!=null;
+			if(seguimiento.causa_codigo==null && !justificada){
 				return {status: 409, message: "Clasifique la causa antes de cerrar el caso."};
+			}
+			if(justificada && Number(seguimiento.llamadas)==0){
+				return {status: 409, message: "Registre la llamada antes de cerrar el caso."};
 			}
 			if(Number(seguimiento.requiere_alta)==1 && !await buscarAlta(conexion, seguimiento.id)){
 				return {status: 409, message: "La causa requiere alta médica: no se puede cerrar el caso sin ella."};
 			}
+			let sinCausa=seguimiento.causa_codigo==null;
 			let ahora=new Date();
 			await conexion.query(
-				"UPDATE seguimientos SET estado='CERRADO', cerrado_en=?, cerrado_por=?, updated_at=CURRENT_TIMESTAMP(3) WHERE id=?",
-				[ahora, req.usuario.usuario, seguimiento.id]
+				"UPDATE seguimientos SET estado='CERRADO', causa_codigo=?, detalle_causa_cifrado=?, cerrado_en=?, cerrado_por=?, updated_at=CURRENT_TIMESTAMP(3) WHERE id=?",
+				[sinCausa?seguimiento.justificacion_causa_codigo:seguimiento.causa_codigo,
+				sinCausa?seguimiento.justificacion_cifrado:seguimiento.detalle_causa_cifrado, ahora, req.usuario.usuario, seguimiento.id]
 			);
 			let [despues]=await conexion.query("SELECT id, estado, causa_codigo, cerrado_en, cerrado_por FROM seguimientos WHERE id=?", [seguimiento.id]);
 			let antes={id: seguimiento.id, estado: seguimiento.estado, causa_codigo: seguimiento.causa_codigo, cerrado_en: seguimiento.cerrado_en, cerrado_por: seguimiento.cerrado_por};
