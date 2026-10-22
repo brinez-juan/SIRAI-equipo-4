@@ -212,3 +212,12 @@ Herramienta: Claude (Claude Code).
 
   (Adjuntos: plan_implementacion_diseno.md y el enlace al Figma v3.)
   ```
+
+## #44 · Corrección: acciones en el detalle del seguimiento (sin issue en el plan)
+- **Quién:** Jesús
+- **Para qué:** la Directora (y Trabajo Social y Médico) solo podían consultar el caso en la bandeja de seguimiento: los formularios de registrar llamada (issue 22), clasificar causa (issue 23) y alta médica y cierre (issue 24) existían en `paginas/` pero nunca se conectaron a `Seguimiento.tsx`. Claude revisó el flujo (backend, permisos y frontend), encontró que el detalle no los importaba y los conectó: el formulario de llamada en la sección "Llamadas", el de clasificación en lugar del resumen mientras el caso está abierto, y alta y cierre al final; al guardar, el detalle se vuelve a pedir. Un caso cerrado solo se consulta. Jesús revisa y hace el commit.
+- **Citado en:** `frontend/src/paginas/Seguimiento.tsx` y `frontend/src/paginas/RegistrarLlamada.tsx` (teléfono opcional en el selector de destinatario).
+- **Prompt:**
+  ```
+  pero en este caso entro a la bandeja de seguimiento como directora y no puedo llegar a editar nada oslo visulaizar, hceca bien el porceso y corrigelo si es que existe
+  ```
