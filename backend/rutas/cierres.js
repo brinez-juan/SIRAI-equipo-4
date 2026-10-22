@@ -32,7 +32,7 @@ function validarCierre(cuerpo){
 	return null;
 }
 
-// [IA+Humano] Base generada con Claude (prompt #17); la lógica se movió a cerrarTurno() con el prompt #18
+// [IA+Humano] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Cierre manual del pase de lista de un día y turno de MI estancia (automatico = 0, cerrado_por = usuario).
 // La transacción con las faltas y los seguimientos está en cerrarTurno() (cierreTurno.js), que comparte con el cierre automático.
 // Body: {fecha, turno}. Responde 201 con {cierre, faltas, seguimientos}.

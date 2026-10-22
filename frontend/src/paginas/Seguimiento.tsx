@@ -344,7 +344,7 @@ const BotonExpediente = () => {
   );
 };
 
-// [IA+Humano] Base generada con Claude (prompt #21 en docs/ia/prompts.md), modificada con el prompt #25. Revisado por: pendiente
+// [IA+Humano] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Detalle de un seguimiento (issue 21): datos, tutores, contactos, llamadas, clasificación y alta.
 // Solo consulta; los formularios de llamada, clasificación y alta llegan con los issues 22, 23 y 24.
 export const Seguimiento = () => (

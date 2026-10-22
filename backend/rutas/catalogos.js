@@ -26,7 +26,7 @@ async function regionActiva(estancia){
 	return region.deleted_at==null?null:"No se puede activar la estancia: su región ("+region.nombre+") está desactivada. Active primero la región.";
 }
 
-// [IA+Humano] Base generada con Claude (prompt #1 en docs/ia/prompts.md), modificada con el prompt #41. Revisado por: pendiente
+// [IA+Humano] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Regiones y estancias: solo el administrador central las consulta y modifica.
 // Desactivar es el borrado lógico del CRUD; se rechaza mientras tengan estancias, infantes o usuarios activos,
 // para no dejar registros vivos apuntando a una región o estancia que ya no aparece. Son reactivables:

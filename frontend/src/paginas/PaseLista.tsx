@@ -117,7 +117,7 @@ const textoEstado = (asistencia: Asistencia | null) => {
     : nombre;
 };
 
-// [IA+Humano] Base generada con Claude (prompt #14), modificada con el prompt #24 (candado de reingreso)
+// [IA+Humano] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Pase de lista del día (issue 14): fecha de hoy y turno matutino ya seleccionados. El flujo rápido es
 // "Marcar todos presentes" (1 clic) y luego 1 clic por cada excepción. DOCENTE y DIRECTORA capturan;
 // TRABAJO_SOCIAL y MEDICO solo consultan. Habla con GET/PUT /pase-lista y POST /pase-lista/todos-presentes.
@@ -174,7 +174,7 @@ export const PaseLista = () => {
     cargar();
   }, [cargar]);
 
-  // [IA+Humano] Base generada con Claude (prompt #14), modificada con el prompt #42
+  // [IA+Humano] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
   // Ausente justificado no se guarda directo: primero abre el diálogo para el motivo.
   const marcar = (infante: Renglon, estado: string) => {
     if (!pase || estado == infante.asistencia?.estado_codigo) {
