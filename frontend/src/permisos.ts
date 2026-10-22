@@ -31,6 +31,8 @@ export const RECURSOS: Record<string, Rol[]> = {
   seguimientos: ["TRABAJO_SOCIAL", "MEDICO", "DIRECTORA"],
   // Visor de la bitácora (issue 29), solo lectura
   Bitacora: ["ADMIN_CENTRAL"],
+  // Preferencias de accesibilidad (issue 32): solo presentación, guardadas en el navegador
+  preferencias: TODOS_LOS_ROLES,
 };
 
 // [IA] Generado con Claude (prompt #9 en docs/ia/prompts.md). Revisado por: pendiente
