@@ -19,6 +19,7 @@ import {
   TextInput,
   Toolbar,
   TopToolbar,
+  WrapperField,
   email,
   required,
   useNotify,
@@ -109,7 +110,9 @@ export const listarUsuarios = () => (
         <TextField source="nombre" />
       </ReferenceField>
       <BooleanField source="activo" label="Activo" looseValue />
-      <BotonActivo />
+      <WrapperField label="Acción">
+        <BotonActivo />
+      </WrapperField>
     </Datagrid>
   </List>
 );

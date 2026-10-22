@@ -1,10 +1,11 @@
-import { forwardRef, type ReactNode } from "react";
+import { forwardRef, useEffect, type ReactNode } from "react";
 import {
   Layout as RALayout,
   AppBar,
   CheckForApplicationUpdate,
   Logout,
   Menu,
+  TitlePortal,
   UserMenu,
   useGetIdentity,
   usePermissions,
@@ -93,11 +94,42 @@ const MenuDelUsuario = () => {
   );
 };
 
-const BarraSuperior = () => <AppBar userMenu={<MenuDelUsuario />} />;
+// [IA] Generado con Claude (prompt #43 en docs/ia/prompts.md). Revisado por: pendiente
+// El título de cada vista (el que react-admin pone en la barra) es el único h1 de la página (P4);
+// los títulos dentro de las páginas empiezan en h2. Se ve igual: solo cambia la etiqueta.
+const BarraSuperior = () => (
+  <AppBar userMenu={<MenuDelUsuario />}>
+    <TitlePortal component="h1" className="RaAppBar-title" />
+  </AppBar>
+);
+
+// [IA] Generado con Claude (prompt #43 en docs/ia/prompts.md). Revisado por: pendiente
+// Título de la pestaña del navegador por vista (P3): copia el título de la barra superior,
+// por ejemplo «Pase de lista · SIRAI». react-admin no cambia document.title por su cuenta.
+const TituloDeLaPestana = () => {
+  useEffect(() => {
+    const titulo = document.getElementById("react-admin-title");
+    if (!titulo) return;
+    const copiar = () => {
+      const texto = titulo.textContent?.trim();
+      document.title = texto ? `${texto} · SIRAI` : "SIRAI";
+    };
+    copiar();
+    const observador = new MutationObserver(copiar);
+    observador.observe(titulo, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+    return () => observador.disconnect();
+  }, []);
+  return null;
+};
 
 export const Layout = ({ children }: { children: ReactNode }) => (
   <RALayout menu={MenuPorRol} appBar={BarraSuperior}>
     {children}
+    <TituloDeLaPestana />
     <CheckForApplicationUpdate />
   </RALayout>
 );
