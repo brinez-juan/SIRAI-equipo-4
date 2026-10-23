@@ -212,3 +212,24 @@ Herramienta: Claude (Claude Code).
 
   (Adjuntos: plan_implementacion_diseno.md y el enlace al Figma v3.)
   ```
+
+## #44 · Corrección: acciones en el detalle del seguimiento (sin issue en el plan)
+- **Quién:** Jesús
+- **Para qué:** la Directora (y Trabajo Social y Médico) solo podían consultar el caso en la bandeja de seguimiento: los formularios de registrar llamada (issue 22), clasificar causa (issue 23) y alta médica y cierre (issue 24) existían en `paginas/` pero nunca se conectaron a `Seguimiento.tsx`. Claude revisó el flujo (backend, permisos y frontend), encontró que el detalle no los importaba y los conectó: el formulario de llamada en la sección "Llamadas", el de clasificación en lugar del resumen mientras el caso está abierto, y alta y cierre al final; al guardar, el detalle se vuelve a pedir. Un caso cerrado solo se consulta. Jesús revisa y hace el commit.
+- **Citado en:** `frontend/src/paginas/Seguimiento.tsx` y `frontend/src/paginas/RegistrarLlamada.tsx` (teléfono opcional en el selector de destinatario).
+- **Prompt:**
+  ```
+  pero en este caso entro a la bandeja de seguimiento como directora y no puedo llegar a editar nada oslo visulaizar, hceca bien el porceso y corrigelo si es que existe
+  ```
+
+## #45 · Corrección: sin clasificación en el seguimiento de una falta justificada (sin issue en el plan)
+- **Quién:** Jesús
+- **Para qué:** si la falta se marcó "Ausente justificado", el motivo y la nota ya se capturaron en el pase de lista (feature 42), así que en el detalle del seguimiento no debe aparecer "Clasificar causa" ni el detalle de la causa; el registro de llamadas (resultado y notas) y el alta/cierre sí. Claude revisó que cerrar un caso exige causa (`chk_clasificado_con_causa` y `PUT /seguimientos/:id/cerrar`) y que el candado de reingreso depende de ella, así que en vez de solo ocultar el formulario hizo que el cierre del turno cree esos seguimientos ya CLASIFICADOS con la causa y la nota de la justificación, y agregó una migración para los casos que ya existían. Jesús revisa y hace el commit.
+  Después, como el caso no se dejaba cerrar (los seguimientos previos seguían sin causa), el cierre de una falta justificada ya no exige clasificar: se habilita en cuanto hay al menos una llamada registrada (409 "Registre la llamada antes de cerrar el caso." si no), y si el caso aún no tenía causa se le guarda la de la justificación al cerrarlo. El detalle (`GET /seguimientos/:id`) también muestra esa causa, para que el aviso de alta médica salga aunque no se haya corrido la migración.
+- **Citado en:** `backend/cierreTurno.js`, `backend/migraciones/seguimientos_justificados.sql`, `backend/rutas/seguimientos.js` (detalle y `PUT /seguimientos/:id/cerrar`), `frontend/src/paginas/Seguimiento.tsx`, `frontend/src/paginas/AltaYCierre.tsx`.
+- **Prompt:**
+  ```
+  falta agregar que si la fatlaes justificada la de claisficar cause y la detalle de la cause ya no aparezca pero el resitro de llamadas, reulstados y notas si.
+
+  no me deja cerrrar el caso para esta tipo de falta, quiero despues de ingresar y registrar la llamada se abra la opciond e cerrar caso
+  ```

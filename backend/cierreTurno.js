@@ -13,7 +13,8 @@ function hoy(){
 //     esta llave, así que el cierre espera a que terminen los registros en curso y los posteriores reciben 409.
 //     Un segundo cierre del mismo día y turno también choca aquí.
 //  2. Los infantes sin registro quedan como FALTA_INJUSTIFICADA (sin hora de entrada).
-//  3. Cada asistencia cuyo estado tenga genera_seguimiento = 1 recibe un seguimiento ABIERTO (uno por asistencia).
+//  3. Cada asistencia cuyo estado tenga genera_seguimiento = 1 recibe un seguimiento ABIERTO (uno por asistencia),
+//     o CLASIFICADO con la causa de su justificación si se marcó Ausente justificado.
 // usuarioId = null es el cierre automático (issue 18): automatico = 1 y cerrado_por/created_by quedan en NULL.
 // Devuelve {cierre, faltas, seguimientos} con los ids creados, o null si ese día y turno ya estaba cerrado.
 async function cerrarTurno(estanciaId, fecha, turno, usuarioId){
@@ -50,15 +51,21 @@ async function cerrarTurno(estanciaId, fecha, turno, usuarioId){
 		}
 		// Incluye las faltas recién creadas. Si la asistencia ya tiene seguimiento (clave única por asistencia), no se duplica.
 		let [conSeguimiento]=await conexion.query(
-			"SELECT a.id FROM asistencias a JOIN estados_asistencia e ON e.codigo=a.estado_codigo"+
+			"SELECT a.id, a.justificacion_causa_codigo, a.justificacion_cifrado FROM asistencias a JOIN estados_asistencia e ON e.codigo=a.estado_codigo"+
 			" WHERE a.estancia_id=? AND a.fecha=? AND a.turno=? AND a.deleted_at IS NULL AND e.genera_seguimiento=1"+
 			" AND NOT EXISTS (SELECT 1 FROM seguimientos s WHERE s.asistencia_id=a.id)",
 			[estanciaId, fecha, turno]
 		);
-		let seguimientos=conSeguimiento.map(asistencia=>[uuidv7(), asistencia.id, usuarioId]);
+		// Una falta justificada ya trae su causa del pase de lista (feature 42): el caso nace CLASIFICADO con ese motivo
+		// y su nota (mismo cifrado, se copia tal cual), y en el detalle ya no se pide clasificar.
+		let seguimientos=conSeguimiento.map(asistencia=>{
+			let justificada=asistencia.justificacion_causa_codigo!=null;
+			return [uuidv7(), asistencia.id, justificada?"CLASIFICADO":"ABIERTO", asistencia.justificacion_causa_codigo,
+				justificada?asistencia.justificacion_cifrado:null, usuarioId];
+		});
 		if(seguimientos.length>0){
 			await conexion.query(
-				"INSERT INTO seguimientos (id, asistencia_id, created_by) VALUES ? ON DUPLICATE KEY UPDATE id=id",
+				"INSERT INTO seguimientos (id, asistencia_id, estado, causa_codigo, detalle_causa_cifrado, created_by) VALUES ? ON DUPLICATE KEY UPDATE id=id",
 				[seguimientos]
 			);
 		}
