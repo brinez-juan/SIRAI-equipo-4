@@ -4,7 +4,6 @@ const {permitir}=require("../seguridad");
 
 const router=express.Router();
 
-// [IA] Generado con Claude (prompt #23 en docs/ia/prompts.md). Revisado por: pendiente
 // Catálogo de causas de inasistencia con su asesoría, para el formulario de clasificación. Es de solo lectura y
 // lo usa quien clasifica (TRABAJO_SOCIAL, MEDICO, DIRECTORA); DOCENTE no ve seguimientos. No tiene datos de infantes.
 router.get("/causas", permitir("TRABAJO_SOCIAL", "MEDICO", "DIRECTORA"), async (req, res)=>{

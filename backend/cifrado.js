@@ -3,7 +3,7 @@ const crypto=require("crypto");
 const IV_BYTES=12;  // tamaño recomendado para GCM
 const TAG_BYTES=16; // etiqueta de autenticación de GCM
 
-// [IA] Generado con Claude (prompt #7 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // La llave se lee al usarla (no al importar el módulo) para que un .env incompleto falle con un
 // mensaje claro y no deje a seed.js guardando datos en claro por error.
 function llave(){
@@ -14,7 +14,7 @@ function llave(){
 	return Buffer.from(hex, "hex");
 }
 
-// [IA] Generado con Claude (prompt #7 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // AES-256-GCM con un IV aleatorio por valor. Devuelve base64 de iv + etiqueta + texto cifrado,
 // así el mismo texto cifrado dos veces da resultados distintos. null/undefined se quedan null.
 function cifrar(texto){
@@ -27,7 +27,7 @@ function cifrar(texto){
 	return Buffer.concat([iv, cifrador.getAuthTag(), cifrado]).toString("base64");
 }
 
-// [IA] Generado con Claude (prompt #7 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Inverso de cifrar(). Si el valor fue alterado o la llave no es la misma, GCM lo detecta y lanza error.
 // Acepta Buffer porque mysql2 devuelve así las columnas binarias.
 function descifrar(texto){

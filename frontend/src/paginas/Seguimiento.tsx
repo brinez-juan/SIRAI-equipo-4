@@ -18,6 +18,7 @@ import {
   Show,
   TopToolbar,
   useRecordContext,
+  useRefresh,
 } from "react-admin";
 import { Link as RouterLink } from "react-router-dom";
 import DescriptionIcon from "@mui/icons-material/Description";
@@ -28,6 +29,9 @@ import {
   fechaLegible,
   nombreCompleto,
 } from "./Bandeja";
+import { RegistrarLlamada } from "./RegistrarLlamada";
+import { ClasificarSeguimiento } from "./ClasificarSeguimiento";
+import { AltaYCierre } from "./AltaYCierre";
 
 type Persona = {
   id: string;
@@ -68,7 +72,6 @@ export const RESULTADOS: Record<string, string> = {
   BUZON: "Buzón de voz",
 };
 
-// [IA] Generado con Claude (prompt #21 en docs/ia/prompts.md). Revisado por: pendiente
 // Una sección del detalle: tarjeta con título (h2 para lectores de pantalla) y contenido.
 const Seccion = ({
   titulo,
@@ -87,7 +90,6 @@ const Seccion = ({
   </Card>
 );
 
-// [IA] Generado con Claude (prompt #21 en docs/ia/prompts.md). Revisado por: pendiente
 // Renglón "Etiqueta: valor" para los datos sueltos.
 const Dato = ({
   etiqueta,
@@ -101,7 +103,6 @@ const Dato = ({
   </Typography>
 );
 
-// [IA] Generado con Claude (prompt #21 en docs/ia/prompts.md). Revisado por: pendiente
 // El teléfono como enlace tel:, para marcar directo desde un teléfono o softphone.
 const Telefono = ({ numero }: { numero: string | null }) =>
   numero ? (
@@ -110,11 +111,15 @@ const Telefono = ({ numero }: { numero: string | null }) =>
     <>—</>
   );
 
-// [IA] Generado con Claude (prompt #21 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Contenido del detalle. El backend ya descifró teléfonos, notas, detalle de la causa y observaciones
 // del alta, y registró la consulta en audit_log como READ_CONFIDENCIAL.
+// Modificado con el prompt #44: los formularios de llamada, clasificación y alta/cierre (issues 22, 23 y 24)
+// van en sus secciones y, al guardar, refresh() vuelve a pedir el detalle. Un caso cerrado solo se consulta.
+// Si la falta es justificada no aparece la clasificación: la causa ya viene del pase de lista.
 const DetalleSeguimiento = () => {
   const caso = useRecordContext();
+  const refresh = useRefresh();
   // Mientras llega GET /seguimientos/:id, react-admin muestra el renglón de la bandeja que ya tenía,
   // y ese no trae infante, tutores ni llamadas: se espera al detalle completo.
   if (!caso?.infante) {
@@ -136,6 +141,10 @@ const DetalleSeguimiento = () => {
     const tipo = llamada.tutor_id ? "Tutor" : "Contacto de emergencia";
     return `${nombreCompleto(persona)} (${tipo})`;
   };
+  const cerrado = caso.estado == "CERRADO";
+  // Falta justificada: la causa y su detalle vienen del pase de lista (backend/cierreTurno.js ya clasificó el caso),
+  // así que no se muestra la clasificación; las llamadas y el alta/cierre sí.
+  const justificada = caso.asistencia.justificacion != null;
 
   return (
     <Box sx={{ p: 2 }}>
@@ -279,54 +288,61 @@ const DetalleSeguimiento = () => {
             </TableBody>
           </Table>
         )}
-      </Seccion>
-
-      <Seccion titulo="Clasificación">
-        {caso.causa ? (
-          <>
-            <Dato etiqueta="Causa">{caso.causa.nombre}</Dato>
-            <Dato etiqueta="Detalle">{caso.causa.detalle || "—"}</Dato>
-            <Dato etiqueta="Fecha probable de retorno">
-              {fechaLegible(caso.fecha_probable_retorno)}
-            </Dato>
-            <Dato etiqueta="Requiere alta médica">
-              {caso.causa.requiere_alta ? "Sí" : "No"}
-            </Dato>
-            <Alert severity="info" sx={{ mt: 1 }}>
-              <strong>Asesoría:</strong> {caso.causa.asesoria}
-            </Alert>
-          </>
-        ) : (
-          <Typography variant="body2">Aún no se clasifica la causa.</Typography>
+        {!cerrado && (
+          <RegistrarLlamada
+            seguimientoId={caso.id}
+            tutores={tutores}
+            contactos={contactos}
+            alRegistrar={refresh}
+          />
         )}
       </Seccion>
 
-      <Seccion titulo="Alta médica">
-        {caso.alta ? (
-          <>
-            <Dato etiqueta="Folio del justificante">
-              {caso.alta.folio_justificante}
-            </Dato>
-            <Dato etiqueta="Emitida el">{fechaHora(caso.alta.emitida_en)}</Dato>
-            <Dato etiqueta="Emitida por">{caso.alta.emitida_por_nombre}</Dato>
-            <Dato etiqueta="Observaciones">
-              {caso.alta.observaciones || "—"}
-            </Dato>
-          </>
-        ) : caso.causa?.requiere_alta ? (
-          <Alert severity="warning">
-            Sin alta médica. Esta causa requiere alta para cerrar el caso y para
-            que el infante vuelva a ingresar.
-          </Alert>
-        ) : (
-          <Typography variant="body2">Sin alta médica.</Typography>
-        )}
-      </Seccion>
+      {/* Abierto: el formulario ya trae la clasificación guardada y su asesoría. Cerrado: solo el resumen */}
+      {justificada ? null : !cerrado ? (
+        <Card variant="outlined" sx={{ mb: 2 }}>
+          <ClasificarSeguimiento
+            seguimiento={
+              caso as Parameters<typeof ClasificarSeguimiento>[0]["seguimiento"]
+            }
+            alClasificar={refresh}
+          />
+        </Card>
+      ) : (
+        <Seccion titulo="Clasificación">
+          {caso.causa ? (
+            <>
+              <Dato etiqueta="Causa">{caso.causa.nombre}</Dato>
+              <Dato etiqueta="Detalle">{caso.causa.detalle || "—"}</Dato>
+              <Dato etiqueta="Fecha probable de retorno">
+                {fechaLegible(caso.fecha_probable_retorno)}
+              </Dato>
+              <Dato etiqueta="Requiere alta médica">
+                {caso.causa.requiere_alta ? "Sí" : "No"}
+              </Dato>
+              <Alert severity="info" sx={{ mt: 1 }}>
+                <strong>Asesoría:</strong> {caso.causa.asesoria}
+              </Alert>
+            </>
+          ) : (
+            <Typography variant="body2">
+              Aún no se clasifica la causa.
+            </Typography>
+          )}
+        </Seccion>
+      )}
+
+      {/* Alta médica (solo MEDICO y DIRECTORA la emiten) y cierre del caso; abierto o cerrado, AltaYCierre muestra lo que hay */}
+      <Card variant="outlined" sx={{ mb: 2 }}>
+        <AltaYCierre
+          seguimiento={caso as Parameters<typeof AltaYCierre>[0]["seguimiento"]}
+          alActualizar={refresh}
+        />
+      </Card>
     </Box>
   );
 };
 
-// [IA] Generado con Claude (prompt #25 en docs/ia/prompts.md). Revisado por: pendiente
 // Abre el expediente imprimible del infante de este caso (issue 25). No aparece mientras llega el detalle.
 const BotonExpediente = () => {
   const caso = useRecordContext();
@@ -344,9 +360,8 @@ const BotonExpediente = () => {
   );
 };
 
-// [IA+Humano] Base generada con Claude (prompt #21 en docs/ia/prompts.md), modificada con el prompt #25. Revisado por: pendiente
-// Detalle de un seguimiento (issue 21): datos, tutores, contactos, llamadas, clasificación y alta.
-// Solo consulta; los formularios de llamada, clasificación y alta llegan con los issues 22, 23 y 24.
+// Detalle de un seguimiento (issue 21): datos, tutores, contactos, llamadas, clasificación, alta y cierre,
+// con los formularios de los issues 22, 23 y 24 mientras el caso no esté cerrado.
 export const Seguimiento = () => (
   <Show
     title="Seguimiento"

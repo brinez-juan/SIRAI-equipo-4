@@ -5,7 +5,6 @@ const {descifrar}=require("../cifrado");
 
 const router=express.Router();
 
-// [IA] Generado con Claude (prompt #25 en docs/ia/prompts.md). Revisado por: pendiente
 // Mismos roles que la bandeja de seguimiento (issue 20): DOCENTE no ve notas ni seguimientos.
 // El token debe traer estancia: la estancia nunca sale del request.
 const acceso=[
@@ -13,7 +12,7 @@ const acceso=[
 	(req, res, next)=>req.usuario.estancia_id==null?res.sendStatus(403):next()
 ];
 
-// [IA] Generado con Claude (prompt #25 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // GET /infantes/:id/expediente — expediente imprimible (issue 25): datos del infante y TODOS sus seguimientos
 // (también los cerrados), del más reciente al más antiguo, cada uno con su falta, causa, llamadas y alta médica.
 // Notas, detalle de la causa y observaciones salen descifrados; los teléfonos no se incluyen (el documento

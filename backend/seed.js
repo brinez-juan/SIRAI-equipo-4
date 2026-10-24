@@ -40,13 +40,11 @@ const APELLIDOS=["Hernández", "García", "Martínez", "López", "González", "P
 	"Flores", "Gómez", "Morales", "Vázquez", "Jiménez", "Reyes", "Díaz", "Torres", "Gutiérrez", "Ruiz"];
 const NOMBRES_ADULTOS=["María", "José", "Guadalupe", "Juan", "Rosa", "Luis", "Carmen", "Jorge", "Ana", "Miguel"];
 
-// [IA] Generado con Claude (prompts #4 y #6 en docs/ia/prompts.md). Revisado por: pendiente
 // Teléfono de 10 dígitos que empieza con 55, distinto para cada número n.
 function telefono(n){
 	return "55"+String(10000000+n*7919%90000000).padStart(8, "0");
 }
 
-// [IA] Generado con Claude (prompts #4 y #6 en docs/ia/prompts.md). Revisado por: pendiente
 // Fecha de nacimiento entre 1 y 5 años antes de hoy, fija para cada i (la demo siempre se ve igual).
 function fechaNacimiento(i){
 	let fecha=new Date();
@@ -55,7 +53,7 @@ function fechaNacimiento(i){
 	return fecha.toISOString().slice(0, 10);
 }
 
-// [IA] Generado con Claude (prompts #4 y #6 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Inserta todo en una sola transacción: si algo falla, la base queda como estaba.
 // Los catálogos (estados_asistencia, causas_inasistencia) ya los inserta schema.sql.
 async function sembrar(conn){
@@ -153,7 +151,7 @@ async function sembrar(conn){
 	}
 }
 
-// [IA] Generado con Claude (prompts #4 y #6 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 async function main(){
 	let conn=await db.getConnection();
 	try{

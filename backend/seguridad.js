@@ -2,7 +2,7 @@ const jwt=require("jsonwebtoken");
 const crypto=require("crypto");
 const {db}=require("./db");
 
-// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // JSON con llaves ordenadas: MySQL reordena las llaves de las columnas JSON,
 // así el hash se puede recalcular a partir de lo que quedó guardado.
 function jsonCanonico(valor){
@@ -15,7 +15,7 @@ function jsonCanonico(valor){
 	return JSON.stringify(valor);
 }
 
-// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // audit_log es una cadena: hash = SHA-256(hash_prev + jsonCanonico(registro)).
 // El lock evita que dos inserts concurrentes tomen el mismo hash_prev.
 // Sin req (procesos del sistema como el cierre automático) la ip y el user_agent quedan en NULL.
@@ -50,7 +50,7 @@ async function log(sujeto, accion, entidad, entidadId, antes, despues, req){
 	}
 }
 
-// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md), modificado con el prompt #30. Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Verifica el JWT del header "Authentication". Si es válido deja sus datos en req.usuario
 // ({usuario, rol, estancia_id, region_id}); si falta, expiró o fue alterado responde 401.
 // Prompt #30: además revisa en la base que el usuario siga activo y con el mismo rol y alcance que dice el token.
@@ -76,7 +76,7 @@ async function autenticar(req, res, next){
 	next();
 }
 
-// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Deja pasar solo a los roles indicados; uso: permitir("DIRECTORA", "DOCENTE"). Responde 403 si no.
 function permitir(...roles){
 	return (req, res, next)=>{
@@ -88,7 +88,6 @@ function permitir(...roles){
 	};
 }
 
-// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
 // Guarda en audit_log cada petición autenticada cuando termina, con su código de respuesta.
 // Así ningún endpoint se queda sin logging aunque su autor no llame a log().
 function registrarPeticion(req, res, next){

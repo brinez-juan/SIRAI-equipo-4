@@ -9,7 +9,7 @@ const MAX_INTENTOS=5;
 const MINUTOS_BLOQUEO=15;
 const DURACION_TOKEN="8h"; // un turno
 
-// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md), modificado con el prompt #30. Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Única ruta pública del backend. Recibe {username (correo), password} y devuelve un JWT.
 // Tras MAX_INTENTOS fallidos la cuenta se bloquea MINUTOS_BLOQUEO minutos.
 router.post("/login", async (req, res)=>{

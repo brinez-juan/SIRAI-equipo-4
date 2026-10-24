@@ -25,7 +25,6 @@ import {
 
 const DUPLICADO = "Ya existe una estancia con esa clave.";
 
-// [IA] Generado con Claude (prompt #8 en docs/ia/prompts.md). Revisado por: pendiente
 // Al crear solo hay guardar.
 const BarraGuardar = () => (
   <Toolbar>
@@ -33,7 +32,6 @@ const BarraGuardar = () => (
   </Toolbar>
 );
 
-// [IA] Generado con Claude (prompt #41 en docs/ia/prompts.md). Revisado por: pendiente
 // Al editar, además, "Desactivar" (borrado lógico) con confirmación. pessimistic: si el backend responde 409
 // (tiene infantes o usuarios activos), la estancia sigue en pantalla y el aviso muestra el mensaje del backend.
 const BarraEditar = () => (
@@ -48,7 +46,6 @@ const BarraEditar = () => (
   </Toolbar>
 );
 
-// [IA] Generado con Claude (prompt #8 en docs/ia/prompts.md), modificado con el prompt #41. Revisado por: pendiente
 // Límites iguales a las columnas de estancias en schema.sql. Los turnos vienen del seed
 // y no se editan aquí; max_sesiones queda fuera de alcance (plan, sección 7).
 const FormularioEstancia = ({ editando = false }: { editando?: boolean }) => (
@@ -79,7 +76,6 @@ const FormularioEstancia = ({ editando = false }: { editando?: boolean }) => (
   </SimpleForm>
 );
 
-// [IA] Generado con Claude (prompt #41 en docs/ia/prompts.md). Revisado por: pendiente
 // Con "Mostrar desactivadas" los renglones no abren Editar y llevan el botón Activar.
 const TablaEstancias = () => {
   const desactivadas = useMostrandoDesactivadas();
@@ -106,14 +102,12 @@ const TablaEstancias = () => {
   );
 };
 
-// [IA+Humano] Base generada con Claude (prompt #3 en docs/ia/prompts.md), modificada con los prompts #8 y #41. Revisado por: pendiente
 export const ListarEstancias = () => (
   <List sort={{ field: "clave", order: "ASC" }} filters={[filtroDesactivadas]}>
     <TablaEstancias />
   </List>
 );
 
-// [IA] Generado con Claude (prompt #8 en docs/ia/prompts.md). Revisado por: pendiente
 export const CrearEstancia = () => {
   const onError = useErrorAlGuardar(DUPLICADO);
   return (
@@ -127,7 +121,6 @@ export const CrearEstancia = () => {
   );
 };
 
-// [IA] Generado con Claude (prompt #8 en docs/ia/prompts.md). Revisado por: pendiente
 // pessimistic: espera la respuesta del backend antes de mostrar el cambio, así un 409 no deja datos falsos en pantalla.
 export const EditarEstancia = () => {
   const onError = useErrorAlGuardar(DUPLICADO);

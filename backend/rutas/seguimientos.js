@@ -5,7 +5,6 @@ const {cifrar, descifrar}=require("../cifrado");
 
 const router=express.Router();
 
-// [IA] Generado con Claude (prompt #20 en docs/ia/prompts.md). Revisado por: pendiente
 // Tabla 2.5 del plan: TRABAJO_SOCIAL, MEDICO y DIRECTORA llevan los seguimientos; DOCENTE no ve notas ni
 // seguimientos. El token debe traer estancia: la estancia nunca sale del request.
 const conEstancia=(req, res, next)=>req.usuario.estancia_id==null?res.sendStatus(403):next();
@@ -19,7 +18,7 @@ const DESDE=" FROM seguimientos s JOIN asistencias a ON a.id=s.asistencia_id JOI
 // Reintento agendado por la llamada más reciente (issue 22). NULL si no hay llamadas o si no hace falta reintentar.
 const SIGUIENTE_INTENTO="(SELECT l.siguiente_intento_en FROM llamadas l WHERE l.seguimiento_id=s.id AND l.deleted_at IS NULL ORDER BY l.intento DESC LIMIT 1)";
 
-// [IA] Generado con Claude (prompt #20 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Bandeja: casos no cerrados de mi estancia. Primero los que tienen el reintento vencido (el más atrasado arriba),
 // luego los que tienen un reintento agendado y al final el resto, de la falta más antigua a la más reciente.
 // "Ahora" se pasa desde Node porque las fechas se guardan en UTC y el NOW() de MySQL usa la zona del servidor.
@@ -48,7 +47,7 @@ router.get("/seguimientos", acceso, async (req, res)=>{
 	}
 });
 
-// [IA] Generado con Claude (prompt #20 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Detalle de un seguimiento de mi estancia (si es de otra, 404 como si no existiera): infante, tutores y contactos
 // con su teléfono descifrado, llamadas con sus notas descifradas, causa con su asesoría y alta médica si existe.
 // Los campos descifrados salen sin el sufijo _cifrado. Como expone datos confidenciales, cada consulta exitosa
@@ -86,13 +85,16 @@ router.get("/seguimientos/:id", acceso, async (req, res)=>{
 			" FROM llamadas l JOIN usuarios u ON u.id=l.realizada_por WHERE l.seguimiento_id=? AND l.deleted_at IS NULL ORDER BY l.intento",
 			[fila.id]
 		);
+		// Una falta justificada que aún no tiene causa (se creó antes de que cierreTurno.js la copiara) usa la de su justificación
+		let sinCausa=fila.causa_codigo==null;
+		let codigoCausa=sinCausa?fila.justificacion_causa_codigo:fila.causa_codigo;
 		let causa=null;
-		if(fila.causa_codigo!=null){
+		if(codigoCausa!=null){
 			let [causas]=await db.query(
 				"SELECT codigo, nombre, asesoria, requiere_alta, justifica_falta, notifica_emergencia FROM causas_inasistencia WHERE codigo=?",
-				[fila.causa_codigo]
+				[codigoCausa]
 			);
-			causa={...causas[0], detalle: descifrar(fila.detalle_causa_cifrado)};
+			causa={...causas[0], detalle: descifrar(sinCausa?fila.justificacion_cifrado:fila.detalle_causa_cifrado)};
 		}
 		let [altas]=await db.query(
 			"SELECT a.id, a.folio_justificante, a.emitida_en, a.emitida_por, CONCAT_WS(' ', u.nombre, u.primer_apellido) AS emitida_por_nombre,"+
@@ -144,13 +146,11 @@ router.get("/seguimientos/:id", acceso, async (req, res)=>{
 const CLASIFICABLES=["ABIERTO", "EN_CONTACTO", "CLASIFICADO"];
 const MAX_DETALLE=2000;
 
-// [IA] Generado con Claude (prompt #23 en docs/ia/prompts.md). Revisado por: pendiente
 // Fecha AAAA-MM-DD que exista en el calendario.
 function esFecha(texto){
 	return typeof texto=="string" && /^\d{4}-\d{2}-\d{2}$/.test(texto) && new Date(texto+"T00:00:00Z").toISOString().slice(0, 10)==texto;
 }
 
-// [IA] Generado con Claude (prompt #23 en docs/ia/prompts.md). Revisado por: pendiente
 // Revisa el body de clasificar. detalle y fecha_probable_retorno son opcionales (null o vacío = sin dato).
 // Exigir texto evita que un objeto o arreglo llegue a la consulta SQL.
 function validarClasificacion(cuerpo){
@@ -166,7 +166,7 @@ function validarClasificacion(cuerpo){
 	return null;
 }
 
-// [IA] Generado con Claude (prompt #23 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Clasifica la causa de la inasistencia y pasa el caso a CLASIFICADO. PUT reemplaza la clasificación completa:
 // lo que no venga (detalle, fecha) queda en NULL. El detalle es confidencial: se guarda cifrado y en la bitácora
 // solo entra cifrado, con el antes y el después. Es un solo UPDATE condicionado al estado, así que si el caso se
@@ -234,7 +234,7 @@ const MAX_OBSERVACIONES=2000;
 // FOR UPDATE OF s: alta y cierre del mismo caso se forman en fila, así no se cierra un caso mientras se le da de alta.
 const BLOQUEAR_SEGUIMIENTO=" WHERE s.id=? AND a.estancia_id=? AND s.deleted_at IS NULL AND a.deleted_at IS NULL FOR UPDATE OF s";
 
-// [IA] Generado con Claude (prompt #24 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Corre fn(conexion) en una transacción; si algo falla no se guarda nada.
 async function enTransaccion(fn){
 	let conexion=await db.getConnection();
@@ -251,7 +251,6 @@ async function enTransaccion(fn){
 	}
 }
 
-// [IA] Generado con Claude (prompt #24 en docs/ia/prompts.md). Revisado por: pendiente
 // Alta médica vigente de un seguimiento (la que no tiene borrado lógico), o undefined.
 async function buscarAlta(conexion, seguimientoId){
 	let [altas]=await conexion.query(
@@ -263,7 +262,7 @@ async function buscarAlta(conexion, seguimientoId){
 	return altas[0];
 }
 
-// [IA] Generado con Claude (prompt #24 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Revisa el body de la alta: folio obligatorio, observaciones opcionales. Exigir texto evita que un objeto o
 // arreglo llegue a la consulta SQL.
 function validarAlta(cuerpo){
@@ -276,7 +275,7 @@ function validarAlta(cuerpo){
 	return null;
 }
 
-// [IA] Generado con Claude (prompt #24 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Registra la alta médica de un seguimiento de mi estancia (si es de otra, 404). Quita el candado de reingreso
 // del pase de lista y permite cerrar los casos cuya causa requiere alta. Una alta por caso (409 si ya tiene) y
 // no se emite sobre un caso cerrado (409). Las observaciones son confidenciales: se guardan cifradas y así entran
@@ -322,16 +321,20 @@ router.post("/seguimientos/:id/alta", accesoAlta, async (req, res)=>{
 	}
 });
 
-// [IA] Generado con Claude (prompt #24 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Cierra un seguimiento de mi estancia (si es de otra, 404). Solo se cierra un caso clasificado
 // (chk_clasificado_con_causa) y, si su causa tiene requiere_alta = 1, solo con alta médica: si no, 409.
 // cerrado_por es quien lo cierra, tomado del token. Un caso cerrado ya no se clasifica ni recibe alta.
+// Una falta justificada no se clasifica: se cierra en cuanto tiene al menos una llamada, y si aún no tenía causa
+// se le guarda la de su justificación (la nota va cifrada tal cual).
 router.put("/seguimientos/:id/cerrar", acceso, async (req, res)=>{
 	try{
 		let resultado=await enTransaccion(async conexion=>{
 			let [filas]=await conexion.query(
-				"SELECT s.id, s.estado, s.causa_codigo, s.cerrado_en, s.cerrado_por, c.requiere_alta"+DESDE+
-				" LEFT JOIN causas_inasistencia c ON c.codigo=s.causa_codigo"+BLOQUEAR_SEGUIMIENTO,
+				"SELECT s.id, s.estado, s.causa_codigo, s.detalle_causa_cifrado, s.cerrado_en, s.cerrado_por, c.requiere_alta,"+
+				" a.justificacion_causa_codigo, a.justificacion_cifrado,"+
+				" (SELECT COUNT(*) FROM llamadas l WHERE l.seguimiento_id=s.id AND l.deleted_at IS NULL) AS llamadas"+DESDE+
+				" LEFT JOIN causas_inasistencia c ON c.codigo=COALESCE(s.causa_codigo, a.justificacion_causa_codigo)"+BLOQUEAR_SEGUIMIENTO,
 				[req.params.id, req.usuario.estancia_id]
 			);
 			let seguimiento=filas[0];
@@ -341,16 +344,22 @@ router.put("/seguimientos/:id/cerrar", acceso, async (req, res)=>{
 			if(seguimiento.estado=="CERRADO"){
 				return {status: 409, message: "El caso ya está cerrado."};
 			}
-			if(seguimiento.causa_codigo==null){
+			let justificada=seguimiento.justificacion_causa_codigo!=null;
+			if(seguimiento.causa_codigo==null && !justificada){
 				return {status: 409, message: "Clasifique la causa antes de cerrar el caso."};
+			}
+			if(justificada && Number(seguimiento.llamadas)==0){
+				return {status: 409, message: "Registre la llamada antes de cerrar el caso."};
 			}
 			if(Number(seguimiento.requiere_alta)==1 && !await buscarAlta(conexion, seguimiento.id)){
 				return {status: 409, message: "La causa requiere alta médica: no se puede cerrar el caso sin ella."};
 			}
+			let sinCausa=seguimiento.causa_codigo==null;
 			let ahora=new Date();
 			await conexion.query(
-				"UPDATE seguimientos SET estado='CERRADO', cerrado_en=?, cerrado_por=?, updated_at=CURRENT_TIMESTAMP(3) WHERE id=?",
-				[ahora, req.usuario.usuario, seguimiento.id]
+				"UPDATE seguimientos SET estado='CERRADO', causa_codigo=?, detalle_causa_cifrado=?, cerrado_en=?, cerrado_por=?, updated_at=CURRENT_TIMESTAMP(3) WHERE id=?",
+				[sinCausa?seguimiento.justificacion_causa_codigo:seguimiento.causa_codigo,
+				sinCausa?seguimiento.justificacion_cifrado:seguimiento.detalle_causa_cifrado, ahora, req.usuario.usuario, seguimiento.id]
 			);
 			let [despues]=await conexion.query("SELECT id, estado, causa_codigo, cerrado_en, cerrado_por FROM seguimientos WHERE id=?", [seguimiento.id]);
 			let antes={id: seguimiento.id, estado: seguimiento.estado, causa_codigo: seguimiento.causa_codigo, cerrado_en: seguimiento.cerrado_en, cerrado_por: seguimiento.cerrado_por};

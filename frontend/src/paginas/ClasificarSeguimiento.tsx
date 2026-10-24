@@ -61,7 +61,7 @@ const PARENTESCOS: Record<string, string> = {
   OTRO: "Otro",
 };
 
-// [IA] Generado con Claude (prompt #23 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Formulario "Clasificar causa" para Seguimiento.tsx (issue 21): causa, detalle y fecha probable de retorno.
 // Al elegir la causa muestra su asesoría para el personal; si la causa notifica a los contactos de emergencia
 // (NO_LOC), muestra esos contactos por prioridad para llamarles (la llamada se registra en el issue 22).

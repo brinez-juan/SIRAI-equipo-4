@@ -53,7 +53,6 @@ const COMPONENTES_PAGINA: Record<string, ComponentType> = {
   reportes: Reportes,
 };
 
-// Cada issue agrega aquí su línea (y su entrada en permisos.ts con los roles).
 // recordRepresentation: lo que se muestra cuando otro recurso apunta a este (ej. la región de una estancia).
 const COMPONENTES_RECURSO: Record<string, Omit<ResourceProps, "name">> = {
   Regiones: {
@@ -92,7 +91,6 @@ const COMPONENTES_RECURSO: Record<string, Omit<ResourceProps, "name">> = {
     list: ListarAsistencias,
     options: { label: "Historial de asistencia" },
   },
-  // En minúsculas porque es la ruta del backend (GET /seguimientos y /seguimientos/:id)
   seguimientos: {
     list: Bandeja,
     show: Seguimiento,
@@ -117,7 +115,6 @@ const COMPONENTES_RECURSO: Record<string, Omit<ResourceProps, "name">> = {
   },
 };
 
-// [IA] Generado con Claude (prompt #9 en docs/ia/prompts.md). Revisado por: pendiente
 // Quita create y edit a los roles que solo consultan (tabla ESCRITURA de permisos.ts);
 // así react-admin no muestra el botón Crear ni abre el formulario de edición.
 const vistasDelRol = (nombre: string, rol: string) => {
@@ -127,7 +124,6 @@ const vistasDelRol = (nombre: string, rol: string) => {
     : resto;
 };
 
-// [IA+Humano] Base generada con Claude (prompt #3 en docs/ia/prompts.md), modificada por: pendiente. Modificado con los prompts #9, #14 y #32.
 // react-admin llama a getPermissions (el rol) y este render solo monta lo que ese rol puede ver:
 // sus <Resource> y sus páginas propias (CustomRoutes, como el pase de lista).
 export const App = () => (

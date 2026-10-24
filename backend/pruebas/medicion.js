@@ -22,7 +22,6 @@ const USUARIO=process.env.USUARIO??"docente@sirai.mx";
 const CLAVE=process.env.CLAVE??"Sirai#2026";
 const TURNO=process.env.TURNO??"MATUTINO";
 
-// [IA] Generado con Claude (prompt #33 en docs/ia/prompts.md). Revisado por: pendiente
 // El backend usa un certificado autofirmado, así que se desactiva la verificación TLS, pero solo si el destino es
 // la propia máquina: contra cualquier otro servidor el script se niega a correr.
 const anfitrion=new URL(BASE).hostname;
@@ -34,7 +33,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED="0";
 
 const dormir=ms=>new Promise(resolve=>setTimeout(resolve, ms));
 
-// [IA] Generado con Claude (prompt #33 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // PID del proceso que escucha en un puerto TCP (undefined si nadie escucha).
 function pidEnPuerto(puerto){
 	try{
@@ -45,7 +44,7 @@ function pidEnPuerto(puerto){
 	}
 }
 
-// [IA] Generado con Claude (prompt #33 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Convierte "109M", "57M+", "1.2G", "512K" o "300" (KiB en Linux) a megabytes.
 function aMegas(texto, porDefecto){
 	let encontrado=/^([\d.]+)\s*([KMGBkmgb]?)/.exec(texto.trim());
@@ -57,7 +56,7 @@ function aMegas(texto, porDefecto){
 	return unidad=="G"?numero*1024:unidad=="M"?numero:unidad=="K"?numero/1024:numero/1024/1024;
 }
 
-// [IA] Generado con Claude (prompt #33 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Muestrea con top (una vez por segundo) el CPU y la memoria residente de varios PID. CPU es el porcentaje de UN núcleo
 // (puede pasar de 100 con varios hilos). Se descarta la primera lectura de top: es el promedio desde que arrancó.
 // Devuelve {pid: {cpu: [...], ram: [...]}} cuando top termina.
@@ -103,7 +102,7 @@ function muestrearProcesos(pids, segundos){
 	});
 }
 
-// [IA] Generado con Claude (prompt #33 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Muestrea un contenedor de Docker con "docker stats" (tarda cerca de 1 s por lectura). El CPU también es
 // porcentaje de un núcleo. La memoria es la que reporta Docker para el contenedor.
 // Usa execFile asíncrono a propósito: con execFileSync el bucle bloquearía todo el programa y la carga
@@ -125,7 +124,7 @@ async function muestrearContenedor(nombre, segundos){
 	return lecturas;
 }
 
-// [IA] Generado con Claude (prompt #33 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 function resumen(valores){
 	if(valores.length==0){
 		return {promedio: NaN, mediana: NaN, maximo: NaN, muestras: 0, serie: []};
@@ -142,7 +141,7 @@ function resumen(valores){
 	};
 }
 
-// [IA] Generado con Claude (prompt #33 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Lanza autocannon (se baja con npx la primera vez) y devuelve su resultado en JSON.
 function cargar(url, token){
 	return new Promise((resolve, reject)=>{
@@ -159,7 +158,7 @@ function cargar(url, token){
 	});
 }
 
-// [IA] Generado con Claude (prompt #33 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Mide una fase (reposo o carga): muestrea los tres procesos a la vez durante "segundos" y, si se pide, corre la carga.
 async function medirFase(objetivos, segundos, trabajo){
 	let pids=objetivos.filter(objetivo=>objetivo.pid).map(objetivo=>objetivo.pid);
@@ -175,7 +174,6 @@ async function medirFase(objetivos, segundos, trabajo){
 	return {filas, carga};
 }
 
-// [IA] Generado con Claude (prompt #33 en docs/ia/prompts.md). Revisado por: pendiente
 const f=(numero, decimales=1)=>Number.isNaN(numero)?"n/d":numero.toFixed(decimales);
 
 async function main(){
@@ -250,7 +248,6 @@ async function main(){
 	console.log("- Respuestas 2xx: "+a["2xx"]+" · no 2xx: "+a.non2xx+" · errores de conexión: "+a.errors+" · tiempos agotados: "+a.timeouts);
 }
 
-// [IA] Generado con Claude (prompt #33 en docs/ia/prompts.md). Revisado por: pendiente
 function execFileSyncSeguro(comando, args){
 	try{
 		return execFileSync(comando, args, {encoding: "utf8"});

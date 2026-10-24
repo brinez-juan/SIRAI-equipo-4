@@ -8,7 +8,6 @@ const {LEEN_NOTA, registrarLecturaDeNotas}=require("./asistencia");
 const router=express.Router();
 const TURNOS=["MATUTINO", "VESPERTINO"];
 
-// [IA] Generado con Claude (prompt #19 en docs/ia/prompts.md). Revisado por: pendiente
 // Tabla 2.5 del plan: todos los roles de estancia consultan asistencia. El token debe traer estancia.
 const conEstancia=(req, res, next)=>req.usuario.estancia_id==null?res.sendStatus(403):next();
 const lectura=[permitir("DOCENTE", "DIRECTORA", "TRABAJO_SOCIAL", "MEDICO"), conEstancia];
@@ -25,13 +24,12 @@ const ORDEN={
 	hora_salida: "a.hora_salida",
 };
 
-// [IA] Generado con Claude (prompt #19 en docs/ia/prompts.md). Revisado por: pendiente
 // AAAA-MM-DD y que exista en el calendario (igual que validarDia en asistencia.js)
 function esFecha(valor){
 	return typeof valor=="string" && /^\d{4}-\d{2}-\d{2}$/.test(valor) && new Date(valor+"T00:00:00Z").toISOString().slice(0, 10)==valor;
 }
 
-// [IA] Generado con Claude (prompt #19 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Filtros de la lista: ?fecha= (un día), ?fecha_gte= y ?fecha_lte= (rango), ?turno=.
 // La estancia siempre es la del token. Devuelve {where, valores} o {error} para responder 400.
 function filtros(query, req){
@@ -57,7 +55,7 @@ function filtros(query, req){
 	return {where: " WHERE "+condiciones.join(" AND "), valores};
 }
 
-// [IA+Humano] Base generada con Claude (prompt #19 en docs/ia/prompts.md), modificada con el prompt #42. Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Historial de asistencia de mi estancia, paginado como lo pide react-admin (?_sort=&_order=&_start=&_end=).
 // fecha sale como texto AAAA-MM-DD: es un DATE y como objeto Date se correría un día en la hora de México.
 // Feature 42: cada renglón trae justificacion_causa_nombre (el motivo de un AUSENTE_JUSTIFICADO) para todos, y

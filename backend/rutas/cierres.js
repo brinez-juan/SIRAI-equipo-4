@@ -7,7 +7,6 @@ const router=express.Router();
 const TURNOS=["MATUTINO", "VESPERTINO"];
 const CERRADO="El pase de lista ya se cerró.";
 
-// [IA] Generado con Claude (prompt #17 en docs/ia/prompts.md). Revisado por: pendiente
 // Solo DIRECTORA cierra el pase de lista (plan, issue 17). El token debe traer estancia: la estancia
 // nunca sale del request.
 const soloDirectora=[
@@ -15,7 +14,6 @@ const soloDirectora=[
 	(req, res, next)=>req.usuario.estancia_id==null?res.sendStatus(403):next()
 ];
 
-// [IA] Generado con Claude (prompt #17 en docs/ia/prompts.md). Revisado por: pendiente
 // Revisa fecha (AAAA-MM-DD, que exista en el calendario y que no sea futura) y turno. Devuelve un mensaje o null.
 // Un día futuro se rechaza porque cerrarlo marcaría como falta a todos los infantes.
 function validarCierre(cuerpo){
@@ -32,7 +30,7 @@ function validarCierre(cuerpo){
 	return null;
 }
 
-// [IA+Humano] Base generada con Claude (prompt #17); la lógica se movió a cerrarTurno() con el prompt #18
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Cierre manual del pase de lista de un día y turno de MI estancia (automatico = 0, cerrado_por = usuario).
 // La transacción con las faltas y los seguimientos está en cerrarTurno() (cierreTurno.js), que comparte con el cierre automático.
 // Body: {fecha, turno}. Responde 201 con {cierre, faltas, seguimientos}.

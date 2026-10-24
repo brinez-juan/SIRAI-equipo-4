@@ -39,7 +39,7 @@ const nombreTutor = (tutor: RaRecord) =>
     .filter(Boolean)
     .join(" ");
 
-// [IA] Generado con Claude (prompt #11 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Quita el vínculo del tutor de la fila (borrado lógico en el backend) y avisa para recargar la tabla.
 const BotonQuitar = ({
   infanteId,
@@ -75,7 +75,7 @@ const BotonQuitar = ({
   );
 };
 
-// [IA] Generado con Claude (prompt #11 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Sección de la ficha del infante: tabla de sus tutores y formulario para vincular uno
 // (tutor, parentesco y si puede recoger). Solo se monta en la edición, que abre DIRECTORA.
 export const TutoresDelInfante = () => {

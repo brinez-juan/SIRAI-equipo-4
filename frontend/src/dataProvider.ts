@@ -15,12 +15,11 @@ const fetchJsonUtil = (url: string, options: fetchUtils.Options = {}) => {
 const tutoresUrl = (infanteId: Identifier) =>
   `${import.meta.env.VITE_BACKEND}/Infantes/${encodeURIComponent(infanteId)}/tutores`;
 
-// [IA] Generado con Claude (prompt #11 en docs/ia/prompts.md). Revisado por: pendiente
 // Además del CRUD de react-admin, las rutas anidadas /Infantes/:id/tutores (issue 11).
 // Se usan con useDataProvider<typeof dataProvider>().
 export const dataProvider = {
   ...jsonServerProvider(import.meta.env.VITE_BACKEND, fetchJsonUtil),
-  // [IA] Generado con Claude (prompt #41 en docs/ia/prompts.md). Revisado por: pendiente
+  // [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
   // Vuelve a activar una región o estancia desactivada (POST /<recurso>/:id/activar).
   activar: (resource: string, id: Identifier) =>
     fetchJsonUtil(
@@ -45,7 +44,7 @@ export const dataProvider = {
     fetchJsonUtil(`${tutoresUrl(infanteId)}/${encodeURIComponent(tutorId)}`, {
       method: "DELETE",
     }),
-  // [IA] Generado con Claude (prompt #23 en docs/ia/prompts.md). Revisado por: pendiente
+  // [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
   // Catálogo de causas con su asesoría y clasificación de un seguimiento (issue 23).
   causasInasistencia: () =>
     fetchJsonUtil(`${import.meta.env.VITE_BACKEND}/causas`).then(
@@ -63,7 +62,7 @@ export const dataProvider = {
       `${import.meta.env.VITE_BACKEND}/seguimientos/${encodeURIComponent(seguimientoId)}/clasificar`,
       { method: "PUT", body: JSON.stringify(datos) },
     ).then(({ json }) => json as RaRecord),
-  // [IA] Generado con Claude (prompt #24 en docs/ia/prompts.md). Revisado por: pendiente
+  // [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
   // Alta médica y cierre de un seguimiento (issue 24).
   registrarAlta: (
     seguimientoId: Identifier,
@@ -78,7 +77,6 @@ export const dataProvider = {
       `${import.meta.env.VITE_BACKEND}/seguimientos/${encodeURIComponent(seguimientoId)}/cerrar`,
       { method: "PUT" },
     ).then(({ json }) => json as RaRecord),
-  // [IA] Generado con Claude (prompt #17 en docs/ia/prompts.md). Revisado por: pendiente
   // Cierre del pase de lista (issue 17): faltas para quien no tiene registro y seguimientos para quien los genera.
   cerrarPaseLista: (datos: { fecha: string; turno: string }) =>
     fetchJsonUtil(`${import.meta.env.VITE_BACKEND}/cierres`, {
@@ -88,7 +86,6 @@ export const dataProvider = {
       ({ json }) =>
         json as { cierre: RaRecord; faltas: number; seguimientos: number },
     ),
-  // [IA] Generado con Claude (prompt #16 en docs/ia/prompts.md). Revisado por: pendiente
   // Salida con tutor autorizado (issue 16). El día es hoy: lo calcula el backend.
   registrarSalida: (
     infanteId: Identifier,
@@ -98,7 +95,7 @@ export const dataProvider = {
       `${import.meta.env.VITE_BACKEND}/pase-lista/${encodeURIComponent(infanteId)}/salida`,
       { method: "PUT", body: JSON.stringify(datos) },
     ).then(({ json }) => json as RaRecord),
-  // [IA] Generado con Claude (prompt #22 en docs/ia/prompts.md). Revisado por: pendiente
+  // [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
   // Registrar una llamada de un seguimiento (issue 22): a un tutor o a un contacto de emergencia (solo uno).
   registrarLlamada: (
     seguimientoId: Identifier,
@@ -113,7 +110,7 @@ export const dataProvider = {
       `${import.meta.env.VITE_BACKEND}/seguimientos/${encodeURIComponent(seguimientoId)}/llamadas`,
       { method: "POST", body: JSON.stringify(datos) },
     ).then(({ json }) => json as RaRecord),
-  // [IA] Generado con Claude (prompt #27 en docs/ia/prompts.md). Revisado por: pendiente
+  // [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
   // Tablero semáforo (issue 26/27): una fila anónima por estancia del día pedido (AAAA-MM-DD).
   tablero: (fecha: string) =>
     fetchJsonUtil(

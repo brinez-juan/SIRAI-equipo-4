@@ -26,7 +26,7 @@ const {cifrar, descifrar}=require("./cifrado");
 // Opcional: alActivar: async (fila)=>mensaje|null, revisa antes de activar; si devuelve un mensaje, responde 409.
 // Los nombres de columna solo salen de esa configuración, nunca del request, para no inyectar SQL.
 
-// [IA] Generado con Claude (prompt #7 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Copia de la fila con las columnas cifradas ya descifradas, para responder al cliente.
 // La fila original no se toca: es la que va a la bitácora, que nunca debe guardar texto en claro.
 function paraRespuesta(recurso, fila){
@@ -40,13 +40,11 @@ function paraRespuesta(recurso, fila){
 	return copia;
 }
 
-// [IA] Generado con Claude (prompt #7 en docs/ia/prompts.md). Revisado por: pendiente
 // Valores a escribir en la base: las columnas cifradas se cifran aquí, antes de armar el SQL.
 function valoresParaEscribir(recurso, campos, body){
 	return campos.map(campo=>(recurso.cifrados??[]).includes(campo)?cifrar(body[campo]):body[campo]);
 }
 
-// [IA] Generado con Claude (prompt #9 en docs/ia/prompts.md), modificado con el prompt #10. Revisado por: pendiente
 // Condición extra para recursos porEstancia (solo filas de la estancia del token) o con "alcance" propio.
 function deMiEstancia(recurso, req){
 	if(recurso.alcance){
@@ -55,7 +53,7 @@ function deMiEstancia(recurso, req){
 	return recurso.porEstancia?{sql: " AND estancia_id=?", valores: [req.usuario.estancia_id]}:{sql: "", valores: []};
 }
 
-// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md), modificado con los prompts #9 y #30. Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Filtros de react-admin (?campo=valor), solo sobre columnas conocidas; excluye borrados lógicos.
 // Un campo repetido (?campo=1&campo=2) llega como arreglo y se filtra con IN; antes armaba "campo=1, 2" y daba 500.
 // ?q= busca texto en las columnas de "busqueda"; %, _ y \ se escapan para que el usuario no arme comodines.
@@ -78,7 +76,6 @@ function filtros(recurso, query, req){
 	return {where: " WHERE "+condiciones.join(" AND ")+estancia.sql, valores: [...valores, ...estancia.valores]};
 }
 
-// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md), modificado con el prompt #9. Revisado por: pendiente
 // En recursos porEstancia, un id de otra estancia se comporta como si no existiera (404).
 async function buscarPorId(recurso, id, req){
 	let estancia=deMiEstancia(recurso, req);
@@ -86,7 +83,7 @@ async function buscarPorId(recurso, id, req){
 	return data[0];
 }
 
-// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Lista paginada y ordenada (?_sort=&_order=&_start=&_end=); el total va en X-Total-Count
 async function getList(recurso, req, res){
 	let sortBy=recurso.lectura.includes(req.query._sort)?req.query._sort:"id";
@@ -105,7 +102,6 @@ async function getList(recurso, req, res){
 	res.json(data.map(fila=>paraRespuesta(recurso, fila)));
 }
 
-// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
 // Varios registros por id (?id=1&id=2)
 // Modificado con el prompt #41: en un recurso reactivable también trae los desactivados, para que una referencia
 // (la región de una estancia desactivada, la estancia de un usuario) siga mostrando su nombre.
@@ -117,7 +113,6 @@ async function getMany(recurso, req, res){
 	res.json(data.map(fila=>paraRespuesta(recurso, fila)));
 }
 
-// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
 // Registros que apuntan a otro (?estancia_id=3), sin paginar
 async function getManyReference(recurso, req, res){
 	let {where, valores}=filtros(recurso, req.query, req);
@@ -127,7 +122,6 @@ async function getManyReference(recurso, req, res){
 	res.json(data.map(fila=>paraRespuesta(recurso, fila)));
 }
 
-// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
 async function getOne(recurso, id, req, res){
 	let data=await buscarPorId(recurso, id, req);
 	if(data==null){
@@ -137,7 +131,7 @@ async function getOne(recurso, id, req, res){
 	}
 }
 
-// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md), modificado con el prompt #10. Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Solo actualiza las columnas permitidas y guarda en la bitácora el antes y el después
 async function updateData(recurso, id, req, res){
 	let invalido=recurso.validar?.(req, false);
@@ -159,7 +153,7 @@ async function updateData(recurso, id, req, res){
 	res.json(paraRespuesta(recurso, data));
 }
 
-// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Borrado lógico: solo llena deleted_at, el registro sigue en la tabla
 // Modificado con el prompt #41: si el recurso tiene alBorrar y devuelve un mensaje, no se borra (409).
 async function deleteData(recurso, id, req, res){
@@ -176,7 +170,7 @@ async function deleteData(recurso, id, req, res){
 	res.json(paraRespuesta(recurso, antes));
 }
 
-// [IA] Generado con Claude (prompt #41 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Deshace el borrado lógico de un recurso reactivable: limpia deleted_at. 404 si no existe o no está desactivado;
 // 409 si alActivar lo impide (por ejemplo, una estancia cuya región sigue desactivada).
 async function activarData(recurso, id, req, res){
@@ -196,7 +190,7 @@ async function activarData(recurso, id, req, res){
 	res.json(paraRespuesta(recurso, data));
 }
 
-// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md), modificado con los prompts #9 y #10. Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // id (uuid) y estancia_id (porEstancia) los pone el servidor; lo que mande el request
 // en esos campos se ignora. Con "alCrear", el INSERT y las filas extra van en una transacción: o se guardan todas o ninguna.
 async function createData(recurso, req, res){
@@ -244,7 +238,7 @@ async function createData(recurso, req, res){
 	res.status(201).json(paraRespuesta(recurso, data));
 }
 
-// [IA] Generado con Claude (prompt #1 en docs/ia/prompts.md), modificado con el prompt #9. Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Registra en el router las 5 rutas de react-admin para un recurso, protegidas por sus roles.
 // GET para "roles"; POST, PUT y DELETE solo para "escritura" (si se indica).
 // Modificado con el prompt #41: un recurso reactivable agrega POST /<nombre>/:id/activar, también solo para "escritura".

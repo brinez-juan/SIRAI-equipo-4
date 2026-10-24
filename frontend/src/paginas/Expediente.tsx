@@ -74,7 +74,7 @@ type DatosExpediente = {
   seguimientos: Caso[];
 };
 
-// [IA] Generado con Claude (prompt #25 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Al imprimir solo sale el expediente: se ocultan la barra, el menú y los botones, y todo va en negro sobre
 // blanco aunque la app esté en modo oscuro. Cada caso intenta no partirse entre dos hojas.
 const estilosImpresion = (
@@ -104,7 +104,7 @@ const estilosImpresion = (
   />
 );
 
-// [IA] Generado con Claude (prompt #25 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 const Dato = ({
   etiqueta,
   children,
@@ -117,7 +117,7 @@ const Dato = ({
   </Typography>
 );
 
-// [IA] Generado con Claude (prompt #25 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Un caso de seguimiento dentro del expediente: falta, causa, llamadas y alta.
 const CasoDelExpediente = ({
   caso,
@@ -201,7 +201,7 @@ const CasoDelExpediente = ({
   </Box>
 );
 
-// [IA] Generado con Claude (prompt #25 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Expediente imprimible de un infante (issue 25): todos sus seguimientos (también los cerrados) con sus
 // llamadas, causa y alta. "Imprimir / Guardar PDF" usa window.print(); el navegador permite guardarlo como
 // PDF. No se usa ninguna librería de PDF. Habla con GET /infantes/:id/expediente (TS, MEDICO y DIRECTORA).

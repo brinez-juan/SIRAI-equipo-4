@@ -9,14 +9,12 @@ const RESULTADOS=["CONTACTO_EXITOSO", "SIN_RESPUESTA", "NUMERO_EQUIVOCADO", "BUZ
 const HORAS_REINTENTO=4;
 const MAX_NOTAS=2000;
 
-// [IA] Generado con Claude (prompt #22 en docs/ia/prompts.md). Revisado por: pendiente
 // Mismos roles que la bandeja de seguimiento (rutas/seguimientos.js, issue 20). El token debe traer estancia.
 const acceso=[
 	permitir("TRABAJO_SOCIAL", "MEDICO", "DIRECTORA"),
 	(req, res, next)=>req.usuario.estancia_id==null?res.sendStatus(403):next()
 ];
 
-// [IA] Generado con Claude (prompt #22 en docs/ia/prompts.md). Revisado por: pendiente
 // Revisa el body: exactamente uno de tutor_id o contacto_emergencia_id (chk_un_destinatario),
 // resultado del ENUM y notas opcionales como texto. Devuelve un mensaje o null.
 function validarLlamada(cuerpo){
@@ -37,7 +35,7 @@ function validarLlamada(cuerpo){
 	return null;
 }
 
-// [IA] Generado con Claude (prompt #22 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Registra una llamada de un seguimiento de mi estancia, todo en una transacción:
 //   - intento = último + 1 (FOR UPDATE sobre el seguimiento: dos llamadas a la vez no toman el mismo número);
 //   - el destinatario debe ser un tutor vinculado o un contacto de emergencia del infante del seguimiento;

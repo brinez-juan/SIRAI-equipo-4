@@ -34,7 +34,6 @@ type Corte = "HOY" | "MES" | "TRIMESTRE";
 // Fecha de hoy en la zona de la estancia, como "AAAA-MM-DD" (en-CA da ese formato).
 const hoy = () => new Date().toLocaleDateString("en-CA", { timeZone: ZONA });
 
-// [IA] Generado con Claude (prompt #28 en docs/ia/prompts.md). Revisado por: pendiente
 // Rango {desde, hasta} de cada corte, de su primer día a hoy. El trimestre es el de calendario:
 // enero-marzo, abril-junio, julio-septiembre u octubre-diciembre.
 const rangoDelCorte = (corte: Corte) => {
@@ -56,7 +55,7 @@ const CORTES: { corte: Corte; etiqueta: string }[] = [
   { corte: "TRIMESTRE", etiqueta: "Este trimestre" },
 ];
 
-// [IA] Generado con Claude (prompt #28 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Al imprimir solo sale el reporte: se ocultan la barra, el menú y los controles, y todo va en negro sobre blanco
 // aunque la app esté en modo oscuro.
 const estilosImpresion = (
@@ -85,7 +84,7 @@ const estilosImpresion = (
   />
 );
 
-// [IA] Generado con Claude (prompt #28 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Cortes de asistencia (issue 28): botones Hoy, Este mes y Este trimestre que calculan el rango (o un rango a mano),
 // una tabla por estancia y día con los totales por estado, la descarga en CSV para Excel y la impresión a PDF con
 // window.print(). Habla con GET /reportes/asistencia; el backend decide qué estancias ve cada rol
@@ -117,7 +116,7 @@ export const Reportes = () => {
       });
   }, [consulta, logoutIfAccessDenied]);
 
-  // [IA] Generado con Claude (prompt #28 en docs/ia/prompts.md). Revisado por: pendiente
+  // [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
   // Pide el CSV con el token (un enlace directo no lo llevaría) y lo guarda como archivo.
   // fetch quita el BOM al leer el texto; se vuelve a poner para que Excel respete los acentos.
   const descargarCsv = () => {

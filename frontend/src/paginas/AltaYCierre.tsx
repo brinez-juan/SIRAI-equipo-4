@@ -30,6 +30,9 @@ type Seguimiento = {
   estado: string;
   cerrado_en: string | null;
   causa: { nombre: string; requiere_alta: number } | null;
+  // Falta justificada (feature 42): no se clasifica, basta con registrar una llamada para cerrar
+  asistencia: { justificacion: object | null };
+  llamadas: unknown[];
   alta: {
     folio_justificante: string | null;
     emitida_en: string;
@@ -51,11 +54,12 @@ const fechaHora = (valor: string) =>
     timeZone: "America/Mexico_City",
   });
 
-// [IA] Generado con Claude (prompt #24 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Secciones "Alta médica" y "Cierre del caso" para Seguimiento.tsx (issue 21). La alta la registran MEDICO y
 // DIRECTORA (folio y observaciones confidenciales) y quita el candado "Requiere alta para ingresar" del pase de lista.
 // El caso se cierra con confirmación; el botón explica con texto por qué no se puede cerrar (sin clasificar o sin
 // la alta que pide su causa). El backend valida lo mismo y responde 409 con su mensaje.
+// Modificado con el prompt #45: una falta justificada no se clasifica y se puede cerrar desde que tiene una llamada.
 export const AltaYCierre = ({ seguimiento, alActualizar }: Props) => {
   const { permissions: rol } = usePermissions();
   const api = useDataProvider<typeof dataProvider>();
@@ -93,12 +97,15 @@ export const AltaYCierre = ({ seguimiento, alActualizar }: Props) => {
         ? `Máximo ${MAX_OBSERVACIONES} caracteres`
         : "",
   };
+  const justificada = seguimiento.asistencia.justificacion != null;
   const motivoNoCerrar =
-    causa == null
-      ? "Clasifique la causa antes de cerrar el caso."
-      : requiereAlta && alta == null
-        ? "La causa requiere alta médica: no se puede cerrar el caso sin ella."
-        : "";
+    justificada && seguimiento.llamadas.length == 0
+      ? "Registre la llamada antes de cerrar el caso."
+      : causa == null
+        ? "Clasifique la causa antes de cerrar el caso."
+        : requiereAlta && alta == null
+          ? "La causa requiere alta médica: no se puede cerrar el caso sin ella."
+          : "";
 
   const registrarAlta = async (evento: FormEvent) => {
     evento.preventDefault();

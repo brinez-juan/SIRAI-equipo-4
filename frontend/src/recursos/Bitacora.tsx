@@ -41,7 +41,6 @@ const ROLES = [
 const NOMBRE_ACCION = Object.fromEntries(ACCIONES.map((a) => [a.id, a.name]));
 const NOMBRE_ROL = Object.fromEntries(ROLES.map((r) => [r.id, r.name]));
 
-// [IA] Generado con Claude (prompt #29 en docs/ia/prompts.md). Revisado por: pendiente
 // ts se guarda en UTC; se muestra en la hora de México con segundos (la bitácora es fina).
 const fechaHora = (valor: string) =>
   new Date(valor).toLocaleString("es-MX", {
@@ -54,14 +53,12 @@ const fechaHora = (valor: string) =>
     second: "2-digit",
   });
 
-// [IA] Generado con Claude (prompt #29 en docs/ia/prompts.md). Revisado por: pendiente
 // "Inicio de sesión (LOGIN)": nombre legible y el código tal como queda en la base.
 const accionLegible = (registro: RaRecord) =>
   NOMBRE_ACCION[registro.accion]
     ? `${NOMBRE_ACCION[registro.accion]} (${registro.accion})`
     : registro.accion;
 
-// [IA] Generado con Claude (prompt #29 en docs/ia/prompts.md). Revisado por: pendiente
 // usuario_id NULL = proceso del sistema (ej. el cierre automático del issue 18).
 const quien = (registro: RaRecord) =>
   registro.usuario_id == null
@@ -102,7 +99,6 @@ const filtros = [
   />,
 ];
 
-// [IA] Generado con Claude (prompt #29 en docs/ia/prompts.md). Revisado por: pendiente
 // Visor de la bitácora (issue 29), solo ADMIN_CENTRAL y solo lectura: lista de lo más reciente a lo más antiguo
 // con filtros por usuario, acción y fechas (más rol y entidad). Clic en un renglón abre el detalle. Sirve para
 // mostrar en la presentación que cada petición autenticada queda registrada.
@@ -142,7 +138,7 @@ export const ListarBitacora = () => (
   </List>
 );
 
-// [IA] Generado con Claude (prompt #29 en docs/ia/prompts.md). Revisado por: pendiente
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Muestra un JSON (antes / después) con sangría; los campos cifrados llegan del backend como "[cifrado]".
 const Json = ({ valor }: { valor: unknown }) =>
   valor == null ? (
@@ -164,7 +160,6 @@ const Json = ({ valor }: { valor: unknown }) =>
     </Box>
   );
 
-// [IA] Generado con Claude (prompt #29 en docs/ia/prompts.md). Revisado por: pendiente
 // Detalle de un registro: quién, qué, cuándo, desde dónde, antes/después y la cadena de hashes
 // (hash = SHA-256(hash_prev + registro), ver log() en backend/seguridad.js).
 export const VerBitacora = () => (
