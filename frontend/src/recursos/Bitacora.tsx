@@ -99,7 +99,6 @@ const filtros = [
   />,
 ];
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Visor de la bitácora (issue 29), solo ADMIN_CENTRAL y solo lectura: lista de lo más reciente a lo más antiguo
 // con filtros por usuario, acción y fechas (más rol y entidad). Clic en un renglón abre el detalle. Sirve para
 // mostrar en la presentación que cada petición autenticada queda registrada.
@@ -161,7 +160,6 @@ const Json = ({ valor }: { valor: unknown }) =>
     </Box>
   );
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Detalle de un registro: quién, qué, cuándo, desde dónde, antes/después y la cadena de hashes
 // (hash = SHA-256(hash_prev + registro), ver log() en backend/seguridad.js).
 export const VerBitacora = () => (
