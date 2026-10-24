@@ -22,7 +22,6 @@ import {
 
 const DUPLICADO = "Ya existe una región con ese nombre.";
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Al crear solo hay guardar.
 const BarraGuardar = () => (
   <Toolbar>
@@ -30,7 +29,6 @@ const BarraGuardar = () => (
   </Toolbar>
 );
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Al editar, además, "Desactivar" (borrado lógico) con confirmación. pessimistic: si el backend responde 409
 // (tiene estancias o supervisores activos), la región sigue en pantalla y el aviso muestra el mensaje del backend.
 const BarraEditar = () => (
@@ -45,7 +43,6 @@ const BarraEditar = () => (
   </Toolbar>
 );
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Mismos límites que la columna regiones.nombre en schema.sql.
 const FormularioRegion = ({ editando = false }: { editando?: boolean }) => (
   <SimpleForm toolbar={editando ? <BarraEditar /> : <BarraGuardar />}>
@@ -57,7 +54,6 @@ const FormularioRegion = ({ editando = false }: { editando?: boolean }) => (
   </SimpleForm>
 );
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Con "Mostrar desactivadas" los renglones no abren Editar y llevan el botón Activar.
 const TablaRegiones = () => {
   const desactivadas = useMostrandoDesactivadas();
@@ -77,14 +73,12 @@ const TablaRegiones = () => {
   );
 };
 
-// [IA+Humano] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 export const ListarRegiones = () => (
   <List sort={{ field: "nombre", order: "ASC" }} filters={[filtroDesactivadas]}>
     <TablaRegiones />
   </List>
 );
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 export const CrearRegion = () => {
   const onError = useErrorAlGuardar(DUPLICADO);
   return (
@@ -94,7 +88,6 @@ export const CrearRegion = () => {
   );
 };
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // pessimistic: espera la respuesta del backend antes de mostrar el cambio, así un 409 no deja datos falsos en pantalla.
 export const EditarRegion = () => {
   const onError = useErrorAlGuardar(DUPLICADO);

@@ -1,13 +1,12 @@
 const {db, uuidv7}=require("./db");
 const {log}=require("./seguridad");
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Fecha de hoy (AAAA-MM-DD) en la hora local de México, que es el "día" de asistencias.fecha.
 function hoy(){
 	return new Intl.DateTimeFormat("en-CA", {timeZone: "America/Mexico_City"}).format(new Date());
 }
 
-// [IA+Humano] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Cierra el pase de lista de un día y turno de una estancia, todo en una transacción (si algo falla no se guarda nada):
 //  1. Inserta el cierre. Va primero a propósito: el registro de asistencia del issue 13 toma un FOR SHARE sobre
 //     esta llave, así que el cierre espera a que terminen los registros en curso y los posteriores reciben 409.
@@ -118,7 +117,6 @@ async function cerrarTurnosVencidos(){
 	}
 }
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Revisa cada minuto si hay turnos por cerrar. Si una vuelta tarda más de un minuto, la siguiente se salta.
 function iniciarCierreAutomatico(){
 	let enCurso=false;

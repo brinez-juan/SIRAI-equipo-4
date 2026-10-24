@@ -23,7 +23,6 @@ const HORA = {
   timeZone: "America/Mexico_City",
 } as const;
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // El backend manda la fecha como "AAAA-MM-DD" (es un DATE); se muestra como DD/MM/AAAA sin pasar por Date,
 // así no se corre un día por la zona horaria.
 const fechaLegible = (asistencia: RaRecord) =>
@@ -44,7 +43,6 @@ const filtros = [
   />,
 ];
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Motivo de un ausente justificado y, debajo, la nota (el backend solo la manda a DIRECTORA, TRABAJO_SOCIAL y MEDICO).
 const Motivo = ({ asistencia }: { asistencia: RaRecord }) =>
   asistencia.justificacion_causa_nombre ? (
@@ -62,7 +60,6 @@ const Motivo = ({ asistencia }: { asistencia: RaRecord }) =>
     <>—</>
   );
 
-// [IA+Humano] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Historial de solo lectura para todos los roles de estancia; el backend siempre filtra por la estancia del token.
 // El estado se muestra con su nombre (texto), no solo con color. "Motivo": por qué se justificó la falta.
 export const ListarAsistencias = () => (

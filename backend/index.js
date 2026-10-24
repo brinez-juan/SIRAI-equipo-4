@@ -61,7 +61,7 @@ app.use(rutasTablero);
 app.use(rutasReportes);
 app.use(rutasBitacora);
 
-// [Humano] Escrito por: pendiente. Arranque HTTPS del servidor con los certificados backend.key y backend.crt
+// Arranque HTTPS del servidor con los certificados backend.key y backend.crt
 const options={
 	key: fs.readFileSync("backend.key"),
 	cert: fs.readFileSync("backend.crt")

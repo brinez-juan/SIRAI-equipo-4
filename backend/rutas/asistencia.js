@@ -18,14 +18,13 @@ const LEEN_NOTA=["DIRECTORA", "TRABAJO_SOCIAL", "MEDICO"];
 // notifica a emergencia), que es justo cuando nadie avisó.
 const MOTIVOS="SELECT codigo, nombre FROM causas_inasistencia WHERE notifica_emergencia=0 ORDER BY nombre";
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
+
 // Tabla 2.5 del plan: DOCENTE y DIRECTORA pasan lista; TRABAJO_SOCIAL y MEDICO solo consultan.
 // El token debe traer estancia: la estancia nunca sale del request.
 const conEstancia=(req, res, next)=>req.usuario.estancia_id==null?res.sendStatus(403):next();
 const lectura=[permitir("DOCENTE", "DIRECTORA", "TRABAJO_SOCIAL", "MEDICO"), conEstancia];
 const escritura=[permitir("DOCENTE", "DIRECTORA"), conEstancia];
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Revisa fecha (AAAA-MM-DD y que exista en el calendario) y turno. Devuelve un mensaje o null.
 function validarDia(fecha, turno){
 	if(typeof fecha!="string" || !/^\d{4}-\d{2}-\d{2}$/.test(fecha) || new Date(fecha+"T00:00:00Z").toISOString().slice(0, 10)!=fecha){
@@ -37,14 +36,12 @@ function validarDia(fecha, turno){
 	return null;
 }
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // La asistencia solo puede usar un turno que la estancia opere (fk_asistencia_turno).
 async function operaTurno(conexion, estanciaId, turno){
 	let [filas]=await conexion.query("SELECT 1 FROM estancia_turnos WHERE estancia_id=? AND turno=? AND deleted_at IS NULL", [estanciaId, turno]);
 	return filas.length>0;
 }
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // FOR SHARE: dentro de una transacción bloquea la llave (estancia, fecha, turno) del cierre, así el cierre
 // (issue 17) espera a que termine este registro y no se cuela una asistencia después de cerrar.
 async function estaCerrado(conexion, estanciaId, fecha, turno, bloquear){
@@ -55,7 +52,6 @@ async function estaCerrado(conexion, estanciaId, fecha, turno, bloquear){
 	return filas.length>0;
 }
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 async function buscarAsistencia(conexion, estanciaId, infanteId, fecha, turno){
 	let [filas]=await conexion.query(
 		"SELECT "+COLUMNAS+" FROM asistencias WHERE estancia_id=? AND infante_id=? AND fecha=? AND turno=? AND deleted_at IS NULL",
@@ -97,7 +93,6 @@ function justificacionDe(fila, usuario, nombres){
 	return justificacion;
 }
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // {codigo: nombre} de los motivos con los que se puede justificar.
 async function nombresDeMotivos(conexion){
 	let [motivos]=await conexion.query(MOTIVOS);
@@ -129,7 +124,6 @@ async function registrarLecturaDeNotas(req, asistenciaIds){
 	}
 }
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Corre fn(conexion) en una transacción; si algo falla no se guarda nada.
 async function enTransaccion(fn){
 	let conexion=await db.getConnection();
@@ -146,7 +140,7 @@ async function enTransaccion(fn){
 	}
 }
 
-// [IA+Humano] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Infantes de mi estancia, cada uno con su asistencia de ese día y turno (o null), y si el turno ya se cerró.
 // requiere_alta: el candado del issue 24 está activo y no se le puede marcar PRESENTE.
 // Feature 42: cada asistencia trae su justificación (ver justificacionDe) y la respuesta trae motivos_justificacion,
@@ -201,7 +195,7 @@ router.get("/pase-lista", lectura, async (req, res)=>{
 	}
 });
 
-// [IA+Humano] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Registra o corrige la asistencia de un infante: upsert sobre uq_asistencia_dia (estancia, infante, fecha, turno).
 // PRESENTE pone hora_entrada (si ya la tenía, se conserva la primera); cualquier otro estado la deja en NULL.
 // Si el infante tiene el candado del issue 24, PRESENTE responde 409 "Requiere alta para ingresar."
@@ -279,7 +273,7 @@ router.put("/pase-lista/:infanteId", escritura, async (req, res)=>{
 	}
 });
 
-// [IA+Humano] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Marca PRESENTE a todos los infantes de mi estancia que aún no tienen registro ese día y turno;
 // los que ya tienen uno (cualquier estado) no se tocan, y los que tienen el candado del issue 24 se saltan.
 // Body: {fecha, turno}. Responde {marcados, requieren_alta} (cuántos se saltaron por el candado).

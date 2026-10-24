@@ -5,7 +5,6 @@ const {cifrar, descifrar}=require("../cifrado");
 
 const router=express.Router();
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Tabla 2.5 del plan: TRABAJO_SOCIAL, MEDICO y DIRECTORA llevan los seguimientos; DOCENTE no ve notas ni
 // seguimientos. El token debe traer estancia: la estancia nunca sale del request.
 const conEstancia=(req, res, next)=>req.usuario.estancia_id==null?res.sendStatus(403):next();
@@ -147,13 +146,11 @@ router.get("/seguimientos/:id", acceso, async (req, res)=>{
 const CLASIFICABLES=["ABIERTO", "EN_CONTACTO", "CLASIFICADO"];
 const MAX_DETALLE=2000;
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Fecha AAAA-MM-DD que exista en el calendario.
 function esFecha(texto){
 	return typeof texto=="string" && /^\d{4}-\d{2}-\d{2}$/.test(texto) && new Date(texto+"T00:00:00Z").toISOString().slice(0, 10)==texto;
 }
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Revisa el body de clasificar. detalle y fecha_probable_retorno son opcionales (null o vacío = sin dato).
 // Exigir texto evita que un objeto o arreglo llegue a la consulta SQL.
 function validarClasificacion(cuerpo){
@@ -254,7 +251,6 @@ async function enTransaccion(fn){
 	}
 }
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Alta médica vigente de un seguimiento (la que no tiene borrado lógico), o undefined.
 async function buscarAlta(conexion, seguimientoId){
 	let [altas]=await conexion.query(

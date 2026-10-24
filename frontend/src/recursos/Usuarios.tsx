@@ -41,7 +41,6 @@ const ROLES = [
 // Roles que llevan estancia (chk_usuarios_alcance); SUPERVISOR lleva región; ADMIN_CENTRAL ninguna
 const ROLES_ESTANCIA = ["DOCENTE", "TRABAJO_SOCIAL", "MEDICO", "DIRECTORA"];
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Antes de enviar, limpia la estancia o región que no le toca al rol (por si se cambió de rol
 // en el formulario) para no chocar con chk_usuarios_alcance en el backend.
 const ajustarAlcance = (data: RaRecord) => ({
@@ -85,7 +84,6 @@ const BotonActivo = () => {
   );
 };
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 export const listarUsuarios = () => (
   <List sort={{ field: "nombre", order: "ASC" }}>
     <Datagrid rowClick="edit" bulkActionButtons={false}>
@@ -117,7 +115,6 @@ export const listarUsuarios = () => (
   </List>
 );
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Muestra estancia o región según el rol elegido en el formulario
 const CamposAlcance = () => {
   const rol = useWatch({ name: "rol" });
@@ -152,7 +149,6 @@ const CamposAlcance = () => {
   return null;
 };
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Campos comunes de crear y editar. Al crear la contraseña es obligatoria; al editar, vacía = no cambia.
 const CamposUsuario = ({ esNuevo }: { esNuevo: boolean }) => (
   <>
@@ -193,7 +189,6 @@ const BarraEditar = () => (
   </Toolbar>
 );
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 export const crearUsuario = () => (
   <Create transform={ajustarAlcance} redirect="list">
     <SimpleForm>
@@ -202,7 +197,6 @@ export const crearUsuario = () => (
   </Create>
 );
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // pessimistic: espera la respuesta del backend para mostrar sus mensajes (rol/alcance, correo repetido)
 export const editarUsuario = () => (
   <Edit

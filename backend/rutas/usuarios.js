@@ -15,7 +15,7 @@ const SELECT="SELECT "+LECTURA.map(campo=>mysql.escapeId(campo)).join(", ")+" FR
 // Columnas que el administrador puede escribir. La contraseña llega aparte como "password".
 const ESCRITURA=["nombre", "primer_apellido", "segundo_apellido", "correo", "rol", "estancia_id", "region_id", "activo"];
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
+
 // Errores propios de usuarios con mensaje para react-admin ({message}); el resto va a responderError.
 function errorUsuario(res, error){
 	if(error.code=="ER_CHECK_CONSTRAINT_VIOLATED" && error.message.includes("chk_usuarios_alcance")){
@@ -42,13 +42,11 @@ function filtros(query){
 	return {where: " WHERE "+condiciones.join(" AND "), valores};
 }
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 async function buscarPorId(id){
 	let [data]=await db.query(SELECT+" WHERE id=? AND deleted_at IS NULL", [id]);
 	return data[0];
 }
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Toma del body solo las columnas permitidas; si viene "password" la hashea con argon2id.
 // Devuelve null si la contraseña viene pero no es un texto no vacío.
 async function camposDelBody(body){

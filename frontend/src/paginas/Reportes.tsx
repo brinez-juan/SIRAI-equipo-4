@@ -34,7 +34,6 @@ type Corte = "HOY" | "MES" | "TRIMESTRE";
 // Fecha de hoy en la zona de la estancia, como "AAAA-MM-DD" (en-CA da ese formato).
 const hoy = () => new Date().toLocaleDateString("en-CA", { timeZone: ZONA });
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Rango {desde, hasta} de cada corte, de su primer día a hoy. El trimestre es el de calendario:
 // enero-marzo, abril-junio, julio-septiembre u octubre-diciembre.
 const rangoDelCorte = (corte: Corte) => {

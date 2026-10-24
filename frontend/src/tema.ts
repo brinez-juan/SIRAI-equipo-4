@@ -9,7 +9,6 @@ import type { Preferencias } from "./preferencias";
 // Tema de MUI que recibe <Admin>. Parte de los temas de react-admin con la paleta guinda del Figma v3
 // (página 00, colección «SIRAI · Colores»). Las preferencias de accesibilidad se aplican encima.
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Variables de color del Figma. Si un color cambia en el Figma, se cambia aquí y en ningún otro lado:
 // ninguna pantalla escribe colores, todas usan las claves del tema (color="error", text.secondary…).
 export const COLORES = {
@@ -173,7 +172,6 @@ const temaGuinda: RaThemeOptions = {
   },
 };
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Colores del modo oscuro. El Figma no tiene versión oscura: se midieron contra el fondo #313131 de
 // react-admin. Sobre el guinda claro el texto va en negro (10.35:1); en blanco sería 2.03:1.
 const OSCURO = {
@@ -359,7 +357,6 @@ const conPreferencias = (
   };
 };
 
-// [IA+Humano] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 export const crearTema = (prefs: Preferencias): RaThemeOptions =>
   conPreferencias(
     prefs.contraste == "alto" ? temaAltoContraste : temaGuinda,
@@ -367,7 +364,6 @@ export const crearTema = (prefs: Preferencias): RaThemeOptions =>
     "claro",
   );
 
-// [IA+Humano] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Con alto contraste no hay tema oscuro (no se diseñó): App.tsx pasa darkTheme={null}.
 export const crearTemaOscuro = (prefs: Preferencias): RaThemeOptions =>
   conPreferencias(temaGuindaOscuro, prefs, "oscuro");

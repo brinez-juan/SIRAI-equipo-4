@@ -8,7 +8,6 @@ const router=express.Router();
 const UMBRAL_VERDE=90;
 const UMBRAL_AMARILLO=75;
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Solo SUPERVISOR (su región) y ADMIN_CENTRAL (todas). Un SUPERVISOR sin región se rechaza con 403: el esquema
 // (chk_usuarios_alcance) lo permite, y tratarlo como "sin filtro" le mostraría todas las estancias.
 const acceso=[
@@ -21,7 +20,6 @@ function hoy(){
 	return new Intl.DateTimeFormat("en-CA", {timeZone: "America/Mexico_City"}).format(new Date());
 }
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // El color sale del porcentaje exacto, no del redondeado. Sin infantes no hay porcentaje: SIN_DATOS.
 function semaforo(total, presentes){
 	if(total==0){
@@ -31,7 +29,6 @@ function semaforo(total, presentes){
 	return porcentaje>=UMBRAL_VERDE?"VERDE":porcentaje>=UMBRAL_AMARILLO?"AMARILLO":"ROJO";
 }
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Porcentaje con un decimal, truncado y no redondeado: 89.96 % se muestra 89.9 y no 90.0, así el número que se ve
 // nunca contradice el color. null si la estancia no tiene infantes.
 function porcentaje(total, presentes){

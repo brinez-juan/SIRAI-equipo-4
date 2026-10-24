@@ -9,14 +9,12 @@ const RESULTADOS=["CONTACTO_EXITOSO", "SIN_RESPUESTA", "NUMERO_EQUIVOCADO", "BUZ
 const HORAS_REINTENTO=4;
 const MAX_NOTAS=2000;
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Mismos roles que la bandeja de seguimiento (rutas/seguimientos.js, issue 20). El token debe traer estancia.
 const acceso=[
 	permitir("TRABAJO_SOCIAL", "MEDICO", "DIRECTORA"),
 	(req, res, next)=>req.usuario.estancia_id==null?res.sendStatus(403):next()
 ];
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Revisa el body: exactamente uno de tutor_id o contacto_emergencia_id (chk_un_destinatario),
 // resultado del ENUM y notas opcionales como texto. Devuelve un mensaje o null.
 function validarLlamada(cuerpo){

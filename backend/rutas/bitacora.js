@@ -16,7 +16,7 @@ const EXACTOS=["usuario_id", "accion", "rol", "entidad_id"];
 // Ciudad de México no tiene horario de verano desde 2022: el día local va de 06:00 a 06:00 UTC
 const DESFASE_MX="-06:00";
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
+
 // Convierte "AAAA-MM-DD" (día en la hora de México) al instante UTC en que empieza; null si no es una fecha válida.
 function inicioDelDia(fecha){
 	if(typeof fecha!="string" || !/^\d{4}-\d{2}-\d{2}$/.test(fecha)){
@@ -44,7 +44,6 @@ function ocultarCifrados(valor){
 	return copia;
 }
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 function paraRespuesta(fila){
 	return {...fila, antes: ocultarCifrados(fila.antes), despues: ocultarCifrados(fila.despues)};
 }

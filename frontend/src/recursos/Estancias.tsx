@@ -102,7 +102,6 @@ const TablaEstancias = () => {
   );
 };
 
-// [IA+Humano] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 export const ListarEstancias = () => (
   <List sort={{ field: "clave", order: "ASC" }} filters={[filtroDesactivadas]}>
     <TablaEstancias />

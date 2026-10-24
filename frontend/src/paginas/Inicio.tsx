@@ -12,7 +12,6 @@ const ROLES: Record<string, string> = {
   DOCENTE: "Docente",
 };
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Pantalla de inicio: confirma quién entró y con qué rol; el menú de la izquierda ya viene filtrado.
 // Modificado con el prompt #27: para SUPERVISOR y ADMIN_CENTRAL la pantalla principal es el tablero semáforo.
 export const Inicio = () => {

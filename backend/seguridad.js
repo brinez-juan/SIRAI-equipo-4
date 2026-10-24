@@ -88,7 +88,6 @@ function permitir(...roles){
 	};
 }
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Guarda en audit_log cada petición autenticada cuando termina, con su código de respuesta.
 // Así ningún endpoint se queda sin logging aunque su autor no llame a log().
 function registrarPeticion(req, res, next){

@@ -86,11 +86,9 @@ const REQUIERE_ALTA = "Requiere alta para ingresar.";
 // asistencias.fecha es el día local de la estancia
 const ZONA = "America/Mexico_City";
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Fecha de hoy en la zona de la estancia, como "AAAA-MM-DD" (en-CA da ese formato).
 const hoy = () => new Date().toLocaleDateString("en-CA", { timeZone: ZONA });
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // "07:32" a partir de la fecha UTC que manda el backend.
 const hora = (valor: string | null) =>
   valor
@@ -101,7 +99,6 @@ const hora = (valor: string | null) =>
       })
     : "";
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Texto del estado actual del renglón: el estado no se comunica solo con color.
 // Un ausente justificado dice también el motivo: "Ausente justificado — Enfermedad en casa".
 const textoEstado = (asistencia: Asistencia | null) => {
@@ -117,7 +114,7 @@ const textoEstado = (asistencia: Asistencia | null) => {
     : nombre;
 };
 
-// [IA+Humano] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
+// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Pase de lista del día (issue 14): fecha de hoy y turno matutino ya seleccionados. El flujo rápido es
 // "Marcar todos presentes" (1 clic) y luego 1 clic por cada excepción. DOCENTE y DIRECTORA capturan;
 // TRABAJO_SOCIAL y MEDICO solo consultan. Habla con GET/PUT /pase-lista y POST /pase-lista/todos-presentes.
@@ -174,7 +171,6 @@ export const PaseLista = () => {
     cargar();
   }, [cargar]);
 
-  // [IA+Humano] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
   // Ausente justificado no se guarda directo: primero abre el diálogo para el motivo.
   const marcar = (infante: Renglon, estado: string) => {
     if (!pase || estado == infante.asistencia?.estado_codigo) {

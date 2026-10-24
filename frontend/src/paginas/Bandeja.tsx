@@ -15,12 +15,11 @@ export const TURNOS: Record<string, string> = {
 };
 export const ZONA = "America/Mexico_City";
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // "AAAA-MM-DD" (un DATE) a DD/MM/AAAA sin pasar por Date, así no se corre un día por la zona horaria.
 export const fechaLegible = (fecha: string | null | undefined) =>
   typeof fecha == "string" ? fecha.split("-").reverse().join("/") : "—";
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
+
 // Fecha y hora (UTC en el backend) en la hora de México: "21/10/2026, 13:40".
 export const fechaHora = (valor: string | null | undefined) =>
   valor
@@ -34,7 +33,7 @@ export const fechaHora = (valor: string | null | undefined) =>
       })
     : "—";
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
+
 export const nombreCompleto = (persona: {
   nombre?: string;
   primer_apellido?: string;
