@@ -16,7 +16,6 @@ const acceso=[
 	(req, res, next)=>req.usuario.rol=="SUPERVISOR" && req.usuario.region_id==null?res.sendStatus(403):next()
 ];
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Fecha de hoy (AAAA-MM-DD) en la hora local de México, que es el "día" de asistencias.fecha.
 function hoy(){
 	return new Intl.DateTimeFormat("en-CA", {timeZone: "America/Mexico_City"}).format(new Date());

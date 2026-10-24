@@ -6,7 +6,6 @@ const router=express.Router();
 const TURNOS=["MATUTINO", "VESPERTINO"];
 const COLUMNAS="id, infante_id, fecha, turno, estado_codigo, hora_entrada, hora_salida, tutor_salida_id";
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Tabla 2.5 del plan: DOCENTE y DIRECTORA registran la salida con tutor. TRABAJO_SOCIAL y MEDICO no.
 // El token debe traer estancia: la estancia nunca sale del request.
 const escritura=[
@@ -14,7 +13,6 @@ const escritura=[
 	(req, res, next)=>req.usuario.estancia_id==null?res.sendStatus(403):next()
 ];
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Fecha de hoy (AAAA-MM-DD) en la hora local de México, que es el "día" de asistencias.fecha. No la manda
 // el cliente: así la salida siempre queda en el mismo día que la entrada y no hay horas de otro día.
 function hoy(){
