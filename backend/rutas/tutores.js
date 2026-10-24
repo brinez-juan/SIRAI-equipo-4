@@ -50,7 +50,6 @@ function validarTutor(req, creando){
 	return null;
 }
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Inserta el consentimiento en la misma transacción que el tutor, con la versión vigente del aviso y el
 // usuario que lo registró (del token). Devuelve la fila para que createData la registre en audit_log.
 async function registrarConsentimiento(conexion, req, tutorId){
@@ -63,7 +62,7 @@ async function registrarConsentimiento(conexion, req, tutorId){
 	return [{tabla: "consentimientos", id: id, fila: {tutor_id: tutorId, version_aviso: VERSION_AVISO, acepta_contacto_telefonico: 1, registrado_por: usuario}}];
 }
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
+
 // DIRECTORA y TRABAJO_SOCIAL gestionan tutores (plan, issue 10). El teléfono se guarda cifrado.
 registrarRecurso(router, "Tutores", {
 	tabla: "tutores",

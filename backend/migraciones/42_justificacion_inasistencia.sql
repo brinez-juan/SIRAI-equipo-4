@@ -1,4 +1,3 @@
--- [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 -- Feature 42: por qué se justificó una inasistencia. Al marcar AUSENTE_JUSTIFICADO en el pase de lista se guarda
 -- el motivo (del catálogo causas_inasistencia) y una nota opcional cifrada con AES-256-GCM (backend/cifrado.js).
 -- Con cualquier otro estado las dos columnas quedan en NULL (lo asegura backend/rutas/asistencia.js).

@@ -40,13 +40,11 @@ function paraRespuesta(recurso, fila){
 	return copia;
 }
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Valores a escribir en la base: las columnas cifradas se cifran aquí, antes de armar el SQL.
 function valoresParaEscribir(recurso, campos, body){
 	return campos.map(campo=>(recurso.cifrados??[]).includes(campo)?cifrar(body[campo]):body[campo]);
 }
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Condición extra para recursos porEstancia (solo filas de la estancia del token) o con "alcance" propio.
 function deMiEstancia(recurso, req){
 	if(recurso.alcance){
@@ -78,7 +76,6 @@ function filtros(recurso, query, req){
 	return {where: " WHERE "+condiciones.join(" AND ")+estancia.sql, valores: [...valores, ...estancia.valores]};
 }
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // En recursos porEstancia, un id de otra estancia se comporta como si no existiera (404).
 async function buscarPorId(recurso, id, req){
 	let estancia=deMiEstancia(recurso, req);
@@ -105,7 +102,6 @@ async function getList(recurso, req, res){
 	res.json(data.map(fila=>paraRespuesta(recurso, fila)));
 }
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Varios registros por id (?id=1&id=2)
 // Modificado con el prompt #41: en un recurso reactivable también trae los desactivados, para que una referencia
 // (la región de una estancia desactivada, la estancia de un usuario) siga mostrando su nombre.
@@ -117,7 +113,6 @@ async function getMany(recurso, req, res){
 	res.json(data.map(fila=>paraRespuesta(recurso, fila)));
 }
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Registros que apuntan a otro (?estancia_id=3), sin paginar
 async function getManyReference(recurso, req, res){
 	let {where, valores}=filtros(recurso, req.query, req);
@@ -127,7 +122,6 @@ async function getManyReference(recurso, req, res){
 	res.json(data.map(fila=>paraRespuesta(recurso, fila)));
 }
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 async function getOne(recurso, id, req, res){
 	let data=await buscarPorId(recurso, id, req);
 	if(data==null){

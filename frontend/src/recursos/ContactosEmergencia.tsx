@@ -43,7 +43,6 @@ const TELEFONO = /^[0-9+()\s-]{7,20}$/;
 
 const VACIO = { nombre: "", parentesco: "", telefono: "", prioridad: "" };
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Primera prioridad libre de 1 a MAX_PRIORIDAD, para sugerirla al agregar un contacto.
 const siguientePrioridad = (contactos: Contacto[]) => {
   const usadas = contactos.map((contacto) => contacto.prioridad);

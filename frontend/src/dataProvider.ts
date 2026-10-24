@@ -15,7 +15,6 @@ const fetchJsonUtil = (url: string, options: fetchUtils.Options = {}) => {
 const tutoresUrl = (infanteId: Identifier) =>
   `${import.meta.env.VITE_BACKEND}/Infantes/${encodeURIComponent(infanteId)}/tutores`;
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Además del CRUD de react-admin, las rutas anidadas /Infantes/:id/tutores (issue 11).
 // Se usan con useDataProvider<typeof dataProvider>().
 export const dataProvider = {
@@ -78,7 +77,6 @@ export const dataProvider = {
       `${import.meta.env.VITE_BACKEND}/seguimientos/${encodeURIComponent(seguimientoId)}/cerrar`,
       { method: "PUT" },
     ).then(({ json }) => json as RaRecord),
-  // [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
   // Cierre del pase de lista (issue 17): faltas para quien no tiene registro y seguimientos para quien los genera.
   cerrarPaseLista: (datos: { fecha: string; turno: string }) =>
     fetchJsonUtil(`${import.meta.env.VITE_BACKEND}/cierres`, {
@@ -88,7 +86,6 @@ export const dataProvider = {
       ({ json }) =>
         json as { cierre: RaRecord; faltas: number; seguimientos: number },
     ),
-  // [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
   // Salida con tutor autorizado (issue 16). El día es hoy: lo calcula el backend.
   registrarSalida: (
     infanteId: Identifier,

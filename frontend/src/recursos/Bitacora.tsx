@@ -41,7 +41,6 @@ const ROLES = [
 const NOMBRE_ACCION = Object.fromEntries(ACCIONES.map((a) => [a.id, a.name]));
 const NOMBRE_ROL = Object.fromEntries(ROLES.map((r) => [r.id, r.name]));
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // ts se guarda en UTC; se muestra en la hora de México con segundos (la bitácora es fina).
 const fechaHora = (valor: string) =>
   new Date(valor).toLocaleString("es-MX", {
@@ -54,14 +53,12 @@ const fechaHora = (valor: string) =>
     second: "2-digit",
   });
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // "Inicio de sesión (LOGIN)": nombre legible y el código tal como queda en la base.
 const accionLegible = (registro: RaRecord) =>
   NOMBRE_ACCION[registro.accion]
     ? `${NOMBRE_ACCION[registro.accion]} (${registro.accion})`
     : registro.accion;
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // usuario_id NULL = proceso del sistema (ej. el cierre automático del issue 18).
 const quien = (registro: RaRecord) =>
   registro.usuario_id == null

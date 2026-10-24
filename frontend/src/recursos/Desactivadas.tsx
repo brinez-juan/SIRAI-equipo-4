@@ -13,7 +13,6 @@ import {
 } from "react-admin";
 import type { dataProvider } from "../dataProvider";
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Interruptor de la lista de regiones y estancias: encendido, el backend responde solo las desactivadas
 // (?desactivadas=true en crud.js).
 export const filtroDesactivadas = (
@@ -25,7 +24,6 @@ export const filtroDesactivadas = (
   />
 );
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // true si la lista está mostrando las desactivadas. Esas no se abren en Editar (el backend responde 404).
 export const useMostrandoDesactivadas = () =>
   !!useListContext().filterValues?.desactivadas;

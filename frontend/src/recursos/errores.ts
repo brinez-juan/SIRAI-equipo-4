@@ -1,6 +1,5 @@
 import { useNotify, type HttpError } from "react-admin";
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Traduce los códigos del backend (responderError en db.js) a un aviso claro al guardar:
 // 409 = dato duplicado, 400 = dato inválido.
 export const useErrorAlGuardar = (duplicado: string) => {

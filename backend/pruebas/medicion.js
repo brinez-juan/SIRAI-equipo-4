@@ -22,7 +22,6 @@ const USUARIO=process.env.USUARIO??"docente@sirai.mx";
 const CLAVE=process.env.CLAVE??"Sirai#2026";
 const TURNO=process.env.TURNO??"MATUTINO";
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // El backend usa un certificado autofirmado, así que se desactiva la verificación TLS, pero solo si el destino es
 // la propia máquina: contra cualquier otro servidor el script se niega a correr.
 const anfitrion=new URL(BASE).hostname;
@@ -175,7 +174,6 @@ async function medirFase(objetivos, segundos, trabajo){
 	return {filas, carga};
 }
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 const f=(numero, decimales=1)=>Number.isNaN(numero)?"n/d":numero.toFixed(decimales);
 
 async function main(){
@@ -250,7 +248,6 @@ async function main(){
 	console.log("- Respuestas 2xx: "+a["2xx"]+" · no 2xx: "+a.non2xx+" · errores de conexión: "+a.errors+" · tiempos agotados: "+a.timeouts);
 }
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 function execFileSyncSeguro(comando, args){
 	try{
 		return execFileSync(comando, args, {encoding: "utf8"});

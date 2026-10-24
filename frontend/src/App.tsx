@@ -117,7 +117,6 @@ const COMPONENTES_RECURSO: Record<string, Omit<ResourceProps, "name">> = {
   },
 };
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Quita create y edit a los roles que solo consultan (tabla ESCRITURA de permisos.ts);
 // así react-admin no muestra el botón Crear ni abre el formulario de edición.
 const vistasDelRol = (nombre: string, rol: string) => {
@@ -127,7 +126,6 @@ const vistasDelRol = (nombre: string, rol: string) => {
     : resto;
 };
 
-// [IA+Humano] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // react-admin llama a getPermissions (el rol) y este render solo monta lo que ese rol puede ver:
 // sus <Resource> y sus páginas propias (CustomRoutes, como el pase de lista).
 export const App = () => (

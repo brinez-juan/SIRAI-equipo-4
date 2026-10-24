@@ -5,7 +5,6 @@ const {descifrar}=require("../cifrado");
 
 const router=express.Router();
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Mismos roles que la bandeja de seguimiento (issue 20): DOCENTE no ve notas ni seguimientos.
 // El token debe traer estancia: la estancia nunca sale del request.
 const acceso=[

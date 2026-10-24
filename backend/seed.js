@@ -40,13 +40,11 @@ const APELLIDOS=["Hernández", "García", "Martínez", "López", "González", "P
 	"Flores", "Gómez", "Morales", "Vázquez", "Jiménez", "Reyes", "Díaz", "Torres", "Gutiérrez", "Ruiz"];
 const NOMBRES_ADULTOS=["María", "José", "Guadalupe", "Juan", "Rosa", "Luis", "Carmen", "Jorge", "Ana", "Miguel"];
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Teléfono de 10 dígitos que empieza con 55, distinto para cada número n.
 function telefono(n){
 	return "55"+String(10000000+n*7919%90000000).padStart(8, "0");
 }
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Fecha de nacimiento entre 1 y 5 años antes de hoy, fija para cada i (la demo siempre se ve igual).
 function fechaNacimiento(i){
 	let fecha=new Date();

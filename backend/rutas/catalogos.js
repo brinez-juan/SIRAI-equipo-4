@@ -19,14 +19,13 @@ async function sinDependientes(id, dependientes, que){
 	return encontrados.length==0?null:"No se puede desactivar "+que+": todavía tiene "+encontrados.join(" y ")+". Muévalos a otra o desactívelos primero.";
 }
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Una estancia solo se activa si su región está activa; si no, quedaría viva dentro de una región que no aparece.
 async function regionActiva(estancia){
 	let [[region]]=await db.query("SELECT nombre, deleted_at FROM regiones WHERE id=?", [estancia.region_id]);
 	return region.deleted_at==null?null:"No se puede activar la estancia: su región ("+region.nombre+") está desactivada. Active primero la región.";
 }
 
-// [IA+Humano] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
+
 // Regiones y estancias: solo el administrador central las consulta y modifica.
 // Desactivar es el borrado lógico del CRUD; se rechaza mientras tengan estancias, infantes o usuarios activos,
 // para no dejar registros vivos apuntando a una región o estancia que ya no aparece. Son reactivables:

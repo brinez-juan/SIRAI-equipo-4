@@ -16,14 +16,12 @@ const SELECT_VINCULO="SELECT t.id, t.nombre, t.primer_apellido, t.segundo_apelli
 	+" FROM infante_tutor it JOIN tutores t ON t.id=it.tutor_id"
 	+" WHERE it.infante_id=? AND it.deleted_at IS NULL AND t.deleted_at IS NULL";
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // El infante debe ser de la estancia del token; si es de otra, se responde como si no existiera.
 async function infanteDeMiEstancia(req){
 	let [filas]=await db.query("SELECT id FROM infantes WHERE id=? AND estancia_id=? AND deleted_at IS NULL", [req.params.id, req.usuario.estancia_id]);
 	return filas.length>0;
 }
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Revisa el body de POST: tutor_id texto, parentesco del ENUM y autorizado_recoger booleano (opcional, false).
 function validarVinculo(cuerpo){
 	if(typeof cuerpo?.tutor_id!="string" || cuerpo.tutor_id==""){

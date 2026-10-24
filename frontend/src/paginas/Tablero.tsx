@@ -36,7 +36,6 @@ const SEMAFOROS: Record<
 
 const hoy = () => new Date().toLocaleDateString("en-CA", { timeZone: ZONA });
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Indicador con color y texto ("Verde – 93 %"): el color solo no basta para accesibilidad.
 // El porcentaje ya viene truncado a un decimal del backend; aquí no se redondea.
 const Semaforo = ({ fila }: { fila: Fila }) => {

@@ -33,7 +33,6 @@ type Destinatario = {
   telefono: string | null;
 };
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Texto de la bandeja para un reintento agendado (siguiente_intento_en de GET /seguimientos):
 // "Reintentar a las 13:40" si es hoy, o "Reintentar el 21/10 a las 13:40" si es otro día. En hora de México.
 export const textoReintento = (siguienteIntento: string | null | undefined) => {

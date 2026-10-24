@@ -5,7 +5,6 @@ const crypto=require("crypto");
 // timezone "Z": las fechas se guardan y se leen en UTC.
 const db=mysql.createPool({uri: process.env.DATABASE_URL, timezone: "Z"});
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // UUID v7: los primeros 48 bits son la hora, así los ids nuevos quedan ordenados en el índice.
 function uuidv7(){
 	let bytes=crypto.randomBytes(16);

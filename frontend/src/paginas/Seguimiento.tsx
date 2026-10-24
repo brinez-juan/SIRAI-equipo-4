@@ -72,7 +72,6 @@ export const RESULTADOS: Record<string, string> = {
   BUZON: "Buzón de voz",
 };
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Una sección del detalle: tarjeta con título (h2 para lectores de pantalla) y contenido.
 const Seccion = ({
   titulo,
@@ -91,7 +90,6 @@ const Seccion = ({
   </Card>
 );
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Renglón "Etiqueta: valor" para los datos sueltos.
 const Dato = ({
   etiqueta,
@@ -105,7 +103,6 @@ const Dato = ({
   </Typography>
 );
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // El teléfono como enlace tel:, para marcar directo desde un teléfono o softphone.
 const Telefono = ({ numero }: { numero: string | null }) =>
   numero ? (
@@ -346,7 +343,6 @@ const DetalleSeguimiento = () => {
   );
 };
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Abre el expediente imprimible del infante de este caso (issue 25). No aparece mientras llega el detalle.
 const BotonExpediente = () => {
   const caso = useRecordContext();
@@ -364,7 +360,6 @@ const BotonExpediente = () => {
   );
 };
 
-// [IA+Humano] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Detalle de un seguimiento (issue 21): datos, tutores, contactos, llamadas, clasificación, alta y cierre,
 // con los formularios de los issues 22, 23 y 24 mientras el caso no esté cerrado.
 export const Seguimiento = () => (

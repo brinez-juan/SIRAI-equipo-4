@@ -8,7 +8,6 @@ const PARENTESCOS=["MADRE", "PADRE", "ABUELO_A", "TIO_A", "HERMANO_A", "TUTOR_LE
 const MAX_PRIORIDAD=10;
 const COLUMNAS="id, infante_id, nombre, parentesco, telefono_cifrado, prioridad, created_at, updated_at";
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Solo DIRECTORA (ficha del infante). TRABAJO_SOCIAL y MEDICO ven estos contactos desde el seguimiento (issue 20).
 // El token debe traer estancia: la estancia nunca sale del request.
 const soloDirectora=[
@@ -16,26 +15,22 @@ const soloDirectora=[
 	(req, res, next)=>req.usuario.estancia_id==null?res.sendStatus(403):next()
 ];
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // El infante de la URL debe ser de la estancia del token; si es de otra se comporta como si no existiera (404).
 async function infanteDeMiEstancia(req){
 	let [filas]=await db.query("SELECT id FROM infantes WHERE id=? AND estancia_id=? AND deleted_at IS NULL", [req.params.id, req.usuario.estancia_id]);
 	return filas[0];
 }
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 async function buscarContacto(req){
 	let [filas]=await db.query("SELECT "+COLUMNAS+" FROM contactos_emergencia WHERE id=? AND infante_id=? AND deleted_at IS NULL", [req.params.contactoId, req.params.id]);
 	return filas[0];
 }
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Copia de la fila con el teléfono descifrado. La fila original (cifrada) es la que va a la bitácora.
 function paraRespuesta(fila){
 	return {...fila, telefono_cifrado: descifrar(fila.telefono_cifrado)};
 }
 
-// [IA] Codigo escrito con asistencia de Claude (prompt # en declaracion de IA).
 // Revisa el body antes de tocar la base. Al crear exige los cuatro campos; al editar solo revisa los que vengan.
 // Exigir tipo evita que un objeto o arreglo llegue a la consulta SQL. La prioridad va de 1 a MAX_PRIORIDAD:
 // los números negativos quedan reservados para los contactos borrados (ver borrar).
